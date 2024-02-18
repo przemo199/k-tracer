@@ -1,0 +1,86 @@
+package org.example.ktracer.primitives
+
+import org.example.ktracer.squared
+import kotlin.math.sqrt
+
+class Vector(x: Number = 0, y: Number = 0, z: Number = 0) : Tuple(x, y, z) {
+    val magnitude: Double
+        get() {
+            return sqrt(x.squared() + y.squared() + z.squared())
+        }
+
+    fun normalized(): Vector {
+        return magnitude.let { Vector(x / it, y / it, z / it) }
+    }
+
+    fun reflect(normal: Vector): Vector {
+        return this - (normal * 2.0 * (this dot normal))
+    }
+
+    operator fun plus(other: Vector): Vector {
+        return Vector(x + other.x, y + other.y, z + other.z)
+    }
+
+    operator fun minus(other: Vector): Vector {
+        return Vector(x - other.x, y - other.y, z - other.z)
+    }
+
+    operator fun times(other: Number): Vector {
+        return other.toDouble().let { Vector(x * it, y * it, z * it) }
+    }
+
+    operator fun div(other: Number): Vector {
+        return other.toDouble().let { Vector(x / it, y / it, z / it) }
+    }
+
+    operator fun unaryMinus(): Vector {
+        return Vector(-x, -y, -z)
+    }
+
+    infix fun dot(other: Vector): Double {
+        return x * other.x + y * other.y + z * other.z
+    }
+
+    infix fun cross(other: Vector): Vector {
+        return Vector(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x,
+        )
+    }
+
+    fun copy(x: Double = this.x, y: Double = this.y, z: Double = this.z): Vector {
+        return Vector(x, y, z)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is Vector && super.equals(other)
+    }
+
+    override fun toString(): String {
+        return "Vector(x=$x, y=$y, z=$z)"
+    }
+
+    companion object {
+        @JvmStatic
+        val ZERO: Vector = Vector()
+
+        @JvmStatic
+        val UP: Vector = Vector(0, 1, 0)
+
+        @JvmStatic
+        val DOWN: Vector = Vector(0, -1, 0)
+
+        @JvmStatic
+        val RIGHT: Vector = Vector(1, 0, 0)
+
+        @JvmStatic
+        val LEFT: Vector = Vector(-1, 0, 0)
+
+        @JvmStatic
+        val FORWARD: Vector = Vector(0, 0, 1)
+
+        @JvmStatic
+        val BACKWARD: Vector = Vector(0, 0, -1)
+    }
+}
