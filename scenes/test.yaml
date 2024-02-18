@@ -1,0 +1,68 @@
+- add: camera
+  width: 3840
+  height: 2560
+  field-of-view: 0.9
+  from: [ 0, 1.5, -5 ]
+  to: [ 0, 1, 0 ]
+  up: [ 0, 1, 0 ]
+
+- add: light
+  at: [ -10, 10, -10 ]
+  intensity: [ 1, 1, 1 ]
+
+# floor
+- add: plane
+  transform:
+    - [ rotate-y, 0.785 ]
+    - [ scale, 0.4, 0.4, 0.4 ]
+  material:
+    pattern:
+      type: checkers
+      colors:
+        - [ 1, 1, 1 ]
+        - [ 0, 0, 0 ]
+    color: [ 1, 0.9,  0.9 ]
+    specular: 0
+    reflective: 0.3
+
+# backdrop
+- add: plane
+  transform:
+    - [ rotate-x, 1.57 ]
+    - [ translate, 0, 0, 5 ]
+  material:
+    color: [ 1, 0.9, 0.9 ]
+    specular: 0
+
+- add: cylinder
+  transform:
+    - [ translate, -0.5, 1.0, 0.5 ]
+  material:
+    color: [ 0.1, 0.4, 0.9 ]
+    diffuse: 0.7
+    specular: 0.3
+    reflective: 0.8
+  min: -1
+  max: 0
+  closed: true
+
+- add: cone
+  transform:
+    - [ scale, 0.5, 0.5, 0.5 ]
+    - [ translate, 1.5, 0.0, -0.5 ]
+  material:
+    color: [ 0.5, 1, 0.1 ]
+    diffuse: 0.7
+    specular: 0.3
+  min: -1
+  max: 1.5
+  closed: true
+
+- add: cube
+  transform:
+    - [ scale, 0.33, 0.33, 0.33 ]
+    - [ translate, -1.5, 0.33, -0.75 ]
+  material:
+    color: [ 1, 0.8, 0.1 ]
+    diffuse: 0.7
+    specular: 0.3
