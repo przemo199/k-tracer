@@ -1,4 +1,4 @@
-# ktracer
+# k-tracer
 
 [![Tests](https://github.com/przemo199/k-tracer/actions/workflows/tests.yaml/badge.svg)](https://github.com/przemo199/k-tracer/actions/workflows/tests.yaml)
 
