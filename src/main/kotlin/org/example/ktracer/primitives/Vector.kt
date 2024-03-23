@@ -57,6 +57,10 @@ class Vector(x: Number = 0, y: Number = 0, z: Number = 0) : Tuple(x, y, z) {
         return other is Vector && super.equals(other)
     }
 
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+
     override fun toString(): String {
         return "Vector(x=$x, y=$y, z=$z)"
     }

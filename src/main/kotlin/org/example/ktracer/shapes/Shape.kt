@@ -1,5 +1,6 @@
 package org.example.ktracer.shapes
 
+import java.util.Objects
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.Ray
@@ -72,6 +73,10 @@ abstract class Shape {
             material == other.material &&
             transformationInverse == other.transformationInverse &&
             parent == other.parent
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(material, transformationInverse, parent)
     }
 
     abstract override fun toString(): String

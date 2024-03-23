@@ -1,5 +1,6 @@
 package org.example.ktracer.shapes
 
+import java.util.Objects
 import kotlin.math.absoluteValue
 import kotlin.math.sqrt
 import org.example.ktracer.EPSILON
@@ -113,6 +114,10 @@ class Cone(
             closed == other.closed &&
             min coarseEquals other.min &&
             max coarseEquals other.max
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), closed, min, max)
     }
 
     override fun toString(): String {

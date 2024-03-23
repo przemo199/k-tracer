@@ -1,5 +1,6 @@
 package org.example.ktracer.shapes
 
+import java.util.Objects
 import org.example.ktracer.composites.Intersection
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
@@ -35,6 +36,10 @@ class Sphere(
 
     override fun equals(other: Any?): Boolean {
         return other is Sphere && super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode()
     }
 
     override fun toString(): String {

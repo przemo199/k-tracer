@@ -5,7 +5,9 @@ import com.sksamuel.scrimage.color.RGBColor
 import com.sksamuel.scrimage.nio.PngWriter
 import org.example.ktracer.primitives.Color
 import java.awt.image.BufferedImage
+import java.io.IOException
 import java.util.stream.StreamSupport
+import kotlin.jvm.Throws
 
 class Canvas(val width: Int, val height: Int) {
     private val pixels: Array<Color> = List(width * height) { Color.BLACK }.toTypedArray()
@@ -35,6 +37,7 @@ class Canvas(val width: Int, val height: Int) {
         return pixels.iterator()
     }
 
+    @Throws(IOException::class)
     fun saveAsPng(path: String) {
         val image = ImmutableImage.create(width, height, BufferedImage.TYPE_INT_RGB).blank()
         StreamSupport.stream(pixels.withIndex().spliterator(), true).forEach { (index, color) ->

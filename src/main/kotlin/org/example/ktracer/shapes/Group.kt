@@ -1,5 +1,6 @@
 package org.example.ktracer.shapes
 
+import java.util.Objects
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.Ray
@@ -88,6 +89,10 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
         return other is Group &&
             super.equals(other) &&
             children == other.children
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), children)
     }
 
     override fun toString(): String {

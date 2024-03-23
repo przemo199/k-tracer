@@ -41,6 +41,10 @@ class Plane(
             super.equals(other)
     }
 
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+
     override fun toString(): String {
         return "Plane(material=$material, transformation=$transformation)"
     }

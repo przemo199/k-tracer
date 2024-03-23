@@ -1,5 +1,6 @@
 package org.example.ktracer.shapes
 
+import java.util.Objects
 import kotlin.math.absoluteValue
 import org.example.ktracer.MAX
 import org.example.ktracer.MIN
@@ -127,6 +128,10 @@ class BoundingBox(
         return other is BoundingBox &&
             min == other.min &&
             max == other.max
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), min, max)
     }
 
     override fun toString(): String {

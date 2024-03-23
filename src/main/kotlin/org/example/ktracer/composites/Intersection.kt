@@ -1,5 +1,6 @@
 package org.example.ktracer.composites
 
+import java.util.Objects
 import org.example.ktracer.coarseEquals
 import org.example.ktracer.shapes.Shape
 
@@ -59,6 +60,10 @@ class Intersection(distance: Number, val shape: Shape) {
         return other is Intersection &&
             distance coarseEquals other.distance &&
             shape == other.shape
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), distance, shape)
     }
 
     override fun toString(): String {

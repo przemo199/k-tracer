@@ -49,6 +49,10 @@ class Cube(material: Material = Material(), transformation: Transformation = Tra
             super.equals(other)
     }
 
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+
     override fun toString(): String {
         return "Cube(material=$material, transformation=$transformation)"
     }

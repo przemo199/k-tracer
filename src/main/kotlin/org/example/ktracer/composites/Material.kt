@@ -1,5 +1,6 @@
 package org.example.ktracer.composites
 
+import java.util.Objects
 import org.example.ktracer.coarseEquals
 import org.example.ktracer.patterns.Pattern
 import org.example.ktracer.primitives.Color
@@ -104,6 +105,19 @@ class Material(
             reflectiveness coarseEquals other.reflectiveness &&
             refractiveIndex coarseEquals other.refractiveIndex &&
             transparency coarseEquals other.transparency
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(
+            color,
+            ambient,
+            diffuse,
+            specular,
+            shininess,
+            reflectiveness,
+            refractiveIndex,
+            transparency
+        )
     }
 
     override fun toString(): String {

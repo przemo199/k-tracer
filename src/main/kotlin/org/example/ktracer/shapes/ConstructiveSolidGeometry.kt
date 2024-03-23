@@ -1,5 +1,6 @@
 package org.example.ktracer.shapes
 
+import java.util.Objects
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.Ray
@@ -88,6 +89,10 @@ class ConstructiveSolidGeometry(
             super.equals(other) &&
             left == other.left &&
             right == other.right
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), left, right)
     }
 
     override fun toString(): String {

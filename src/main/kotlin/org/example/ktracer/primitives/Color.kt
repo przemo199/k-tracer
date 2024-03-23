@@ -31,6 +31,10 @@ class Color(red: Number = 0, green: Number = 0, blue: Number = 0) : Tuple(red, g
         return other is Color && super.equals(other)
     }
 
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+
     override fun toString(): String {
         return "Color(red=$x, green=$y, blue=$z)"
     }

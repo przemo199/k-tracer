@@ -1,5 +1,6 @@
 package org.example.ktracer.shapes
 
+import java.util.Objects
 import org.example.ktracer.EPSILON
 import org.example.ktracer.composites.Intersection
 import org.example.ktracer.composites.Intersections
@@ -64,6 +65,10 @@ class Triangle(
             edge1 == other.edge1 &&
             edge2 == other.edge2 &&
             normal == other.normal
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), vertex1, vertex2, vertex3, edge1, edge2)
     }
 
     override fun toString(): String {

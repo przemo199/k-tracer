@@ -1,5 +1,6 @@
 package org.example.ktracer.shapes
 
+import java.util.Objects
 import org.example.ktracer.EPSILON
 import org.example.ktracer.coarseEquals
 import org.example.ktracer.composites.Intersection
@@ -99,6 +100,10 @@ class Cylinder(
             closed == other.closed &&
             min coarseEquals other.min &&
             max coarseEquals other.max
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), closed, min, max)
     }
 
     override fun toString(): String {
