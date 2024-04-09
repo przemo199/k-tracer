@@ -69,27 +69,25 @@ class Camera {
 
     fun render(world: World, parallel: Boolean = false): Canvas {
         val canvas = Canvas(horizontalSize, verticalSize)
-        val coordinateStream = canvas.coordinateStream().wrapInProgressBar()
+        val coordinateStream = IntStream.range(0, canvas.size).wrapInProgressBar()
+
+        val renderPixel = { index: Int ->
+            val x = index % canvas.width
+            val y = index / canvas.width
+            val ray = rayForPixel(x, y)
+            canvas[index] = world.colorAt(ray)
+        }
 
         if (parallel) {
             createForkJoinPool().use {
                 it.submit {
-                    IntStream.range(0, canvas.size)
+                    coordinateStream
                         .parallel()
-                        .wrapInProgressBar()
-                        .forEach { index ->
-                            val x = index % canvas.width
-                            val y = index / canvas.width
-                            val ray = rayForPixel(x, y)
-                            canvas[index] = world.colorAt(ray)
-                        }
+                        .forEach(renderPixel)
                 }.get()
             }
         } else {
-            coordinateStream.forEach { (x, y) ->
-                val ray = rayForPixel(x, y)
-                canvas[x, y] = world.colorAt(ray)
-            }
+            coordinateStream.forEach(renderPixel)
         }
 
         return canvas
