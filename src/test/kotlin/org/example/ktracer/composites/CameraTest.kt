@@ -53,7 +53,7 @@ class CameraTest {
     @Test
     fun `ray through canvas with transformed camera`() {
         val camera = Camera(201, 101, PI / 2.0)
-        camera.transformation= Transformations.rotationY(PI / 4.0) * Transformations.translation(0, -2, 5)
+        camera.transformation = Transformations.rotationY(PI / 4.0) * Transformations.translation(0, -2, 5)
         val ray = camera.rayForPixel(100, 50)
         assertEquals(Point(0, 2, -5), ray.origin)
         assertEquals(Vector(sqrt(2.0) / 2.0, 0, -sqrt(2.0) / 2.0), ray.direction)

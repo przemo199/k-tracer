@@ -1,6 +1,5 @@
 package org.example.ktracer.shapes
 
-import java.util.Objects
 import org.example.ktracer.composites.Intersection
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
@@ -24,10 +23,9 @@ class Sphere(
         val b = 2.0 * (ray.direction dot sphereToRayDistance)
         val c = (sphereToRayDistance dot sphereToRayDistance) - 1.0
 
-        solveQuadratic(a, b, c)?.let {
-            return Intersections(Intersection(it.first, this), Intersection(it.second, this))
+        return solveQuadratic(a, b, c)?.let {
+            Intersections(Intersection(it.first, this), Intersection(it.second, this))
         }
-        return null
     }
 
     override fun boundingBox(): BoundingBox {

@@ -72,6 +72,13 @@ class Triangle(
     }
 
     override fun toString(): String {
-        return "Triangle(material=$material, transformation=$transformation, vertex1=$vertex1, vertex2=$vertex2, vertex3=$vertex3, edge1=$edge1, edge2=$edge2, normal=$normal)"
+        return "Triangle(material=$material, " +
+                "transformation=$transformation, " +
+                "vertex1=$vertex1, " +
+                "vertex2=$vertex2, " +
+                "vertex3=$vertex3, " +
+                "edge1=$edge1, " +
+                "edge2=$edge2, " +
+                "normal=$normal)"
     }
 }

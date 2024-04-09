@@ -64,11 +64,11 @@ class Material(
         val lightDotNormal = (lightVector dot normal)
         if (lightDotNormal < 0.0) {
             diffuse = Color.BLACK
-            specular = diffuse
+            specular = Color.BLACK
         } else {
             diffuse = effectiveColor * this.diffuse * lightDotNormal
             val reflectionVector = -(lightVector).reflect(normal)
-            val reflectDotCamera = (reflectionVector dot cameraVector)
+            val reflectDotCamera = reflectionVector dot cameraVector
 
             specular = if (reflectDotCamera <= 0.0) {
                 Color.BLACK
@@ -121,17 +121,20 @@ class Material(
     }
 
     override fun toString(): String {
-        return "Material(color=$color, ambient=$ambient, diffuse=$diffuse, specular=$specular, " +
-            "shininess=$shininess, reflectiveness=$reflectiveness, refractiveIndex=$refractiveIndex, " +
-            "transparency=$transparency, castsShadow=$castsShadow)"
+        return "Material(color=$color, " +
+                "ambient=$ambient, " +
+                "diffuse=$diffuse, " +
+                "specular=$specular, " +
+                "shininess=$shininess, " +
+                "reflectiveness=$reflectiveness, " +
+                "refractiveIndex=$refractiveIndex, " +
+                "transparency=$transparency, " +
+                "castsShadow=$castsShadow)"
     }
 
     companion object {
         @JvmStatic
         val GLASS
-            get() = Material().apply {
-                transparency = 1.0
-                refractiveIndex = 1.5
-            }
+            get() = Material(transparency = 1.0, refractiveIndex = 1.5)
     }
 }

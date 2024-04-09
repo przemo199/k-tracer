@@ -3,7 +3,7 @@ package org.example.ktracer.primitives
 import org.example.ktracer.squared
 import kotlin.math.sqrt
 
-class Vector(x: Number = 0, y: Number = 0, z: Number = 0) : Tuple(x, y, z) {
+class Vector(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z) {
     val magnitude: Double
         get() {
             return sqrt(x.squared() + y.squared() + z.squared())
@@ -38,14 +38,14 @@ class Vector(x: Number = 0, y: Number = 0, z: Number = 0) : Tuple(x, y, z) {
     }
 
     infix fun dot(other: Vector): Double {
-        return x * other.x + y * other.y + z * other.z
+        return (x * other.x) + (y * other.y) + (z * other.z)
     }
 
     infix fun cross(other: Vector): Vector {
         return Vector(
-            y * other.z - z * other.y,
-            z * other.x - x * other.z,
-            x * other.y - y * other.x,
+            (y * other.z) - (z * other.y),
+            (z * other.x) - (x * other.z),
+            (x * other.y) - (y * other.x)
         )
     }
 

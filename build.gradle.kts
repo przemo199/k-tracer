@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.0.0-Beta5"
+    kotlin("jvm") version "2.0.0-RC1"
     application
 }
 
@@ -26,7 +26,6 @@ val junitVersion = "5.10.1"
 
 dependencies {
     testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
     implementation("com.sksamuel.scrimage:scrimage-core:4.1.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.3")
@@ -36,7 +35,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("org.example.ktracer.MainKt")
+    mainClass.set("org.example.ktracer.KTracerKt")
 }
 
 tasks {

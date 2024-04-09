@@ -18,11 +18,11 @@ class Cube(material: Material = Material(), transformation: Transformation = Tra
         val maxValue = listOf(point.x.absoluteValue, point.y.absoluteValue, point.z.absoluteValue).max()
 
         if (maxValue == point.x.absoluteValue) {
-            return Vector(point.x, 0, 0)
+            return Vector(x = point.x)
         } else if (maxValue == point.y.absoluteValue) {
-            return Vector(0, point.y, 0)
+            return Vector(y = point.y)
         }
-        return Vector(0, 0, point.z)
+        return Vector(z = point.z)
     }
 
     override fun localIntersect(ray: Ray): Intersections? {

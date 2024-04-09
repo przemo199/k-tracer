@@ -53,7 +53,7 @@ class Cylinder(
             return Vector.DOWN
         }
 
-        return Vector(point.x, 0, point.z)
+        return Vector(x = point.x, z = point.z)
     }
 
     override fun localIntersect(ray: Ray): Intersections? {

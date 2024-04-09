@@ -17,13 +17,13 @@ class Matrix(val elements: DoubleArray) {
         }
     }
 
-    constructor(elements: Iterable<Number>) : this(elements.map { it.toDouble() }.toDoubleArray())
+    constructor(elements: Iterable<Number>) : this(elements.map(Number::toDouble).toDoubleArray())
 
     fun transpose(): Matrix {
         val result = elements.toMutableList()
         for (row in 0..<SIDE_LENGTH) {
-            for (col in row..<SIDE_LENGTH) {
-                Collections.swap(result, rowColToIndex(row, col), rowColToIndex(col, row))
+            for (column in row..<SIDE_LENGTH) {
+                Collections.swap(result, rowColToIndex(row, column), rowColToIndex(column, row))
             }
         }
         return Matrix(result)
@@ -131,12 +131,12 @@ class Matrix(val elements: DoubleArray) {
     operator fun times(other: Matrix): Matrix {
         val result = MutableList(INDICES) { 0.0 }
         for (row in 0..<SIDE_LENGTH) {
-            for (col in 0..<SIDE_LENGTH) {
+            for (column in 0..<SIDE_LENGTH) {
                 var sum = 0.0
                 for (index in 0..<SIDE_LENGTH) {
-                    sum += this[row, index] * other[index, col]
+                    sum += this[row, index] * other[index, column]
                 }
-                result[rowColToIndex(row, col)] = sum
+                result[rowColToIndex(row, column)] = sum
             }
         }
         return Matrix(result.toList())

@@ -9,4 +9,8 @@ data class CheckerPattern(val colorA: Color, val colorB: Color) : Pattern() {
         val distance = floor(point.x) + floor(point.y) + floor(point.z)
         return if (distance.toInt() % 2 == 0) colorA else colorB
     }
+
+    override fun toString(): String {
+        return "CheckerPattern(colorA=${colorA}, colorB=${colorB})"
+    }
 }

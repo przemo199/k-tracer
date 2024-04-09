@@ -11,4 +11,8 @@ data class RingPattern(val colorA: Color, val colorB: Color) : Pattern() {
         val distance = (point.x.squared() + point.z.squared()).run(::sqrt).run(::floor)
         return if (distance % 2.0 == 0.0) colorA else colorB
     }
+
+    override fun toString(): String {
+        return "RingPattern(colorA=${colorA}, colorB=${colorB})"
+    }
 }

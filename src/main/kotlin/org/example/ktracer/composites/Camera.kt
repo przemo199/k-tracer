@@ -1,11 +1,14 @@
 package org.example.ktracer.composites
 
 import dev.reimer.progressbar.ktx.progressBar
+import java.util.concurrent.ForkJoinPool
+import java.util.stream.BaseStream
+import java.util.stream.IntStream
 import me.tongfei.progressbar.ProgressBarStyle
 import org.example.ktracer.primitives.Point
-import java.util.stream.IntStream
 import java.util.stream.Stream
 import kotlin.math.tan
+import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Transformation
 
 class Camera {
@@ -59,16 +62,36 @@ class Camera {
         return Ray(origin, direction)
     }
 
+    fun renderPixel(world: World, x: Int, y: Int): Color {
+        val ray = rayForPixel(x, y)
+        return world.colorAt(ray)
+    }
+
     fun render(world: World, parallel: Boolean = false): Canvas {
         val canvas = Canvas(horizontalSize, verticalSize)
-        IntStream.range(0, canvas.size).run {
-            if (parallel) this.parallel() else this
-        }.wrapInProgressBar().forEach { index ->
-            val x = index % canvas.width
-            val y = index / canvas.width
-            val ray = rayForPixel(x, y)
-            canvas[index] = world.colorAt(ray)
+        val coordinateStream = canvas.coordinateStream().wrapInProgressBar()
+
+        if (parallel) {
+            createForkJoinPool().use {
+                it.submit {
+                    IntStream.range(0, canvas.size)
+                        .parallel()
+                        .wrapInProgressBar()
+                        .forEach { index ->
+                            val x = index % canvas.width
+                            val y = index / canvas.width
+                            val ray = rayForPixel(x, y)
+                            canvas[index] = world.colorAt(ray)
+                        }
+                }.get()
+            }
+        } else {
+            coordinateStream.forEach { (x, y) ->
+                val ray = rayForPixel(x, y)
+                canvas[x, y] = world.colorAt(ray)
+            }
         }
+
         return canvas
     }
 
@@ -77,17 +100,28 @@ class Camera {
     }
 
     override fun toString(): String {
-        return "Camera(horizontalSize=$horizontalSize, verticalSize=$verticalSize, fieldOfView=$fieldOfView, halfWidth=$halfWidth, halfHeight=$halfHeight, pixelSize=$pixelSize, transformation=$transformation)"
+        return "Camera(" +
+                "horizontalSize=$horizontalSize, " +
+                "verticalSize=$verticalSize, " +
+                "fieldOfView=$fieldOfView, " +
+                "halfWidth=$halfWidth, " +
+                "halfHeight=$halfHeight, " +
+                "pixelSize=$pixelSize, " +
+                "transformation=$transformation" +
+                ")"
     }
 
     companion object {
         @JvmStatic
-        fun IntStream.wrapInProgressBar(): Stream<Int> {
+        fun <T, S : BaseStream<T, S>> S.wrapInProgressBar(): Stream<T> {
             return this.progressBar {
                 unitSize = 1
                 style = ProgressBarStyle.ASCII
                 updateIntervalMillis = 50
             }
         }
+
+        @JvmStatic
+        private fun createForkJoinPool() = ForkJoinPool(Runtime.getRuntime().availableProcessors())
     }
 }

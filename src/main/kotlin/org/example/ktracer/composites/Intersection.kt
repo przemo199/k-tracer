@@ -63,7 +63,7 @@ class Intersection(distance: Number, val shape: Shape) {
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), distance, shape)
+        return Objects.hash(distance, shape)
     }
 
     override fun toString(): String {

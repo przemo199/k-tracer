@@ -6,17 +6,16 @@ class Intersections(vararg intersection: Intersection) : ArrayList<Intersection>
     fun hit(): Intersection? {
         var maybeHit: Intersection? = null
         var hitDistance = MAX
-        for (intersection in this) {
-            if (intersection.isWithinDistance(hitDistance)) {
-                maybeHit = intersection
-                hitDistance = intersection.distance
+        this.forEach {
+            if (it.isWithinDistance(hitDistance)) {
+                maybeHit = it
+                hitDistance = it.distance
             }
         }
         return maybeHit
     }
 
     fun sortByDistance() {
-        listOf(1).size
         sortBy { it.distance }
     }
 }

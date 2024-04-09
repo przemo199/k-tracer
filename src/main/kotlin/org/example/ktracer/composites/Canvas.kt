@@ -6,15 +6,20 @@ import com.sksamuel.scrimage.nio.PngWriter
 import org.example.ktracer.primitives.Color
 import java.awt.image.BufferedImage
 import java.io.IOException
-import java.util.stream.StreamSupport
+import java.util.stream.IntStream
+import java.util.stream.Stream
 import kotlin.jvm.Throws
 
 class Canvas(val width: Int, val height: Int) {
-    private val pixels: Array<Color> = List(width * height) { Color.BLACK }.toTypedArray()
+    private val pixels: Array<Color> = Array(width * height) { Color.BLACK }
     val size get() = pixels.size
 
-    private fun coordinatesToIndex(x: Int, y: Int): Int {
-        return (x * width) + y
+    private fun coordinatesToIndex(x: Int, y: Int) = (y * width) + x
+
+    private fun indexToCoordinates(index: Int) = Pair(index % width, index / width)
+
+    fun coordinateStream(): Stream<Pair<Int, Int>> {
+        return IntStream.range(0, size).mapToObj(::indexToCoordinates)
     }
 
     operator fun get(index: Int): Color {
@@ -40,9 +45,7 @@ class Canvas(val width: Int, val height: Int) {
     @Throws(IOException::class)
     fun saveAsPng(path: String) {
         val image = ImmutableImage.create(width, height, BufferedImage.TYPE_INT_RGB).blank()
-        StreamSupport.stream(pixels.withIndex().spliterator(), true).forEach { (index, color) ->
-            image.setColor(index, clipColor(color))
-        }
+        pixels.asSequence().map(::clipColor).withIndex().forEach { (index, color) -> image.setColor(index, color) }
         image.forWriter(PngWriter().withMaxCompression()).write(path)
     }
 

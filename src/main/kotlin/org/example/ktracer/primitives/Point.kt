@@ -1,6 +1,6 @@
 package org.example.ktracer.primitives
 
-class Point(x: Number = 0, y: Number = 0, z: Number = 0) : Tuple(x, y, z) {
+class Point(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z) {
     operator fun plus(other: Vector): Point {
         return Point(x + other.x, y + other.y, z + other.z)
     }
@@ -14,15 +14,11 @@ class Point(x: Number = 0, y: Number = 0, z: Number = 0) : Tuple(x, y, z) {
     }
 
     operator fun times(other: Number): Point {
-        other.toDouble().also {
-            return Point(x * it, y * it, z * it)
-        }
+        return other.toDouble().let { Point(x * it, y * it, z * it) }
     }
 
     operator fun div(other: Number): Point {
-        other.toDouble().also {
-            return Point(x / it, y / it, z / it)
-        }
+        return other.toDouble().let { Point(x / it, y / it, z / it) }
     }
 
     operator fun unaryMinus(): Point {
