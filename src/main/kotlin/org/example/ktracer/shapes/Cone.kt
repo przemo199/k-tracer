@@ -34,12 +34,12 @@ class Cone(
 
         val distance1 = (min - ray.origin.y) / ray.direction.y
         if (checkCaps(ray, distance1, min)) {
-            intersections.add(Intersection(distance1, this))
+            intersections += Intersection(distance1, this)
         }
 
         val distance2 = (max - ray.origin.y) / ray.direction.y
         if (checkCaps(ray, distance2, max)) {
-            intersections.add(Intersection(distance2, this))
+            intersections += Intersection(distance2, this)
         }
     }
 
@@ -62,7 +62,7 @@ class Cone(
         return Vector(point.x, y, point.z)
     }
 
-    override fun localIntersect(ray: Ray): Intersections? {
+    override fun localIntersect(ray: Ray, intersections: Intersections) {
         val a = ray.direction.x.squared() - ray.direction.y.squared() + ray.direction.z.squared()
         val b = 2.0 * (
             (ray.origin.x * ray.direction.x) -
@@ -71,10 +71,9 @@ class Cone(
         )
         val c = ray.origin.x.squared() - ray.origin.y.squared() + ray.origin.z.squared()
 
-        val intersections = Intersections()
         if (a.absoluteValue < EPSILON && b.absoluteValue > EPSILON) {
             val distance = -c / (2.0 * b)
-            intersections.add(Intersection(distance, this))
+            intersections += Intersection(distance, this)
         } else {
             solveQuadratic(a, b, c)?.let {
                 var distance1 = it.first
@@ -86,18 +85,17 @@ class Cone(
 
                 val y1 = ray.origin.y + ray.direction.y * distance1
                 if (min < y1 && y1 < max) {
-                    intersections.add(Intersection(distance1, this))
+                    intersections += Intersection(distance1, this)
                 }
 
                 val y2 = ray.origin.y + ray.direction.y * distance2
                 if (min < y2 && y2 < max) {
-                    intersections.add(Intersection(distance2, this))
+                    intersections += Intersection(distance2, this)
                 }
             }
         }
 
         intersectCaps(ray, intersections)
-        return intersections.ifEmpty { null }
     }
 
     override fun boundingBox(): BoundingBox {

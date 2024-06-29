@@ -10,6 +10,7 @@ import kotlin.math.sqrt
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.example.ktracer.composites.Intersections
 
 class GroupTest {
     @Test
@@ -33,7 +34,9 @@ class GroupTest {
     fun `intersecting ray with an empty group`() {
         val group = Group()
         val ray = Ray(Point(0, 0, 0), Vector.FORWARD)
-        assertTrue(ray.intersect(group).isNullOrEmpty())
+        val intersections = Intersections()
+        ray.intersect(group, intersections)
+        assertTrue(intersections.isEmpty())
     }
 
     @Test
@@ -48,7 +51,8 @@ class GroupTest {
         group.add(sphere2)
         group.add(sphere3)
         val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
-        val intersections = ray.intersect(group)!!
+        val intersections = Intersections()
+        ray.intersect(group, intersections)
         assertEquals(4, intersections.size)
         assertEquals(sphere2, intersections[0].shape)
         assertEquals(sphere2, intersections[1].shape)
@@ -64,7 +68,9 @@ class GroupTest {
         sphere.transformation = Transformations.translation(5, 0, 0)
         group.add(sphere)
         val ray = Ray(Point(10, 0, -10), Vector.FORWARD)
-        assertEquals(2, ray.intersect(group)!!.size)
+        val intersections = Intersections()
+        ray.intersect(group, intersections)
+        assertEquals(2, intersections.size)
     }
 
     @Test

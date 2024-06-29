@@ -4,10 +4,10 @@ import java.util.stream.Stream
 import kotlin.math.sqrt
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import org.example.ktracer.MAX
 import org.example.ktracer.MIN
+import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Ray
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Vector
@@ -30,7 +30,8 @@ class ConeTest {
     fun `intersecting ray with cone`(origin: Point, direction: Vector, distance1: Double, distance2: Double) {
         val cone = Cone()
         val ray = Ray(origin, direction.normalized())
-        val intersections = cone.localIntersect(ray)!!
+        val intersections = Intersections()
+        cone.localIntersect(ray, intersections)
         assertEquals(2, intersections.size)
         assertEquals(distance1, intersections[0].distance)
         assertEquals(distance2, intersections[1].distance)
@@ -40,7 +41,8 @@ class ConeTest {
     fun `intersecting ray with cone parallel to one of cone halves`() {
         val cone = Cone()
         val ray = Ray(Point(0, 0, -1), Vector(0, 1, 1).normalized())
-        val intersections = cone.localIntersect(ray)!!
+        val intersections = Intersections()
+        cone.localIntersect(ray, intersections)
         assertEquals(1, intersections.size)
         assertEquals(0.3535533905932738, intersections[0].distance)
     }
@@ -50,12 +52,9 @@ class ConeTest {
     fun `intersecting ray with cone caps`(origin: Point, direction: Vector, count: Int) {
         val cone = Cone(-0.5, 0.5, true)
         val ray = Ray(origin, direction.normalized())
-        val intersections = cone.localIntersect(ray)
-        if (count > 0) {
-            assertEquals(count, intersections!!.size)
-        } else {
-            assertNull(intersections)
-        }
+        val intersections = Intersections()
+        cone.localIntersect(ray, intersections)
+        assertEquals(count, intersections.size)
     }
 
     @ParameterizedTest

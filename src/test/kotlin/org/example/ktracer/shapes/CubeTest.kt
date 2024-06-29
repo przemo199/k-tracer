@@ -10,7 +10,8 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import org.example.ktracer.composites.Intersections
 
 class CubeTest {
     @ParameterizedTest
@@ -18,7 +19,8 @@ class CubeTest {
     fun `ray intersects cube`(origin: Point, direction: Vector, distance1: Double, distance2: Double) {
         val cube = Cube()
         val ray = Ray(origin, direction)
-        val intersections = cube.localIntersect(ray)!!
+        val intersections = Intersections()
+        cube.localIntersect(ray, intersections)
         assertEquals(2, intersections.size)
         assertEquals(distance1, intersections[0].distance)
         assertEquals(distance2, intersections[1].distance)
@@ -29,8 +31,9 @@ class CubeTest {
     fun `ray misses cube`(origin: Point, direction: Vector) {
         val cube = Cube()
         val ray = Ray(origin, direction)
-        val intersections = cube.localIntersect(ray)
-        assertNull(intersections)
+        val intersections = Intersections()
+        cube.localIntersect(ray, intersections)
+        assertTrue(intersections.isEmpty())
     }
 
     @ParameterizedTest

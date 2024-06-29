@@ -29,7 +29,7 @@ class ConstructiveSolidGeometry(
             val leftHit = left in it.shape
 
             if (intersectionAllowed(operand, leftHit, inLeft, inRight)) {
-                result.add(it)
+                result += it
             }
 
             if (leftHit) inLeft = !inLeft else inRight = !inRight
@@ -41,31 +41,21 @@ class ConstructiveSolidGeometry(
         throw UnsupportedOperationException()
     }
 
-    override fun localIntersect(ray: Ray): Intersections? {
+    override fun localIntersect(ray: Ray, intersections: Intersections) {
         if (!boundingBox().intersects(ray)) {
-            return null
+            return
         }
 
-        val leftIntersections = ray.intersect(left)
-        val rightIntersections = ray.intersect(right)
-        if (leftIntersections == null && rightIntersections == null) {
-            return null
+        val localIntersections = Intersections()
+        ray.intersect(left, localIntersections)
+        ray.intersect(right, localIntersections)
+
+        if (localIntersections.isEmpty()) {
+            return
         }
 
-        val intersections = Intersections()
-        leftIntersections?.let {
-            intersections.addAll(it)
-        }
-        rightIntersections?.let {
-            intersections.addAll(it)
-        }
-
-        if (intersections.isEmpty()) {
-            return null
-        }
-
-        intersections.sortByDistance()
-        return filterIntersections(intersections).ifEmpty { null }
+        localIntersections.sortByDistance()
+        intersections += filterIntersections(localIntersections)
     }
 
     override fun contains(other: Shape): Boolean {

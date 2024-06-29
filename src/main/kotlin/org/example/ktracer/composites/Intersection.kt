@@ -27,10 +27,10 @@ class Intersection(distance: Number, val shape: Shape) {
                 refractiveIndex1 = if (containers.isEmpty()) 1.0 else containers.last().material.refractiveIndex
             }
 
-            if (containers.contains(intersection.shape)) {
-                containers.remove(intersection.shape)
+            if (intersection.shape in containers) {
+                containers -= intersection.shape
             } else {
-                containers.add(intersection.shape)
+                containers += intersection.shape
             }
 
             if (intersection == this) {

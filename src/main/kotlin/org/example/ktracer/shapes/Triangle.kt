@@ -26,26 +26,26 @@ class Triangle(
         return normal
     }
 
-    override fun localIntersect(ray: Ray): Intersections? {
+    override fun localIntersect(ray: Ray, intersections: Intersections) {
         val directionCrossEdge2 = ray.direction cross edge2
         val determinant = edge1 dot directionCrossEdge2
         if (determinant.absoluteValue < EPSILON) {
-            return null
+            return
         }
 
         val determinantInverse = 1.0 / determinant
         val vertexToOrigin = ray.origin - vertex1
         val u = determinantInverse * (vertexToOrigin dot directionCrossEdge2)
         if (u !in 0.0..1.0) {
-            return null
+            return
         }
         val originCrossEdge1 = vertexToOrigin cross edge1
         val v = determinantInverse * (ray.direction dot originCrossEdge1)
         if (v < 0.0 || u + v > 1.0) {
-            return null
+            return
         }
         val distance = determinantInverse * (edge2 dot originCrossEdge1)
-        return Intersections(Intersection(distance, this))
+        intersections += Intersection(distance, this)
     }
 
     override fun boundingBox(): BoundingBox {

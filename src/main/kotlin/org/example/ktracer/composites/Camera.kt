@@ -10,23 +10,21 @@ import java.util.stream.Stream
 import kotlin.math.tan
 import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Transformation
+import org.example.ktracer.shapes.Transformable
 
-class Camera {
+class Camera : Transformable {
     val horizontalSize: Int
     val verticalSize: Int
     val fieldOfView: Double
     val halfWidth: Double
     val halfHeight: Double
     val pixelSize: Double
-    var transformation: Transformation
-        get() {
-            return transformationInverse.inverse()
-        }
+    override var transformationInverse: Transformation = Transformation.IDENTITY
         set(value) {
-            transformationInverse = value.inverse()
+            field = value
+            updateOrigin()
         }
-    var transformationInverse: Transformation
-        private set
+    var origin: Point
 
     constructor(horizontalSize: Int, verticalSize: Int, fieldOfView: Number) {
         val halfView = tan(fieldOfView.toDouble() / 2.0)
@@ -49,6 +47,11 @@ class Camera {
         this.halfHeight = halfHeight
         this.pixelSize = pixelSize
         this.transformationInverse = Transformation.IDENTITY
+        this.origin = transformationInverse * Point.ORIGIN
+    }
+
+    fun updateOrigin() {
+        origin = transformationInverse * Point.ORIGIN
     }
 
     fun rayForPixel(x: Int, y: Int): Ray {
@@ -57,25 +60,30 @@ class Camera {
         val worldX = halfWidth - offsetX
         val worldY = halfHeight - offsetY
         val pixel = transformationInverse * Point(worldX, worldY, -1.0)
-        val origin = transformationInverse * Point.ORIGIN
         val direction = (pixel - origin).normalized()
         return Ray(origin, direction)
     }
 
-    fun renderPixel(world: World, x: Int, y: Int): Color {
+    inline fun renderPixel(world: World, x: Int, y: Int, intersections: Intersections = Intersections()): Color {
         val ray = rayForPixel(x, y)
-        return world.colorAt(ray)
+        return world.colorAt(ray, intersections)
     }
 
     fun render(world: World, parallel: Boolean = false): Canvas {
         val canvas = Canvas(horizontalSize, verticalSize)
         val coordinateStream = IntStream.range(0, canvas.size).wrapInProgressBar()
 
+        val threadLocalIntersections = object : ThreadLocal<Intersections>() {
+            override fun initialValue(): Intersections {
+                return Intersections()
+            }
+        }
+
         val renderPixel = { index: Int ->
             val x = index % canvas.width
             val y = index / canvas.width
             val ray = rayForPixel(x, y)
-            canvas[index] = world.colorAt(ray)
+            canvas[index] = world.colorAt(ray, threadLocalIntersections.get())
         }
 
         if (parallel) {
@@ -123,3 +131,4 @@ class Camera {
         private fun createForkJoinPool() = ForkJoinPool(Runtime.getRuntime().availableProcessors())
     }
 }
+

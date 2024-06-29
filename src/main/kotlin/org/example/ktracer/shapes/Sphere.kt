@@ -17,14 +17,15 @@ class Sphere(
         return Vector(point.x, point.y, point.z)
     }
 
-    override fun localIntersect(ray: Ray): Intersections? {
+    override fun localIntersect(ray: Ray, intersections: Intersections) {
         val sphereToRayDistance = Vector(ray.origin.x, ray.origin.y, ray.origin.z)
         val a = ray.direction dot ray.direction
         val b = 2.0 * (ray.direction dot sphereToRayDistance)
         val c = (sphereToRayDistance dot sphereToRayDistance) - 1.0
 
-        return solveQuadratic(a, b, c)?.let {
-            Intersections(Intersection(it.first, this), Intersection(it.second, this))
+        solveQuadratic(a, b, c)?.let {
+            intersections += Intersection(it.first, this)
+            intersections += Intersection(it.second, this)
         }
     }
 

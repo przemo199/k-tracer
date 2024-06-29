@@ -8,8 +8,11 @@ import org.example.ktracer.primitives.Vector
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
 
-abstract class Shape {
-    var material: Material
+interface Intersectable {
+    fun localIntersect(ray: Ray, intersections: Intersections)
+}
+
+interface Transformable {
     var transformation: Transformation
         get() {
             return transformationInverse.inverse()
@@ -18,7 +21,15 @@ abstract class Shape {
             transformationInverse = value.inverse()
         }
     var transformationInverse: Transformation
-        private set
+}
+
+interface Boxable {
+    fun boundingBox(): BoundingBox
+}
+
+abstract class Shape : Intersectable, Transformable, Boxable {
+    var material: Material
+    override var transformationInverse: Transformation = Transformation.IDENTITY
     var parent: Shape? = null
 
     constructor(material: Material, transformation: Transformation) {
@@ -63,10 +74,6 @@ abstract class Shape {
     }
 
     abstract fun localNormalAt(point: Point): Vector
-
-    abstract fun localIntersect(ray: Ray): Intersections?
-
-    abstract fun boundingBox(): BoundingBox
 
     override fun equals(other: Any?): Boolean {
         return other is Shape &&

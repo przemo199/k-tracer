@@ -3,9 +3,10 @@ package org.example.ktracer.shapes
 import java.util.stream.Stream
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import org.example.ktracer.MAX
 import org.example.ktracer.MIN
+import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Ray
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Vector
@@ -27,8 +28,9 @@ class CylinderTest {
     fun `ray misses cylinder`(origin: Point, direction: Vector) {
         val cylinder = Cylinder()
         val ray = Ray(origin, direction.normalized())
-        val intersections = cylinder.localIntersect(ray)
-        assertNull(intersections)
+        val intersections = Intersections()
+        cylinder.localIntersect(ray, intersections)
+        assertTrue(intersections.isEmpty())
     }
 
     @ParameterizedTest
@@ -36,7 +38,8 @@ class CylinderTest {
     fun `ray intersects cylinder`(origin: Point, direction: Vector, distance1: Double, distance2: Double) {
         val cylinder = Cylinder()
         val ray = Ray(origin, direction.normalized())
-        val intersections = cylinder.localIntersect(ray)!!
+        val intersections = Intersections()
+        cylinder.localIntersect(ray, intersections)
         assertEquals(2, intersections.size)
         assertEquals(distance1, intersections[0].distance)
         assertEquals(distance2, intersections[1].distance)
@@ -55,12 +58,9 @@ class CylinderTest {
     fun `intersecting constrained cylinder`(origin: Point, direction: Vector, count: Int) {
         val cylinder = Cylinder(min = 1, max = 2)
         val ray = Ray(origin, direction.normalized())
-        val intersections = cylinder.localIntersect(ray)
-        if (count > 0) {
-            assertEquals(count, intersections!!.size)
-        } else {
-            assertNull(intersections)
-        }
+        val intersections = Intersections()
+        cylinder.localIntersect(ray, intersections)
+        assertEquals(count, intersections.size)
     }
 
     @Test

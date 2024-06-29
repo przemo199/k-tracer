@@ -29,7 +29,7 @@ class BoundingBox(
         )
         val boundingBox = BoundingBox()
 
-        points.forEach { boundingBox.add(transformation * it) }
+        points.forEach { boundingBox += transformation * it }
 
         return boundingBox
     }
@@ -65,8 +65,20 @@ class BoundingBox(
         add(box.max)
     }
 
-    fun add(shape: Shape) {
+    fun add(shape: Boxable) {
         add(shape.boundingBox())
+    }
+
+    operator fun plusAssign(point: Point) {
+        add(point)
+    }
+
+    operator fun plusAssign(box: BoundingBox) {
+        add(box)
+    }
+
+    operator fun plusAssign(box: Boxable) {
+        add(box)
     }
 
     internal fun intersects(ray: Ray): Boolean {

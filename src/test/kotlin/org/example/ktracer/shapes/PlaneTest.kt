@@ -5,9 +5,10 @@ import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Vector
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import org.example.ktracer.MAX
 import org.example.ktracer.MIN
+import org.example.ktracer.composites.Intersections
 
 class PlaneTest {
     @Test
@@ -26,15 +27,17 @@ class PlaneTest {
     fun `ray doesn't intersect plane in parallel`() {
         val plane = Plane()
         val ray = Ray(Point(0, 10, 0), Vector(0, 0, 1))
-        val intersections = plane.localIntersect(ray)
-        assertNull(intersections)
+        val intersections = Intersections()
+        plane.localIntersect(ray, intersections)
+        assertTrue(intersections.isEmpty())
     }
 
     @Test
     fun `ray intersects plane from above`() {
         val plane = Plane()
         val ray = Ray(Point(0, 1, 0), Vector(0, -1, 0))
-        val intersections = plane.localIntersect(ray)!!
+        val intersections = Intersections()
+        plane.localIntersect(ray, intersections)
         assertEquals(1, intersections.size)
         assertEquals(1.0, intersections[0].distance)
         assertEquals(plane, intersections[0].shape)
@@ -44,7 +47,8 @@ class PlaneTest {
     fun `ray intersects plane from below`() {
         val plane = Plane()
         val ray = Ray(Point(0, -1, 0), Vector(0, 1, 0))
-        val intersections = plane.localIntersect(ray)!!
+        val intersections = Intersections()
+        plane.localIntersect(ray, intersections)
         assertEquals(1, intersections.size)
         assertEquals(1.0, intersections[0].distance)
         assertEquals(plane, intersections[0].shape)

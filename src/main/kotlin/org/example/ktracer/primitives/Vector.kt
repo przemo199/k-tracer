@@ -66,25 +66,25 @@ class Vector(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z)
     }
 
     companion object {
-        @JvmStatic
+        @JvmField
         val ZERO: Vector = Vector()
 
-        @JvmStatic
+        @JvmField
         val UP: Vector = Vector(0, 1, 0)
 
-        @JvmStatic
+        @JvmField
         val DOWN: Vector = Vector(0, -1, 0)
 
-        @JvmStatic
+        @JvmField
         val RIGHT: Vector = Vector(1, 0, 0)
 
-        @JvmStatic
+        @JvmField
         val LEFT: Vector = Vector(-1, 0, 0)
 
-        @JvmStatic
+        @JvmField
         val FORWARD: Vector = Vector(0, 0, 1)
 
-        @JvmStatic
+        @JvmField
         val BACKWARD: Vector = Vector(0, 0, -1)
     }
 }

@@ -5,7 +5,8 @@ import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Vector
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import org.example.ktracer.composites.Intersections
 
 class TriangleTest {
     @Test
@@ -34,37 +35,46 @@ class TriangleTest {
     fun `ray parallel to triangle`() {
         val triangle = Triangle(Point(0, 1, 0), Point(-1, 0, 0), Point(1, 0, 0))
         val ray = Ray(Point(0, -1, -2), Vector.UP)
-        assertNull(triangle.localIntersect(ray))
+        val intersections = Intersections()
+        triangle.localIntersect(ray, intersections)
+        assertTrue(intersections.isEmpty())
     }
 
     @Test
     fun `ray misses p1 p3 edge`() {
         val triangle = Triangle(Point(0, 1, 0), Point(-1, 0, 0), Point(1, 0, 0))
         val ray = Ray(Point(1, 1, -2), Vector.FORWARD)
-        assertNull(triangle.localIntersect(ray))
+        val intersections = Intersections()
+        triangle.localIntersect(ray, intersections)
+        assertTrue(intersections.isEmpty())
     }
 
     @Test
     fun `ray misses p1 p2 edge`() {
         val triangle = Triangle(Point(0, 1, 0), Point(-1, 0, 0), Point(1, 0, 0))
         val ray = Ray(Point(-1, 1, -2), Vector.FORWARD)
-        assertNull(triangle.localIntersect(ray))
+        val intersections = Intersections()
+        triangle.localIntersect(ray, intersections)
+        assertTrue(intersections.isEmpty())
     }
 
     @Test
     fun `ray misses p2 p3 edge`() {
         val triangle = Triangle(Point(0, 1, 0), Point(-1, 0, 0), Point(1, 0, 0))
         val ray = Ray(Point(0, -1, -2), Vector.FORWARD)
-        assertNull(triangle.localIntersect(ray))
+        val intersections = Intersections()
+        triangle.localIntersect(ray, intersections)
+        assertTrue(intersections.isEmpty())
     }
 
     @Test
     fun `ray intersects p2 p3 edge`() {
         val triangle = Triangle(Point(0, 1, 0), Point(-1, 0, 0), Point(1, 0, 0))
         val ray = Ray(Point(0, 0.5, -2), Vector.FORWARD)
-        val intersections = triangle.localIntersect(ray)!!
+        val intersections = Intersections()
+        triangle.localIntersect(ray, intersections)
         assertEquals(1, intersections.size)
-        assertEquals(2.0, intersections[0].distance)
+        assertEquals(2.0, intersections.first().distance)
     }
 
     @Test

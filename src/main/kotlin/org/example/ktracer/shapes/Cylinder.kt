@@ -33,12 +33,12 @@ class Cylinder(
 
         val distance = (min - ray.origin.y) / ray.direction.y
         if (checkCap(ray, distance)) {
-            intersections.add(Intersection(distance, this))
+            intersections += Intersection(distance, this)
         }
 
         val distance1 = (max - ray.origin.y) / ray.direction.y
         if (checkCap(ray, distance1)) {
-            intersections.add(Intersection(distance1, this))
+            intersections += Intersection(distance1, this)
         }
     }
 
@@ -56,8 +56,7 @@ class Cylinder(
         return Vector(x = point.x, z = point.z)
     }
 
-    override fun localIntersect(ray: Ray): Intersections? {
-        val intersections = Intersections()
+    override fun localIntersect(ray: Ray, intersections: Intersections) {
         val a = ray.direction.x.squared() + ray.direction.z.squared()
 
         if (a.absoluteValue > 0.0) {
@@ -73,18 +72,17 @@ class Cylinder(
 
                 val y1 = ray.origin.y + ray.direction.y * distance1
                 if (min < y1 && y1 < max) {
-                    intersections.add(Intersection(distance1, this))
+                    intersections += Intersection(distance1, this)
                 }
 
                 val y2 = ray.origin.y + ray.direction.y * distance2
                 if (min < y2 && y2 < max) {
-                    intersections.add(Intersection(distance2, this))
+                    intersections += Intersection(distance2, this)
                 }
             }
         }
 
         intersectCaps(ray, intersections)
-        return intersections.ifEmpty { null }
     }
 
     override fun boundingBox(): BoundingBox {

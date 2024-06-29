@@ -25,7 +25,7 @@ class Cube(material: Material = Material(), transformation: Transformation = Tra
         return Vector(z = point.z)
     }
 
-    override fun localIntersect(ray: Ray): Intersections? {
+    override fun localIntersect(ray: Ray, intersections: Intersections) {
         val (xDistanceMin, xDistanceMax) = checkAxis(ray.origin.x, ray.direction.x, AXIS_MIN, AXIS_MAX)
         val (yDistanceMin, yDistanceMax) = checkAxis(ray.origin.y, ray.direction.y, AXIS_MIN, AXIS_MAX)
         val (zDistanceMin, zDistanceMax) = checkAxis(ray.origin.z, ray.direction.z, AXIS_MIN, AXIS_MAX)
@@ -33,10 +33,9 @@ class Cube(material: Material = Material(), transformation: Transformation = Tra
         val distanceMin = listOf(xDistanceMin, yDistanceMin, zDistanceMin).max()
         val distanceMax = listOf(xDistanceMax, yDistanceMax, zDistanceMax).min()
 
-        if (distanceMin > distanceMax || distanceMax < 0) {
-            return null
-        } else {
-            return Intersections(Intersection(distanceMin, this), Intersection(distanceMax, this))
+        if (distanceMin < distanceMax && distanceMax >= 0) {
+            intersections += Intersection(distanceMin, this)
+            intersections += Intersection(distanceMax, this)
         }
     }
 

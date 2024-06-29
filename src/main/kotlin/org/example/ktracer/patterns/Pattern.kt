@@ -4,17 +4,10 @@ import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
 import org.example.ktracer.shapes.Shape
+import org.example.ktracer.shapes.Transformable
 
-abstract class Pattern {
-    var transformation: Transformation
-        get() {
-            return transformationInverse.inverse()
-        }
-        set(value) {
-            transformationInverse = value.inverse()
-        }
-    var transformationInverse: Transformation = Transformation.IDENTITY
-        private set
+abstract class Pattern : Transformable {
+    override var transformationInverse: Transformation = Transformation.IDENTITY
 
     abstract fun colorAt(point: Point): Color
 

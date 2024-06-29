@@ -26,15 +26,16 @@ class WorldTest {
         val sphere2 = Sphere()
         sphere2.transformation = Transformations.scaling(0.5, 0.5, 0.5)
         assertEquals(Light(), world.lights[0])
-        assertTrue(world.shapes.contains(sphere1))
-        assertTrue(world.shapes.contains(sphere2))
+        assertTrue(sphere1 in world.shapes)
+        assertTrue(sphere2 in world.shapes)
     }
 
     @Test
     fun `intersect world with ray`() {
         val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
-        val intersections = world.intersections(ray)
+        val intersections = Intersections()
+        world.collect_intersections(ray, intersections)
         assertEquals(4, intersections.size)
         assertEquals(4.0, intersections[0].distance)
         assertEquals(4.5, intersections[1].distance)
@@ -48,7 +49,7 @@ class WorldTest {
         val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
         val intersection = Intersection(4.0, world.shapes[0])
         val computedHit = intersection.prepareComputations(ray, Intersections())
-        val color = world.shadeHit(computedHit, 1)
+        val color = world.shadeHit(computedHit, Intersections(), 1)
         assertEquals(Color(0.3806611928908177, 0.47582649111352215, 0.28549589466811326), color)
     }
 
@@ -56,7 +57,7 @@ class WorldTest {
     fun `color when ray misses`() {
         val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector(0, 1, 0))
-        val color = world.colorAt(ray)
+        val color = world.colorAt(ray, Intersections())
         assertEquals(Color.BLACK, color)
     }
 
@@ -64,7 +65,7 @@ class WorldTest {
     fun `color when ray hits`() {
         val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
-        val color = world.colorAt(ray)
+        val color = world.colorAt(ray, Intersections())
         assertEquals(Color(0.3806611928908177, 0.47582649111352215, 0.28549589466811326), color)
     }
 
@@ -86,7 +87,7 @@ class WorldTest {
         world.shapes[1] = sphere2
 
         val ray = Ray(Point(0, 0, 0.75), Vector(0, 0, -1))
-        val color = world.colorAt(ray)
+        val color = world.colorAt(ray, Intersections())
         assertEquals(color, world.shapes[1].material.color)
     }
 
@@ -94,28 +95,28 @@ class WorldTest {
     fun `no shadow when nothing obscures light`() {
         val world = World.default()
         val point = Point(0, 0, 10)
-        assertFalse(world.isShadowed(point, world.lights[0]))
+        assertFalse(world.isShadowed(point, world.lights.first(), Intersections()))
     }
 
     @Test
     fun `no shadow when light is behind hit`() {
         val world = World.default()
         val point = Point(-20, 20, -20)
-        assertFalse(world.isShadowed(point, world.lights[0]))
+        assertFalse(world.isShadowed(point, world.lights.first(), Intersections()))
     }
 
     @Test
     fun `no shadow when object is behind hit`() {
         val world = World.default()
         val point = Point(-2, 2, -2)
-        assertFalse(world.isShadowed(point, world.lights[0]))
+        assertFalse(world.isShadowed(point, world.lights.first(), Intersections()))
     }
 
     @Test
     fun `shadow when object is between hit and light`() {
         val world = World.default()
         val point = Point(10, -10, 10)
-        assertTrue(world.isShadowed(point, world.lights[0]))
+        assertTrue(world.isShadowed(point, world.lights.first(), Intersections()))
     }
 
     @Test
@@ -131,7 +132,7 @@ class WorldTest {
         val ray = Ray(Point(0, 0, 5), Vector(0, 0, 1))
         val intersection = Intersection(4, sphere)
         val computedHit = intersection.prepareComputations(ray, Intersections())
-        val color = world.shadeHit(computedHit, 1)
+        val color = world.shadeHit(computedHit, Intersections(), 1)
         assertEquals(Color(0.1, 0.1, 0.1), color)
     }
 
@@ -144,7 +145,7 @@ class WorldTest {
 
         val intersection = Intersection(1, secondShape)
         val computedHit = intersection.prepareComputations(ray, Intersections())
-        val color = world.reflectedColor(computedHit, 1)
+        val color = world.reflectedColor(computedHit, Intersections(), 1)
         assertEquals(Color.BLACK, color)
     }
 
@@ -160,7 +161,7 @@ class WorldTest {
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersection = Intersection(sqrt(2.0), shape)
         val computedHit = intersection.prepareComputations(ray, Intersections())
-        val color = world.reflectedColor(computedHit, 1)
+        val color = world.reflectedColor(computedHit, Intersections(), 1)
         assertEquals(Color(0.19033059782447959, 0.23791324728059948, 0.1427479483683597), color)
     }
 
@@ -176,7 +177,7 @@ class WorldTest {
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersection = Intersection(sqrt(2.0), shape)
         val computedHit = intersection.prepareComputations(ray, Intersections())
-        val color = world.shadeHit(computedHit, 1)
+        val color = world.shadeHit(computedHit, Intersections(), 1)
         assertEquals(Color(0.8767559865605615, 0.9243386360166814, 0.8291733371044416), color)
     }
 
@@ -196,7 +197,7 @@ class WorldTest {
         world.shapes.add(lower)
         world.shapes.add(upper)
         val ray = Ray(Point.ORIGIN, Vector.UP)
-        world.colorAt(ray)
+        world.colorAt(ray, Intersections())
     }
 
     @Test
@@ -212,7 +213,7 @@ class WorldTest {
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersection = Intersection(sqrt(2.0), plane)
         val computedHit = intersection.prepareComputations(ray, Intersections())
-        val color = world.reflectedColor(computedHit, 5)
+        val color = world.reflectedColor(computedHit, Intersections(), 5)
         assertEquals(Color.BLACK, color)
     }
 
@@ -223,7 +224,7 @@ class WorldTest {
         val intersections = Intersections(Intersection(4, shape), Intersection(6, shape))
         val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val computedHit = intersections[0].prepareComputations(ray, intersections)
-        val color = world.refractedColor(computedHit, 1)
+        val color = world.refractedColor(computedHit, Intersections(), 1)
         assertEquals(Color.BLACK, color)
     }
 
@@ -240,7 +241,7 @@ class WorldTest {
             Intersection(6, shape),
         )
         val computedHit = intersections[0].prepareComputations(ray, intersections)
-        val color = world.refractedColor(computedHit, 0)
+        val color = world.refractedColor(computedHit, Intersections(), 0)
         assertEquals(Color.BLACK, color)
     }
 
@@ -257,7 +258,7 @@ class WorldTest {
             Intersection(sqrt(2.0) / 2.0, shape),
         )
         val computedHit = intersections[1].prepareComputations(ray, intersections)
-        val color = world.refractedColor(computedHit, 5)
+        val color = world.refractedColor(computedHit, Intersections(), 5)
         assertEquals(Color.BLACK, color)
     }
 
@@ -281,7 +282,7 @@ class WorldTest {
             Intersection(0.9899, firstShape),
         )
         val computedHit = intersections[2].prepareComputations(ray, intersections)
-        val color = world.refractedColor(computedHit, 5)
+        val color = world.refractedColor(computedHit, Intersections(), 5)
         assertEquals(Color(0, 0.9988846746935405, 0.047216423650885055), color)
     }
 
@@ -303,7 +304,7 @@ class WorldTest {
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersections = Intersections(Intersection(sqrt(2.0), floor))
         val computedHit = intersections[0].prepareComputations(ray, intersections)
-        val color = world.shadeHit(computedHit, 5)
+        val color = world.shadeHit(computedHit, Intersections(), 5)
         assertEquals(Color(0.9364253887360819, 0.6864253887360819, 0.6864253887360819), color)
     }
 
@@ -326,7 +327,7 @@ class WorldTest {
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersections = Intersections(Intersection(sqrt(2.0), floor))
         val computedHit = intersections[0].prepareComputations(ray, intersections)
-        val color = world.shadeHit(computedHit, 5)
+        val color = world.shadeHit(computedHit, Intersections(), 5)
         assertEquals(Color(0.933915140358792, 0.6964342261158358, 0.6924306911639343), color)
     }
 }

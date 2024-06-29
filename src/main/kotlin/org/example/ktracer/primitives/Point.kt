@@ -42,7 +42,7 @@ class Point(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z) 
     }
 
     companion object {
-        @JvmStatic
+        @JvmField
         val ORIGIN: Point = Point()
     }
 }

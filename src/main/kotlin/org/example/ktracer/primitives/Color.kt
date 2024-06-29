@@ -40,14 +40,19 @@ class Color(red: Number = 0, green: Number = 0, blue: Number = 0) : Tuple(red, g
     }
 
     companion object {
+        @JvmField
         val BLACK = Color(0.0, 0.0, 0.0)
 
+        @JvmField
         val WHITE = Color(1.0, 1.0, 1.0)
 
+        @JvmField
         val RED = Color(1.0, 0.0, 0.0)
 
+        @JvmField
         val GREEN = Color(0.0, 1.0, 0.0)
 
+        @JvmField
         val BLUE = Color(0.0, 0.0, 1.0)
     }
 }

@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ConstructiveSolidGeometryTest {
     @Test
@@ -63,8 +64,9 @@ class ConstructiveSolidGeometryTest {
     fun `ray misses csg`() {
         val csg = ConstructiveSolidGeometry(ConstructiveSolidGeometry.Operand.UNION, Sphere(), Cube())
         val ray = Ray(Point(0, 2, -5), Vector(0, 0, 1))
-        val intersections = csg.localIntersect(ray)
-        assertEquals(null, intersections)
+        val intersections = Intersections()
+        csg.localIntersect(ray, intersections)
+        assertTrue(intersections.isEmpty())
     }
 
     @Test
@@ -74,7 +76,8 @@ class ConstructiveSolidGeometryTest {
         sphere2.transformation = translation(0, 0, 0.5)
         val csg = ConstructiveSolidGeometry(ConstructiveSolidGeometry.Operand.UNION, sphere1, sphere2)
         val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
-        val intersections = csg.localIntersect(ray)!!
+        val intersections = Intersections()
+        csg.localIntersect(ray, intersections)
         assertEquals(2, intersections.size)
         assertEquals(4.0, intersections[0].distance)
         assertEquals(sphere1, intersections[0].shape)

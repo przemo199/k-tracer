@@ -14,26 +14,21 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
 
     fun add(shape: Shape) {
         shape.parent = this
-        children.add(shape)
+        children += shape
     }
 
     override fun localNormalAt(point: Point): Vector {
         throw UnsupportedOperationException()
     }
 
-    override fun localIntersect(ray: Ray): Intersections? {
+    override fun localIntersect(ray: Ray, intersections: Intersections) {
         if (!boundingBox().intersects(ray)) {
-            return null
+            return
         }
 
-        val intersections = Intersections()
-        for (shape in children) {
-            ray.intersect(shape)?.let {
-                intersections.addAll(it)
-            }
-        }
+        children.forEach { ray.intersect(it, intersections) }
+
         intersections.sortByDistance()
-        return if (intersections.isEmpty()) null else intersections
     }
 
     override fun contains(other: Shape): Boolean {
@@ -52,11 +47,11 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
             val childBoundingBox = it.parentSpaceBounds()
             if (childBoundingBox in leftBox) {
                 if (childBoundingBox !in rightBox) {
-                    leftGroup.add(it)
+                    leftGroup += it
                 }
             } else {
                 if (childBoundingBox in rightBox) {
-                    rightGroup.add(it)
+                    rightGroup += it
                 }
             }
         }

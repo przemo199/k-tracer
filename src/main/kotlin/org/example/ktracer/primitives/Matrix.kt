@@ -187,10 +187,10 @@ class Matrix(val elements: DoubleArray) {
 
     companion object {
         @JvmStatic
-        private val SIDE_LENGTH = 4
+        val SIDE_LENGTH = 4
 
         @JvmStatic
-        private val INDICES = SIDE_LENGTH * SIDE_LENGTH
+        val INDICES = SIDE_LENGTH * SIDE_LENGTH
 
         /**
          * Empty matrix

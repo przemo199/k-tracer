@@ -20,13 +20,13 @@ class Plane(
         return Vector.UP
     }
 
-    override fun localIntersect(ray: Ray): Intersections? {
+    override fun localIntersect(ray: Ray, intersections: Intersections) {
         if (ray.direction.y.absoluteValue < EPSILON) {
-            return null
+            return
         }
 
         val distance = -ray.origin.y / ray.direction.y
-        return Intersections(Intersection(distance, this))
+        intersections += Intersection(distance, this)
     }
 
     override fun boundingBox(): BoundingBox {

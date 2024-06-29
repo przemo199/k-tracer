@@ -11,26 +11,21 @@ import org.example.ktracer.squared
 import kotlin.math.sqrt
 
 class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
-    fun intersections(ray: Ray): Intersections {
-        val intersections = Intersections()
-        for (shape in shapes) {
-            ray.intersect(shape)?.let {
-                intersections.addAll(it)
-            }
-        }
+    fun collect_intersections(ray: Ray, intersections: Intersections) {
+        intersections.clear()
+        shapes.forEach { ray.intersect(it, intersections) }
         intersections.sortByDistance()
-        return intersections
     }
 
-    fun shadeHit(computedHit: ComputedHit, remainingIterations: Int): Color {
+    fun shadeHit(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {
         val material = computedHit.shape.material
         val surfaceColor = lights.map {
-            val inShadow = isShadowed(computedHit.overPoint, it)
+            val inShadow = isShadowed(computedHit.overPoint, it, intersections)
             material.lightingFromComputedHit(computedHit, it, inShadow)
-        }.fold(Color.BLACK) { acc, color -> acc + color }
+        }.fold(Color(0, 0, 0)) { acc, color -> acc + color }
 
-        val reflectedColor = reflectedColor(computedHit, remainingIterations)
-        val refractedColor = refractedColor(computedHit, remainingIterations)
+        val reflectedColor = reflectedColor(computedHit, intersections, remainingIterations)
+        val refractedColor = refractedColor(computedHit, intersections, remainingIterations)
         if (material.reflectiveness > 0.0 && material.transparency > 0.0) {
             val reflectance = computedHit.schlick()
             return surfaceColor + (reflectedColor * reflectance) + (refractedColor * (1.0 - reflectance))
@@ -39,38 +34,38 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         }
     }
 
-    private fun localColorAt(ray: Ray, remainingIterations: Int): Color {
-        val intersections = intersections(ray)
+    private fun localColorAt(ray: Ray, intersections: Intersections, remainingIterations: Int): Color {
+        collect_intersections(ray, intersections)
 
         intersections.hit()?.let {
             val computedHit = it.prepareComputations(ray, intersections)
-            return shadeHit(computedHit, remainingIterations)
+            return shadeHit(computedHit, intersections, remainingIterations)
         }
         return Color.BLACK
     }
 
-    fun colorAt(ray: Ray): Color {
-        return localColorAt(ray, MAX_REFLECTION_ITERATIONS)
+    fun colorAt(ray: Ray, intersections: Intersections): Color {
+        return localColorAt(ray, intersections, MAX_REFLECTION_ITERATIONS)
     }
 
-    fun isShadowed(point: Point, light: Light): Boolean {
+    fun isShadowed(point: Point, light: Light, intersections: Intersections): Boolean {
         val pointToLightVector = light.position - point
         val distanceToLight = pointToLightVector.magnitude
         val shadowRay = Ray(point, pointToLightVector.normalized())
-        val intersections = intersections(shadowRay)
-        return intersections.stream().anyMatch { it.isWithinDistance(distanceToLight) && it.shape.material.castsShadow }
+        collect_intersections(shadowRay, intersections)
+        return intersections.any { it.shape.material.castsShadow && it.isWithinDistance(distanceToLight) }
     }
 
-    internal fun reflectedColor(computedHit: ComputedHit, remainingIterations: Int): Color {
+    fun reflectedColor(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {
         if (remainingIterations == 0 || computedHit.shape.material.reflectiveness == 0.0) {
             return Color.BLACK
         }
         val reflectedRay = Ray(computedHit.overPoint, computedHit.reflectionVector)
-        val reflectedColor = localColorAt(reflectedRay, remainingIterations - 1)
+        val reflectedColor = localColorAt(reflectedRay, intersections, remainingIterations - 1)
         return reflectedColor * computedHit.shape.material.reflectiveness
     }
 
-    internal fun refractedColor(computedHit: ComputedHit, remainingIterations: Int): Color {
+    fun refractedColor(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {
         if (remainingIterations == 0 || computedHit.shape.material.transparency == 0.0) {
             return Color.BLACK
         }
@@ -87,7 +82,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         val cosT = sqrt(1.0 - sin2t)
         val direction = computedHit.normal * (nRatio * cosI - cosT) - (computedHit.cameraVector * nRatio)
         val refractedRay = Ray(computedHit.underPoint, direction)
-        val refractedColor = localColorAt(refractedRay, remainingIterations - 1)
+        val refractedColor = localColorAt(refractedRay, intersections, remainingIterations - 1)
         return refractedColor * computedHit.shape.material.transparency
     }
 
