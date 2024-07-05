@@ -18,13 +18,25 @@ class Color(red: Number = 0, green: Number = 0, blue: Number = 0) : Tuple(red, g
     }
 
     operator fun times(other: Number): Color {
-        other.toDouble().also {
-            return Color(red * it, green * it, blue * it)
+        return map(other.toDouble()::times)
+    }
+
+    operator fun div(other: Number): Color {
+        return other.toDouble().let {
+            map { that -> that / it}
         }
+    }
+
+    inline fun map(fn: (Double) -> Double): Color {
+        return Color(fn(red), fn(green), fn(blue))
     }
 
     fun copy(red: Double = this.red, green: Double = this.green, blue: Double = this.blue): Color {
         return Color(red, green, blue)
+    }
+
+    fun clamp(): Color {
+        return map(::clamp)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -40,19 +52,27 @@ class Color(red: Number = 0, green: Number = 0, blue: Number = 0) : Tuple(red, g
     }
 
     companion object {
-        @JvmField
-        val BLACK = Color(0.0, 0.0, 0.0)
+        const val MIN_COLOR_VALUE = 0.0
+
+        const val MAX_COLOR_VALUE = 1.0
 
         @JvmField
-        val WHITE = Color(1.0, 1.0, 1.0)
+        val BLACK = Color(MIN_COLOR_VALUE, MIN_COLOR_VALUE, MIN_COLOR_VALUE)
 
         @JvmField
-        val RED = Color(1.0, 0.0, 0.0)
+        val WHITE = Color(MAX_COLOR_VALUE, MAX_COLOR_VALUE, MAX_COLOR_VALUE)
 
         @JvmField
-        val GREEN = Color(0.0, 1.0, 0.0)
+        val RED = Color(MAX_COLOR_VALUE, MIN_COLOR_VALUE, MIN_COLOR_VALUE)
 
         @JvmField
-        val BLUE = Color(0.0, 0.0, 1.0)
+        val GREEN = Color(MIN_COLOR_VALUE, MAX_COLOR_VALUE, MIN_COLOR_VALUE)
+
+        @JvmField
+        val BLUE = Color(MIN_COLOR_VALUE, MIN_COLOR_VALUE, MAX_COLOR_VALUE)
+
+        fun clamp(value: Double): Double {
+            return value.coerceIn(MIN_COLOR_VALUE, MAX_COLOR_VALUE)
+        }
     }
 }

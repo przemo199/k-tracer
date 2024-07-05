@@ -9,8 +9,6 @@ const val MIN = -Double.MAX_VALUE
 
 const val MAX = Double.MAX_VALUE
 
-const val MAX_REFLECTION_ITERATIONS = 6
-
 infix fun Double.coarseEquals(other: Double): Boolean {
     return (this - other).absoluteValue < EPSILON
 }

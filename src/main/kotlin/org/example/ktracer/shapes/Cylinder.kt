@@ -112,9 +112,9 @@ class Cylinder(
         @JvmStatic
         fun checkCap(ray: Ray, distance: Number): Boolean {
             distance.toDouble().let {
-                val x = ray.origin.x + ray.direction.x * it
-                val z = ray.origin.z + ray.direction.z * it
-                return x.squared() + z.squared() <= 1.0
+                val x = ray.origin.x + (ray.direction.x * it)
+                val z = ray.origin.z + (ray.direction.z * it)
+                return (x.squared() + z.squared()) <= 1.0
             }
         }
     }

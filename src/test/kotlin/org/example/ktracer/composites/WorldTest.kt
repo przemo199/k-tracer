@@ -35,7 +35,8 @@ class WorldTest {
         val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
         val intersections = Intersections()
-        world.collect_intersections(ray, intersections)
+        world.collectIntersections(ray, intersections)
+        intersections.sort()
         assertEquals(4, intersections.size)
         assertEquals(4.0, intersections[0].distance)
         assertEquals(4.5, intersections[1].distance)
@@ -57,7 +58,7 @@ class WorldTest {
     fun `color when ray misses`() {
         val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector(0, 1, 0))
-        val color = world.colorAt(ray, Intersections())
+        val color = world.colorAt(ray)
         assertEquals(Color.BLACK, color)
     }
 
@@ -65,7 +66,7 @@ class WorldTest {
     fun `color when ray hits`() {
         val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
-        val color = world.colorAt(ray, Intersections())
+        val color = world.colorAt(ray)
         assertEquals(Color(0.3806611928908177, 0.47582649111352215, 0.28549589466811326), color)
     }
 
@@ -87,7 +88,7 @@ class WorldTest {
         world.shapes[1] = sphere2
 
         val ray = Ray(Point(0, 0, 0.75), Vector(0, 0, -1))
-        val color = world.colorAt(ray, Intersections())
+        val color = world.colorAt(ray)
         assertEquals(color, world.shapes[1].material.color)
     }
 
@@ -197,7 +198,7 @@ class WorldTest {
         world.shapes.add(lower)
         world.shapes.add(upper)
         val ray = Ray(Point.ORIGIN, Vector.UP)
-        world.colorAt(ray, Intersections())
+        world.colorAt(ray)
     }
 
     @Test

@@ -89,12 +89,12 @@ class SceneLoader {
 
     private fun parseMaterial(yaml: JsonNode): Material {
         if (yaml.isTextual) {
-            return materialDefinitions[yaml.asText()]!!.deepCopy()
+            return materialDefinitions[yaml.asText()]!!.copy()
         }
 
         val material =
             yaml[EXTEND]?.let {
-                Material(materialDefinitions[it.asText()]!!)
+                materialDefinitions[it.asText()]?.copy()
             } ?: Material()
 
         val materialYaml = yaml[Keyword.VALUE] ?: yaml
@@ -149,7 +149,7 @@ class SceneLoader {
         transformationYaml?.forEach {
             when {
                 it.isTextual -> {
-                    transformation = transformationDefinitions[it.asText()]!!.deepCopy()
+                    transformation = transformationDefinitions[it.asText()]!!.copy()
                 }
                 it.isArray -> {
                     val array = it as ArrayNode

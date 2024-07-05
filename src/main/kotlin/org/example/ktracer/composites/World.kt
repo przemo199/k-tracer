@@ -1,6 +1,5 @@
 package org.example.ktracer.composites
 
-import org.example.ktracer.MAX_REFLECTION_ITERATIONS
 import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Light
 import org.example.ktracer.primitives.Point
@@ -11,10 +10,9 @@ import org.example.ktracer.squared
 import kotlin.math.sqrt
 
 class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
-    fun collect_intersections(ray: Ray, intersections: Intersections) {
+    fun collectIntersections(ray: Ray, intersections: Intersections) {
         intersections.clear()
         shapes.forEach { ray.intersect(it, intersections) }
-        intersections.sortByDistance()
     }
 
     fun shadeHit(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {
@@ -22,7 +20,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         val surfaceColor = lights.map {
             val inShadow = isShadowed(computedHit.overPoint, it, intersections)
             material.lightingFromComputedHit(computedHit, it, inShadow)
-        }.fold(Color(0, 0, 0)) { acc, color -> acc + color }
+        }.fold(Color(0, 0, 0), Color::plus)
 
         val reflectedColor = reflectedColor(computedHit, intersections, remainingIterations)
         val refractedColor = refractedColor(computedHit, intersections, remainingIterations)
@@ -35,16 +33,16 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
     }
 
     private fun localColorAt(ray: Ray, intersections: Intersections, remainingIterations: Int): Color {
-        collect_intersections(ray, intersections)
+        collectIntersections(ray, intersections)
 
         intersections.hit()?.let {
             val computedHit = it.prepareComputations(ray, intersections)
             return shadeHit(computedHit, intersections, remainingIterations)
         }
-        return Color.BLACK
+        return DEFAULT_COLOR
     }
 
-    fun colorAt(ray: Ray, intersections: Intersections): Color {
+    fun colorAt(ray: Ray, intersections: Intersections = Intersections()): Color {
         return localColorAt(ray, intersections, MAX_REFLECTION_ITERATIONS)
     }
 
@@ -52,13 +50,13 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         val pointToLightVector = light.position - point
         val distanceToLight = pointToLightVector.magnitude
         val shadowRay = Ray(point, pointToLightVector.normalized())
-        collect_intersections(shadowRay, intersections)
+        collectIntersections(shadowRay, intersections)
         return intersections.any { it.shape.material.castsShadow && it.isWithinDistance(distanceToLight) }
     }
 
     fun reflectedColor(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {
         if (remainingIterations == 0 || computedHit.shape.material.reflectiveness == 0.0) {
-            return Color.BLACK
+            return DEFAULT_COLOR
         }
         val reflectedRay = Ray(computedHit.overPoint, computedHit.reflectionVector)
         val reflectedColor = localColorAt(reflectedRay, intersections, remainingIterations - 1)
@@ -67,7 +65,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
 
     fun refractedColor(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {
         if (remainingIterations == 0 || computedHit.shape.material.transparency == 0.0) {
-            return Color.BLACK
+            return DEFAULT_COLOR
         }
 
         val nRatio = computedHit.refractiveIndex1 / computedHit.refractiveIndex2
@@ -76,7 +74,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         val isTotalInternalReflection = sin2t > 1.0
 
         if (isTotalInternalReflection) {
-            return Color.BLACK
+            return DEFAULT_COLOR
         }
 
         val cosT = sqrt(1.0 - sin2t)
@@ -91,6 +89,11 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
     }
 
     companion object {
+        const val MAX_REFLECTION_ITERATIONS = 6
+
+        @JvmField
+        val DEFAULT_COLOR = Color.BLACK
+
         fun default(): World {
             val sphere1 = Sphere()
             sphere1.material.color = Color(0.8, 1, 0.6)

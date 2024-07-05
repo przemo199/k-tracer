@@ -54,7 +54,7 @@ class ConstructiveSolidGeometry(
             return
         }
 
-        localIntersections.sortByDistance()
+        localIntersections.sort()
         intersections += filterIntersections(localIntersections)
     }
 

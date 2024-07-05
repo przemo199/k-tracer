@@ -9,14 +9,15 @@ import java.io.IOException
 import java.util.stream.IntStream
 import java.util.stream.Stream
 import kotlin.jvm.Throws
+import kotlin.math.roundToInt
 
 class Canvas(val width: Int, val height: Int) {
-    private val pixels: Array<Color> = Array(width * height) { Color.BLACK }
+    private val pixels: Array<Color> = Array(width * height) { DEFAULT_COLOR }
     val size get() = pixels.size
 
-    private fun coordinatesToIndex(x: Int, y: Int) = (y * width) + x
+    fun coordinatesToIndex(x: Int, y: Int) = (y * width) + x
 
-    private fun indexToCoordinates(index: Int) = Pair(index % width, index / width)
+    fun indexToCoordinates(index: Int) = Pair(index % width, index / width)
 
     fun coordinateStream(): Stream<Pair<Int, Int>> {
         return IntStream.range(0, size).mapToObj(::indexToCoordinates)
@@ -45,25 +46,25 @@ class Canvas(val width: Int, val height: Int) {
     @Throws(IOException::class)
     fun saveAsPng(path: String) {
         val image = ImmutableImage.create(width, height, BufferedImage.TYPE_INT_RGB).blank()
-        pixels.asSequence().map(::clipColor).withIndex().forEach { (index, color) -> image.setColor(index, color) }
+        pixels.asSequence()
+            .map(Color::clamp)
+            .map { it.toRGBColor() }
+            .withIndex()
+            .forEach { (index, color) -> image.setColor(index, color) }
         image.forWriter(PngWriter().withMaxCompression()).write(path)
     }
 
     companion object {
-        private const val MAX_COLOR_VALUE = 255
+        const val MIN_COLOR_VALUE = 0.0
 
-        @JvmStatic
-        private fun clipValueToRange(color: Double): Int {
-            return minOf((color * MAX_COLOR_VALUE).toInt(), MAX_COLOR_VALUE)
-        }
+        const val MAX_COLOR_VALUE = 255.0
 
-        @JvmStatic
-        private fun clipColor(color: Color): RGBColor {
-            return RGBColor(
-                clipValueToRange(color.red),
-                clipValueToRange(color.green),
-                clipValueToRange(color.blue),
-            )
+        @JvmField
+        val DEFAULT_COLOR = World.DEFAULT_COLOR
+
+        fun Color.toRGBColor(): RGBColor {
+            val (red, green, blue) = map { it * MAX_COLOR_VALUE }
+            return RGBColor(red.roundToInt(), green.roundToInt(), blue.roundToInt())
         }
     }
 }

@@ -10,39 +10,18 @@ import org.example.ktracer.primitives.Vector
 import org.example.ktracer.shapes.Shape
 import kotlin.math.pow
 
-class Material(
+data class Material(
     var color: Color = Color.WHITE,
-    ambient: Number = 0.1,
-    diffuse: Number = 0.9,
-    specular: Number = 0.9,
-    shininess: Number = 200,
-    reflectiveness: Number = 0,
-    refractiveIndex: Number = 1,
-    transparency: Number = 0,
+    var ambient: Double = 0.1,
+    var diffuse: Double = 0.9,
+    var specular: Double = 0.9,
+    var shininess: Double = 200.0,
+    var reflectiveness: Double = 0.0,
+    var refractiveIndex: Double = 1.0,
+    var transparency: Double = 0.0,
     var castsShadow: Boolean = true,
     var pattern: Pattern? = null,
 ) {
-    var ambient: Double = ambient.toDouble()
-    var diffuse: Double = diffuse.toDouble()
-    var specular: Double = specular.toDouble()
-    var shininess: Double = shininess.toDouble()
-    var reflectiveness: Double = reflectiveness.toDouble()
-    var refractiveIndex: Double = refractiveIndex.toDouble()
-    var transparency: Double = transparency.toDouble()
-
-    constructor(material: Material) : this(
-        material.color,
-        material.ambient,
-        material.diffuse,
-        material.specular,
-        material.shininess,
-        material.reflectiveness,
-        material.refractiveIndex,
-        material.transparency,
-        material.castsShadow,
-        material.pattern,
-    )
-
     fun lighting(
         shape: Shape,
         light: Light,
@@ -91,10 +70,6 @@ class Material(
         )
     }
 
-    fun deepCopy(): Material {
-        return Material(this)
-    }
-
     override fun equals(other: Any?): Boolean {
         return other is Material &&
             color == other.color &&
@@ -136,5 +111,31 @@ class Material(
         @JvmStatic
         val GLASS
             get() = Material(transparency = 1.0, refractiveIndex = 1.5)
+
+        operator fun invoke(
+            color: Color = Color.WHITE,
+            ambient: Number = 0.1,
+            diffuse: Number = 0.9,
+            specular: Number = 0.9,
+            shininess: Number = 200,
+            reflectiveness: Number = 0,
+            refractiveIndex: Number = 1,
+            transparency: Number = 0,
+            castsShadow: Boolean = true,
+            pattern: Pattern? = null
+        ): Material {
+            return Material(
+                color,
+                ambient.toDouble(),
+                diffuse.toDouble(),
+                specular.toDouble(),
+                shininess.toDouble(),
+                reflectiveness.toDouble(),
+                refractiveIndex.toDouble(),
+                transparency.toDouble(),
+                castsShadow,
+                pattern
+            )
+        }
     }
 }

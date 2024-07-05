@@ -14,15 +14,21 @@ class Point(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z) 
     }
 
     operator fun times(other: Number): Point {
-        return other.toDouble().let { Point(x * it, y * it, z * it) }
+        return map(other.toDouble()::times)
     }
 
     operator fun div(other: Number): Point {
-        return other.toDouble().let { Point(x / it, y / it, z / it) }
+        return other.toDouble().let {
+            map { that -> that / it}
+        }
     }
 
     operator fun unaryMinus(): Point {
-        return Point(-x, -y, -z)
+        return map(Double::unaryMinus)
+    }
+
+    inline fun map(fn: (Double) -> Double): Point {
+        return Point(fn(x), fn(y), fn(z))
     }
 
     fun copy(x: Double = this.x, y: Double = this.y, z: Double = this.z): Point {

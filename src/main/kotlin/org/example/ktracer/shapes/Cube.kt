@@ -11,7 +11,10 @@ import kotlin.math.absoluteValue
 import org.example.ktracer.MAX
 import org.example.ktracer.primitives.Transformation
 
-class Cube(material: Material = Material(), transformation: Transformation = Transformation.IDENTITY) :
+class Cube(
+    material: Material = Material(),
+    transformation: Transformation = Transformation.IDENTITY
+) :
     Shape(material, transformation) {
 
     override fun localNormalAt(point: Point): Vector {

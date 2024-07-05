@@ -5,7 +5,7 @@ import java.util.Collections
 
 typealias Transformation = Matrix
 
-class Matrix(val elements: DoubleArray) {
+data class Matrix(val elements: DoubleArray) {
     private var inverseCache: Matrix? = null
 
     /**
@@ -114,7 +114,7 @@ class Matrix(val elements: DoubleArray) {
                 (a00 * b09 - a01 * b07 + a02 * b06) * determinantInverse,
                 (a31 * b01 - a30 * b03 - a32 * b00) * determinantInverse,
                 (a20 * b03 - a21 * b01 + a22 * b00) * determinantInverse,
-            ),
+            )
         )
         inverseCache = inverse
         return inverse

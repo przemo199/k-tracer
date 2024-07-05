@@ -38,27 +38,16 @@ abstract class Shape : Intersectable, Transformable, Boxable {
     }
 
     fun normalAt(worldPoint: Point): Vector {
-        val localPoint = worldToObject(worldPoint)
-        val localNormal = localNormalAt(localPoint)
-        return normalToWorld(localNormal)
+        return worldPoint.run(::worldToObject).run(::localNormalAt).run(::normalToWorld)
     }
 
     fun worldToObject(point: Point): Point {
-        var localPoint = point
-        parent?.let {
-            localPoint = it.worldToObject(point)
-        }
-        return transformationInverse * localPoint
+        return transformationInverse * (parent?.worldToObject(point) ?: point)
     }
 
     fun normalToWorld(normal: Vector): Vector {
         val worldNormal = (transformationInverse.transpose() * normal).normalized()
-
-        parent?.let {
-            return it.normalToWorld(worldNormal)
-        }
-
-        return worldNormal
+        return parent?.normalToWorld(worldNormal) ?: worldNormal
     }
 
     open operator fun contains(other: Shape): Boolean {

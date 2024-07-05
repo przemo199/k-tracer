@@ -28,7 +28,7 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
 
         children.forEach { ray.intersect(it, intersections) }
 
-        intersections.sortByDistance()
+        intersections.sort()
     }
 
     override fun contains(other: Shape): Boolean {
