@@ -13,6 +13,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
     fun collectIntersections(ray: Ray, intersections: Intersections) {
         intersections.clear()
         shapes.forEach { ray.intersect(it, intersections) }
+        intersections.sort()
     }
 
     fun shadeHit(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {

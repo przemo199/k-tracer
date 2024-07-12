@@ -75,7 +75,8 @@ class ConstructiveSolidGeometry(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is ConstructiveSolidGeometry &&
+        return this === other ||
+            other is ConstructiveSolidGeometry &&
             super.equals(other) &&
             left == other.left &&
             right == other.right

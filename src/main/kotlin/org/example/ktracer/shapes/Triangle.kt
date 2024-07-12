@@ -57,7 +57,8 @@ class Triangle(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Triangle &&
+        return this === other ||
+            other is Triangle &&
             super.equals(other) &&
             vertex1 == other.vertex1 &&
             vertex2 == other.vertex2 &&

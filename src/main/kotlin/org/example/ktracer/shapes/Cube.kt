@@ -47,8 +47,8 @@ class Cube(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Cube &&
-            super.equals(other)
+        return this === other ||
+            other is Cube && super.equals(other)
     }
 
     override fun hashCode(): Int {

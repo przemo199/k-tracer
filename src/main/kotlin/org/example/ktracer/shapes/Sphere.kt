@@ -34,7 +34,7 @@ class Sphere(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Sphere && super.equals(other)
+        return this === other || other is Sphere && super.equals(other)
     }
 
     override fun hashCode(): Int {

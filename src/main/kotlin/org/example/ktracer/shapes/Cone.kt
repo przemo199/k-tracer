@@ -107,7 +107,8 @@ class Cone(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Cone &&
+        return this === other ||
+            other is Cone &&
             super.equals(other) &&
             closed == other.closed &&
             min coarseEquals other.min &&

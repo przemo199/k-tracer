@@ -81,7 +81,8 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Group &&
+        return this === other ||
+            other is Group &&
             super.equals(other) &&
             children == other.children
     }

@@ -21,17 +21,16 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
         var refractiveIndex1 = 1.0
         var refractiveIndex2 = 1.0
         for (intersection in intersections) {
-            if (intersection == this) {
+            val isThis = intersection === this
+            if (isThis) {
                 refractiveIndex1 = if (containers.isEmpty()) 1.0 else containers.last().material.refractiveIndex
             }
 
-            if (intersection.shape in containers) {
-                containers -= intersection.shape
-            } else {
+            if (!containers.remove(intersection.shape)) {
                 containers += intersection.shape
             }
 
-            if (intersection == this) {
+            if (isThis) {
                 refractiveIndex2 = if (containers.isEmpty()) 1.0 else containers.last().material.refractiveIndex
                 break
             }
@@ -59,7 +58,8 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Intersection &&
+        return this === other ||
+            other is Intersection &&
             distance coarseEquals other.distance &&
             shape == other.shape
     }

@@ -8,15 +8,6 @@ typealias Transformation = Matrix
 data class Matrix(val elements: DoubleArray) {
     private var inverseCache: Matrix? = null
 
-    /**
-     * Creates identity matrix
-     */
-    constructor() : this(DoubleArray(INDICES)) {
-        for (index in 0..<SIDE_LENGTH) {
-            elements[rowColToIndex(index, index)] = 1.0
-        }
-    }
-
     constructor(elements: Iterable<Number>) : this(elements.map(Number::toDouble).toDoubleArray())
 
     fun transpose(): Matrix {
@@ -139,7 +130,7 @@ data class Matrix(val elements: DoubleArray) {
                 result[rowColToIndex(row, column)] = sum
             }
         }
-        return Matrix(result.toList())
+        return Matrix(result)
     }
 
     operator fun times(other: Point): Point {
@@ -168,12 +159,9 @@ data class Matrix(val elements: DoubleArray) {
         return Vector(result[0], result[1], result[2])
     }
 
-    fun deepCopy(): Matrix {
-        return Matrix(elements.clone())
-    }
-
     override fun equals(other: Any?): Boolean {
-        return other is Matrix &&
+        return this === other ||
+            other is Matrix &&
             elements.zip(other.elements).all { it.first coarseEquals it.second }
     }
 
@@ -207,6 +195,17 @@ data class Matrix(val elements: DoubleArray) {
         @JvmStatic
         private fun rowColToIndex(x: Int, y: Int): Int {
             return (x * SIDE_LENGTH) + y
+        }
+
+        /**
+         * Creates identity matrix
+         */
+        operator fun invoke(): Matrix {
+            val elements = DoubleArray(INDICES)
+            for (index in 0..<SIDE_LENGTH) {
+                elements[rowColToIndex(index, index)] = 1.0
+            }
+            return Matrix(elements)
         }
     }
 }

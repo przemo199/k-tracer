@@ -93,7 +93,8 @@ class Cylinder(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Cylinder &&
+        return this === other ||
+            other is Cylinder &&
             super.equals(other) &&
             closed == other.closed &&
             min coarseEquals other.min &&

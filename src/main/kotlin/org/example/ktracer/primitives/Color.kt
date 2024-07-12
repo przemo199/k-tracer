@@ -40,7 +40,8 @@ class Color(red: Number = 0, green: Number = 0, blue: Number = 0) : Tuple(red, g
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Color && super.equals(other)
+        return this === other ||
+            other is Color && super.equals(other)
     }
 
     override fun hashCode(): Int {

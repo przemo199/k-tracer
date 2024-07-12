@@ -71,7 +71,8 @@ data class Material(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Material &&
+        return this === other ||
+            other is Material &&
             color == other.color &&
             ambient coarseEquals other.ambient &&
             diffuse coarseEquals other.diffuse &&

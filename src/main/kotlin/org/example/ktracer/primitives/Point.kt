@@ -36,7 +36,7 @@ class Point(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z) 
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Point && super.equals(other)
+        return this === other || other is Point && super.equals(other)
     }
 
     override fun hashCode(): Int {

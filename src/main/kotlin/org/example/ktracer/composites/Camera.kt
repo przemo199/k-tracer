@@ -73,28 +73,31 @@ class Camera : Transformable {
         val canvas = Canvas(horizontalSize, verticalSize)
         val indexStream = IntStream.range(0, canvas.size).wrapInProgressBar()
 
-        val intersections = object : ThreadLocal<Intersections>() {
-            override fun initialValue(): Intersections {
-                return Intersections()
-            }
-        }
-
-        val renderPixel = { index: Int ->
-            val (x, y) = canvas.indexToCoordinates(index)
-            val ray = rayForPixel(x, y)
-            canvas[index] = world.colorAt(ray, intersections.get())
-        }
-
         if (parallel) {
+            val intersections = object : ThreadLocal<Intersections>() {
+                override fun initialValue(): Intersections {
+                    return Intersections()
+                }
+            }
+
             createForkJoinPool().use {
                 it.submit {
                     indexStream
                         .parallel()
-                        .forEach(renderPixel)
+                        .forEach { index: Int ->
+                            val (x, y) = canvas.indexToCoordinates(index)
+                            val ray = rayForPixel(x, y)
+                            canvas[index] = world.colorAt(ray, intersections.get())
+                        }
                 }.get()
             }
         } else {
-            indexStream.forEach(renderPixel)
+            val intersections = Intersections()
+            indexStream.forEach { index: Int ->
+                val (x, y) = canvas.indexToCoordinates(index)
+                val ray = rayForPixel(x, y)
+                canvas[index] = world.colorAt(ray, intersections)
+            }
         }
 
         return canvas

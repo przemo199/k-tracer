@@ -60,7 +60,7 @@ class Vector(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z)
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Vector && super.equals(other)
+        return this === other || other is Vector && super.equals(other)
     }
 
     override fun hashCode(): Int {

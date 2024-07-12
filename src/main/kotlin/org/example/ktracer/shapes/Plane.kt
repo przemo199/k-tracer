@@ -37,7 +37,8 @@ class Plane(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Plane &&
+        return this === other ||
+            other is Plane &&
             super.equals(other)
     }
 

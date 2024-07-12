@@ -137,7 +137,8 @@ class BoundingBox(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is BoundingBox &&
+        return this === other ||
+            other is BoundingBox &&
             min == other.min &&
             max == other.max
     }
