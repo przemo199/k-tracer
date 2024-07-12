@@ -97,9 +97,11 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
 
         fun default(): World {
             val sphere1 = Sphere()
-            sphere1.material.color = Color(0.8, 1, 0.6)
-            sphere1.material.diffuse = 0.7
-            sphere1.material.specular = 0.2
+            sphere1.material.apply {
+                color = Color(0.8, 1, 0.6)
+                diffuse = 0.7
+                specular = 0.2
+            }
             val sphere2 = Sphere()
             sphere2.transformation = Transformations.scaling(0.5, 0.5, 0.5)
             return World(mutableListOf(Light()), mutableListOf(sphere1, sphere2))

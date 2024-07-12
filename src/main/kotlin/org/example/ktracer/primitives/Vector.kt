@@ -3,7 +3,7 @@ package org.example.ktracer.primitives
 import org.example.ktracer.squared
 import kotlin.math.sqrt
 
-class Vector(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z) {
+class Vector(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) {
     val magnitude: Double
         get() {
             return sqrt(x.squared() + y.squared() + z.squared())
@@ -92,5 +92,9 @@ class Vector(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z)
 
         @JvmField
         val BACKWARD: Vector = Vector(0, 0, -1)
+
+        operator fun invoke(x: Number, y: Number, z: Number): Vector {
+            return Vector(x.toDouble(), y.toDouble(), z.toDouble())
+        }
     }
 }

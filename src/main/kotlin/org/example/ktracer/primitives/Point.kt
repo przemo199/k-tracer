@@ -1,6 +1,6 @@
 package org.example.ktracer.primitives
 
-class Point(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z) {
+class Point(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) {
     operator fun plus(other: Vector): Point {
         return Point(x + other.x, y + other.y, z + other.z)
     }
@@ -50,5 +50,9 @@ class Point(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : Tuple(x, y, z) 
     companion object {
         @JvmField
         val ORIGIN: Point = Point()
+
+        operator fun invoke(x: Number, y: Number, z: Number): Point {
+            return Point(x.toDouble(), y.toDouble(), z.toDouble())
+        }
     }
 }

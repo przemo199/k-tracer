@@ -1,6 +1,6 @@
 package org.example.ktracer.primitives
 
-class Color(red: Number = 0, green: Number = 0, blue: Number = 0) : Tuple(red, green, blue) {
+class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(red, green, blue) {
     val red by this::x
     val green by this::y
     val blue by this::z
@@ -74,6 +74,10 @@ class Color(red: Number = 0, green: Number = 0, blue: Number = 0) : Tuple(red, g
 
         fun clamp(value: Double): Double {
             return value.coerceIn(MIN_COLOR_VALUE, MAX_COLOR_VALUE)
+        }
+
+        operator fun invoke(x: Number, y: Number, z: Number): Color {
+            return Color(x.toDouble(), y.toDouble(), z.toDouble())
         }
     }
 }

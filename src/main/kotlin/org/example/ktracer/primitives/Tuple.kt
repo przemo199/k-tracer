@@ -3,11 +3,7 @@ package org.example.ktracer.primitives
 import java.util.Objects
 import org.example.ktracer.coarseEquals
 
-abstract class Tuple(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) {
-    val x: Double = x.toDouble()
-    val y: Double = y.toDouble()
-    val z: Double = z.toDouble()
-
+abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0.0) {
     operator fun component1() = x
 
     operator fun component2() = y
