@@ -11,10 +11,12 @@ data class Matrix(val elements: DoubleArray) {
     constructor(elements: Iterable<Number>) : this(elements.map(Number::toDouble).toDoubleArray())
 
     fun transpose(): Matrix {
-        val result = elements.toMutableList()
+        val result = elements.copyOf()
         for (row in 0..<SIDE_LENGTH) {
             for (column in row..<SIDE_LENGTH) {
-                Collections.swap(result, rowColToIndex(row, column), rowColToIndex(column, row))
+                result[rowColToIndex(row, column)] = result[rowColToIndex(column, row)].also {
+                    result[rowColToIndex(column, row)] = result[rowColToIndex(row, column)]
+                }
             }
         }
         return Matrix(result)
@@ -48,10 +50,28 @@ data class Matrix(val elements: DoubleArray) {
         return determinant() != 0.0
     }
 
+    fun isIdentity(): Boolean {
+        for (row in 0..SIDE_LENGTH) {
+            for (column in 0..SIDE_LENGTH) {
+                if ((row == column && !(get(row, column) coarseEquals 1.0)) || !(get(row, column) coarseEquals 0.0)) {
+                    return false
+                }
+            }
+        }
+
+        return true
+    }
+
     fun inverse(): Matrix {
         inverseCache?.let {
             return it
         }
+
+        if (isIdentity()) {
+            inverseCache = this
+            return this
+        }
+
         val a00 = elements[0]
         val a01 = elements[1]
         val a02 = elements[2]
@@ -85,26 +105,24 @@ data class Matrix(val elements: DoubleArray) {
         val determinant = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
         require(determinant != 0.0) { "Matrix is not invertible" }
 
-        val determinantInverse = 1.0 / determinant
-
         val inverse = Matrix(
             doubleArrayOf(
-                (a11 * b11 - a12 * b10 + a13 * b09) * determinantInverse,
-                (a02 * b10 - a01 * b11 - a03 * b09) * determinantInverse,
-                (a31 * b05 - a32 * b04 + a33 * b03) * determinantInverse,
-                (a22 * b04 - a21 * b05 - a23 * b03) * determinantInverse,
-                (a12 * b08 - a10 * b11 - a13 * b07) * determinantInverse,
-                (a00 * b11 - a02 * b08 + a03 * b07) * determinantInverse,
-                (a32 * b02 - a30 * b05 - a33 * b01) * determinantInverse,
-                (a20 * b05 - a22 * b02 + a23 * b01) * determinantInverse,
-                (a10 * b10 - a11 * b08 + a13 * b06) * determinantInverse,
-                (a01 * b08 - a00 * b10 - a03 * b06) * determinantInverse,
-                (a30 * b04 - a31 * b02 + a33 * b00) * determinantInverse,
-                (a21 * b02 - a20 * b04 - a23 * b00) * determinantInverse,
-                (a11 * b07 - a10 * b09 - a12 * b06) * determinantInverse,
-                (a00 * b09 - a01 * b07 + a02 * b06) * determinantInverse,
-                (a31 * b01 - a30 * b03 - a32 * b00) * determinantInverse,
-                (a20 * b03 - a21 * b01 + a22 * b00) * determinantInverse,
+                (a11 * b11 - a12 * b10 + a13 * b09) / determinant,
+                (a02 * b10 - a01 * b11 - a03 * b09) / determinant,
+                (a31 * b05 - a32 * b04 + a33 * b03) / determinant,
+                (a22 * b04 - a21 * b05 - a23 * b03) / determinant,
+                (a12 * b08 - a10 * b11 - a13 * b07) / determinant,
+                (a00 * b11 - a02 * b08 + a03 * b07) / determinant,
+                (a32 * b02 - a30 * b05 - a33 * b01) / determinant,
+                (a20 * b05 - a22 * b02 + a23 * b01) / determinant,
+                (a10 * b10 - a11 * b08 + a13 * b06) / determinant,
+                (a01 * b08 - a00 * b10 - a03 * b06) / determinant,
+                (a30 * b04 - a31 * b02 + a33 * b00) / determinant,
+                (a21 * b02 - a20 * b04 - a23 * b00) / determinant,
+                (a11 * b07 - a10 * b09 - a12 * b06) / determinant,
+                (a00 * b09 - a01 * b07 + a02 * b06) / determinant,
+                (a31 * b01 - a30 * b03 - a32 * b00) / determinant,
+                (a20 * b03 - a21 * b01 + a22 * b00) / determinant,
             )
         )
         inverseCache = inverse
@@ -120,7 +138,7 @@ data class Matrix(val elements: DoubleArray) {
     }
 
     operator fun times(other: Matrix): Matrix {
-        val result = MutableList(INDICES) { 0.0 }
+        val result = DoubleArray(INDICES) { 0.0 }
         for (row in 0..<SIDE_LENGTH) {
             for (column in 0..<SIDE_LENGTH) {
                 var sum = 0.0
@@ -134,7 +152,7 @@ data class Matrix(val elements: DoubleArray) {
     }
 
     operator fun times(other: Point): Point {
-        val result = MutableList(SIDE_LENGTH) { 0.0 }
+        val result = DoubleArray(SIDE_LENGTH) { 0.0 }
         val point = doubleArrayOf(other.x, other.y, other.z, 1.0)
         for (row in 0..<SIDE_LENGTH) {
             var sum = 0.0
@@ -147,7 +165,7 @@ data class Matrix(val elements: DoubleArray) {
     }
 
     operator fun times(other: Vector): Vector {
-        val result = MutableList(SIDE_LENGTH) { 0.0 }
+        val result = DoubleArray(SIDE_LENGTH) { 0.0 }
         val vector = doubleArrayOf(other.x, other.y, other.z, 0.0)
         for (row in 0..<SIDE_LENGTH) {
             var sum = 0.0
@@ -184,7 +202,7 @@ data class Matrix(val elements: DoubleArray) {
          * Empty matrix
          */
         @JvmStatic
-        val EMPTY get() = Matrix(List(INDICES) { 0 })
+        val EMPTY get() = Matrix(DoubleArray(INDICES) { 0.0 })
 
         /**
          * Identity matrix
