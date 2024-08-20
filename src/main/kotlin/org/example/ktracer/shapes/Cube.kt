@@ -18,14 +18,16 @@ class Cube(
     Shape(material, transformation) {
 
     override fun localNormalAt(point: Point): Vector {
-        val maxValue = listOf(point.x.absoluteValue, point.y.absoluteValue, point.z.absoluteValue).max()
+        val absPoint = point.abs()
+        val maxValue = absPoint.asDoubleArray().max()
 
-        if (maxValue == point.x.absoluteValue) {
-            return Vector(x = point.x)
-        } else if (maxValue == point.y.absoluteValue) {
-            return Vector(y = point.y)
+        return if (maxValue == absPoint.x) {
+            Vector(x = point.x)
+        } else if (maxValue == absPoint.y) {
+            Vector(y = point.y)
+        } else {
+            Vector(z = point.z)
         }
-        return Vector(z = point.z)
     }
 
     override fun localIntersect(ray: Ray, intersections: Intersections) {
@@ -33,8 +35,8 @@ class Cube(
         val (yDistanceMin, yDistanceMax) = checkAxis(ray.origin.y, ray.direction.y, AXIS_MIN, AXIS_MAX)
         val (zDistanceMin, zDistanceMax) = checkAxis(ray.origin.z, ray.direction.z, AXIS_MIN, AXIS_MAX)
 
-        val distanceMin = listOf(xDistanceMin, yDistanceMin, zDistanceMin).max()
-        val distanceMax = listOf(xDistanceMax, yDistanceMax, zDistanceMax).min()
+        val distanceMin = doubleArrayOf(xDistanceMin, yDistanceMin, zDistanceMin).max()
+        val distanceMax = doubleArrayOf(xDistanceMax, yDistanceMax, zDistanceMax).min()
 
         if (distanceMin < distanceMax && distanceMax >= 0) {
             intersections += Intersection(distanceMin, this)

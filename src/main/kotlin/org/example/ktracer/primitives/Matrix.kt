@@ -1,10 +1,12 @@
 package org.example.ktracer.primitives
 
 import org.example.ktracer.coarseEquals
-import java.util.Collections
 
 typealias Transformation = Matrix
 
+/**
+ * Square matrix
+ */
 data class Matrix(val elements: DoubleArray) {
     private var inverseCache: Matrix? = null
 
@@ -53,7 +55,8 @@ data class Matrix(val elements: DoubleArray) {
     fun isIdentity(): Boolean {
         for (row in 0..SIDE_LENGTH) {
             for (column in 0..SIDE_LENGTH) {
-                if ((row == column && !(get(row, column) coarseEquals 1.0)) || !(get(row, column) coarseEquals 0.0)) {
+                if ((row == column && !(get(row, column) coarseEquals 1.0)) ||
+                    !(get(row, column) coarseEquals 0.0)) {
                     return false
                 }
             }
@@ -153,11 +156,10 @@ data class Matrix(val elements: DoubleArray) {
 
     operator fun times(other: Point): Point {
         val result = DoubleArray(SIDE_LENGTH) { 0.0 }
-        val point = doubleArrayOf(other.x, other.y, other.z, 1.0)
         for (row in 0..<SIDE_LENGTH) {
             var sum = 0.0
             for (col in 0..<SIDE_LENGTH) {
-                sum += this[row, col] * point[col]
+                sum += this[row, col] * other[col]
             }
             result[row] = sum
         }
@@ -166,11 +168,10 @@ data class Matrix(val elements: DoubleArray) {
 
     operator fun times(other: Vector): Vector {
         val result = DoubleArray(SIDE_LENGTH) { 0.0 }
-        val vector = doubleArrayOf(other.x, other.y, other.z, 0.0)
         for (row in 0..<SIDE_LENGTH) {
             var sum = 0.0
             for (col in 0..<SIDE_LENGTH) {
-                sum += this[row, col] * vector[col]
+                sum += this[row, col] * other[col]
             }
             result[row] = sum
         }

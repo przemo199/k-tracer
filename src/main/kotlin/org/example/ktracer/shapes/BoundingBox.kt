@@ -17,7 +17,7 @@ class BoundingBox(
     }
 
     fun transform(transformation: Transformation): BoundingBox {
-        val points = listOf(
+        val points = arrayOf(
             min,
             Point(min.x, min.y, max.z),
             Point(min.x, max.y, min.z),
@@ -86,8 +86,8 @@ class BoundingBox(
         val (yDistanceMin, yDistanceMax) = Cube.checkAxis(ray.origin.y, ray.direction.y, min.y, max.y)
         val (zDistanceMin, zDistanceMax) = Cube.checkAxis(ray.origin.z, ray.direction.z, min.z, max.z)
 
-        val distanceMin = listOf(xDistanceMin, yDistanceMin, zDistanceMin).max()
-        val distanceMax = listOf(xDistanceMax, yDistanceMax, zDistanceMax).min()
+        val distanceMin = doubleArrayOf(xDistanceMin, yDistanceMin, zDistanceMin).max()
+        val distanceMax = doubleArrayOf(xDistanceMax, yDistanceMax, zDistanceMax).min()
 
         return !(distanceMin > distanceMax || distanceMax < 0)
     }
@@ -97,7 +97,7 @@ class BoundingBox(
         val dimensionY = (max.y - min.y).absoluteValue
         val dimensionZ = (max.z - min.z).absoluteValue
 
-        val maxDimension = listOf(dimensionX, dimensionY, dimensionZ).max()
+        val maxDimension = doubleArrayOf(dimensionX, dimensionY, dimensionZ).max()
 
         var (xMin, yMin, zMin) = min
         var (xMax, yMax, zMax) = max

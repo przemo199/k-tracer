@@ -35,8 +35,12 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
         return Color(red, green, blue)
     }
 
-    fun clamp(): Color {
+    fun clamped(): Color {
         return map(::clamp)
+    }
+
+    override fun component4(): Double {
+        return 1.0
     }
 
     override fun equals(other: Any?): Boolean {

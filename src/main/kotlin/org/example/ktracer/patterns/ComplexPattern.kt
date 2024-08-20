@@ -11,6 +11,6 @@ data class ComplexPattern(val patternA: Pattern, val patternB: Pattern) : Patter
     }
 
     override fun toString(): String {
-        return "ComplexPattern(patternA=${patternA}, patternB=${patternB})"
+        return "ComplexPattern(patternA=$patternA, patternB=$patternB)"
     }
 }

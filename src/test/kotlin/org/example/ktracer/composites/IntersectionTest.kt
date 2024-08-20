@@ -30,7 +30,7 @@ class IntersectionTest {
         assertEquals(intersection.distance, computedHit.distance)
         assertEquals(shape, computedHit.shape)
         assertEquals(Point(0, 0, -1), computedHit.point)
-        assertEquals(Vector(0, 0, -1), computedHit.cameraVector)
+        assertEquals(Vector(0, 0, -1), computedHit.cameraDirection)
         assertEquals(Vector(0, 0, -1), computedHit.normal)
     }
 
@@ -51,7 +51,7 @@ class IntersectionTest {
         val computedHit = intersection.prepareComputations(ray, Intersections())
         assertTrue(computedHit.isInside)
         assertEquals(Point(0, 0, 1), computedHit.point)
-        assertEquals(Vector(0, 0, -1), computedHit.cameraVector)
+        assertEquals(Vector(0, 0, -1), computedHit.cameraDirection)
     }
 
     @Test
@@ -71,7 +71,7 @@ class IntersectionTest {
         val ray = Ray(Point(0, 1, -1), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersection = Intersection(sqrt(2.0), shape)
         val computedHit = intersection.prepareComputations(ray, Intersections())
-        assertEquals(Vector(0, sqrt(2.0) / 2.0, sqrt(2.0) / 2.0), computedHit.reflectionVector)
+        assertEquals(Vector(0, sqrt(2.0) / 2.0, sqrt(2.0) / 2.0), computedHit.reflectionDirection)
     }
 
     @Test

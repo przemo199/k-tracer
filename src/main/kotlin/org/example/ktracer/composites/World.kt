@@ -48,9 +48,9 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
     }
 
     fun isShadowed(point: Point, light: Light, intersections: Intersections): Boolean {
-        val pointToLightVector = light.position - point
-        val distanceToLight = pointToLightVector.magnitude
-        val shadowRay = Ray(point, pointToLightVector.normalized())
+        val pointToLightDirection = light.position - point
+        val distanceToLight = pointToLightDirection.magnitude
+        val shadowRay = Ray(point, pointToLightDirection.normalized())
         collectIntersections(shadowRay, intersections)
         return intersections.any { it.shape.material.castsShadow && it.isWithinDistance(distanceToLight) }
     }
@@ -59,7 +59,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         if (remainingIterations == 0 || computedHit.shape.material.reflectiveness == 0.0) {
             return DEFAULT_COLOR
         }
-        val reflectedRay = Ray(computedHit.overPoint, computedHit.reflectionVector)
+        val reflectedRay = Ray(computedHit.overPoint, computedHit.reflectionDirection)
         val reflectedColor = localColorAt(reflectedRay, intersections, remainingIterations - 1)
         return reflectedColor * computedHit.shape.material.reflectiveness
     }
@@ -70,7 +70,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         }
 
         val nRatio = computedHit.refractiveIndex1 / computedHit.refractiveIndex2
-        val cosI = computedHit.cameraVector dot computedHit.normal
+        val cosI = computedHit.cameraDirection dot computedHit.normal
         val sin2t = nRatio.squared() * (1.0 - cosI.squared())
         val isTotalInternalReflection = sin2t > 1.0
 
@@ -79,7 +79,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         }
 
         val cosT = sqrt(1.0 - sin2t)
-        val direction = computedHit.normal * (nRatio * cosI - cosT) - (computedHit.cameraVector * nRatio)
+        val direction = computedHit.normal * (nRatio * cosI - cosT) - (computedHit.cameraDirection * nRatio)
         val refractedRay = Ray(computedHit.underPoint, direction)
         val refractedColor = localColorAt(refractedRay, intersections, remainingIterations - 1)
         return refractedColor * computedHit.shape.material.transparency

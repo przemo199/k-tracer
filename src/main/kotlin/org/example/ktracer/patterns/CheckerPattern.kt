@@ -11,6 +11,6 @@ data class CheckerPattern(val colorA: Color, val colorB: Color) : Pattern() {
     }
 
     override fun toString(): String {
-        return "CheckerPattern(colorA=${colorA}, colorB=${colorB})"
+        return "CheckerPattern(colorA=$colorA, colorB=$colorB)"
     }
 }

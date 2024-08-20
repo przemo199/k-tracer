@@ -18,7 +18,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.3")
-    implementation("com.sksamuel.scrimage:scrimage-core:4.1.3")
+    implementation("com.sksamuel.scrimage:scrimage-core:4.2.0")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.3")
     implementation("dev.reimer:progressbar-ktx:0.1.0")
     implementation("me.tongfei:progressbar:0.10.1")

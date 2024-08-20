@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
 
 class Canvas(val width: Int, val height: Int) {
     private val pixels: Array<Color> = Array(width * height) { DEFAULT_COLOR }
-    val size get() = pixels.size
+    val size = width * height
 
     fun coordinatesToIndex(x: Int, y: Int) = (y * width) + x
 
@@ -47,7 +47,7 @@ class Canvas(val width: Int, val height: Int) {
     fun saveAsPng(path: String) {
         val image = ImmutableImage.create(width, height, BufferedImage.TYPE_INT_RGB).blank()
         pixels.asSequence()
-            .map(Color::clamp)
+            .map(Color::clamped)
             .map { it.toRGBColor() }
             .withIndex()
             .forEach { (index, color) -> image.setColor(index, color) }

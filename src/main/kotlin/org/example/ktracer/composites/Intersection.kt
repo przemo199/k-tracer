@@ -15,7 +15,7 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
             normal = -normal
         }
 
-        val reflectionVector = ray.direction.reflect(normal)
+        val reflectionDirection = ray.direction.reflect(normal)
 
         val containers: MutableList<Shape> = mutableListOf()
         var refractiveIndex1 = 1.0
@@ -42,7 +42,7 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
             point,
             camera,
             normal,
-            reflectionVector,
+            reflectionDirection,
             isInside,
             refractiveIndex1,
             refractiveIndex2,

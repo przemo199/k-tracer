@@ -12,6 +12,6 @@ data class StripePattern(val colorA: Color, val colorB: Color) : Pattern() {
     }
 
     override fun toString(): String {
-        return "StripePattern(colorA=${colorA}, colorB=${colorB})"
+        return "StripePattern(colorA=$colorA, colorB=$colorB)"
     }
 }

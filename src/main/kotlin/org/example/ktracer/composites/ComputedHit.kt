@@ -12,9 +12,9 @@ data class ComputedHit(
     val distance: Double,
     val shape: Shape,
     val point: Point,
-    val cameraVector: Vector,
+    val cameraDirection: Vector,
     val normal: Vector,
-    val reflectionVector: Vector,
+    val reflectionDirection: Vector,
     val isInside: Boolean,
     val refractiveIndex1: Double,
     val refractiveIndex2: Double,
@@ -23,7 +23,7 @@ data class ComputedHit(
     val underPoint = point - (normal * EPSILON)
 
     fun schlick(): Double {
-        var cos = cameraVector dot normal
+        var cos = cameraDirection dot normal
 
         if (refractiveIndex1 > refractiveIndex2) {
             val refractionRatio = refractiveIndex1 / refractiveIndex2
@@ -44,9 +44,9 @@ data class ComputedHit(
             distance: Number,
             shape: Shape,
             point: Point,
-            cameraVector: Vector,
+            cameraDirection: Vector,
             normal: Vector,
-            reflectionVector: Vector,
+            reflectionDirection: Vector,
             isInside: Boolean,
             refractiveIndex1: Number,
             refractiveIndex2: Number
@@ -55,9 +55,9 @@ data class ComputedHit(
                 distance.toDouble(),
                 shape,
                 point,
-                cameraVector,
+                cameraDirection,
                 normal,
-                reflectionVector,
+                reflectionDirection,
                 isInside,
                 refractiveIndex1.toDouble(),
                 refractiveIndex2.toDouble()

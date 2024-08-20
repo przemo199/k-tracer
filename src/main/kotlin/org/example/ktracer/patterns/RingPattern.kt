@@ -13,6 +13,6 @@ data class RingPattern(val colorA: Color, val colorB: Color) : Pattern() {
     }
 
     override fun toString(): String {
-        return "RingPattern(colorA=${colorA}, colorB=${colorB})"
+        return "RingPattern(colorA=$colorA, colorB=$colorB)"
     }
 }

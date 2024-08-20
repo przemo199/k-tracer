@@ -26,7 +26,7 @@ data class Material(
         shape: Shape,
         light: Light,
         point: Point,
-        cameraVector: Vector,
+        cameraDirection: Vector,
         normal: Vector,
         inShadow: Boolean,
     ): Color {
@@ -39,15 +39,15 @@ data class Material(
 
         val diffuse: Color
         val specular: Color
-        val lightVector = (light.position - point).normalized()
-        val lightDotNormal = (lightVector dot normal)
+        val lightDirection = (light.position - point).normalized()
+        val lightDotNormal = (lightDirection dot normal)
         if (lightDotNormal < 0.0) {
             diffuse = Color.BLACK
             specular = Color.BLACK
         } else {
             diffuse = effectiveColor * this.diffuse * lightDotNormal
-            val reflectionVector = -(lightVector).reflect(normal)
-            val reflectDotCamera = reflectionVector dot cameraVector
+            val reflectionDirection = -(lightDirection).reflect(normal)
+            val reflectDotCamera = reflectionDirection dot cameraDirection
 
             specular = if (reflectDotCamera <= 0.0) {
                 Color.BLACK
@@ -64,7 +64,7 @@ data class Material(
             computedHit.shape,
             light,
             computedHit.overPoint,
-            computedHit.cameraVector,
+            computedHit.cameraDirection,
             computedHit.normal,
             inShadow,
         )

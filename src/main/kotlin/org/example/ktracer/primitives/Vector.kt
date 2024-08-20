@@ -1,16 +1,14 @@
 package org.example.ktracer.primitives
 
+import kotlin.math.absoluteValue
 import org.example.ktracer.squared
 import kotlin.math.sqrt
 
 class Vector(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) {
-    val magnitude: Double
-        get() {
-            return sqrt(x.squared() + y.squared() + z.squared())
-        }
+    val magnitude: Double by lazy(LazyThreadSafetyMode.NONE) { sqrt(x.squared() + y.squared() + z.squared()) }
 
     fun normalized(): Vector {
-        return magnitude.let { Vector(x / it, y / it, z / it) }
+        return map { it / magnitude }
     }
 
     fun reflect(normal: Vector): Vector {
@@ -31,12 +29,16 @@ class Vector(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z)
 
     operator fun div(other: Number): Vector {
         return other.toDouble().let {
-            map { that -> that / it}
+            map { that -> that / it }
         }
     }
 
     operator fun unaryMinus(): Vector {
         return map(Double::unaryMinus)
+    }
+
+    fun abs(): Vector {
+        return map { it.absoluteValue }
     }
 
     infix fun dot(other: Vector): Double {
@@ -57,6 +59,10 @@ class Vector(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z)
 
     fun copy(x: Double = this.x, y: Double = this.y, z: Double = this.z): Vector {
         return Vector(x, y, z)
+    }
+
+    override fun component4(): Double {
+        return 0.0
     }
 
     override fun equals(other: Any?): Boolean {
