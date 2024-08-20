@@ -19,7 +19,7 @@ class Camera : Transformable {
     val halfWidth: Double
     val halfHeight: Double
     val pixelSize: Double
-    override var transformationInverse: Transformation = Transformation.IDENTITY
+    override var transformation: Transformation = Transformation.IDENTITY
         set(value) {
             field = value
             updateOrigin()
@@ -46,12 +46,12 @@ class Camera : Transformable {
         this.halfWidth = halfWidth
         this.halfHeight = halfHeight
         this.pixelSize = pixelSize
-        this.transformationInverse = Transformation.IDENTITY
-        this.origin = transformationInverse * Point.ORIGIN
+        this.transformation = Transformation.IDENTITY
+        this.origin = transformation * Point.ORIGIN
     }
 
     fun updateOrigin() {
-        origin = transformationInverse * Point.ORIGIN
+        origin = transformation.inverse() * Point.ORIGIN
     }
 
     fun rayForPixel(x: Int, y: Int): Ray {
@@ -59,7 +59,7 @@ class Camera : Transformable {
         val offsetY = (y + 0.5) * pixelSize
         val worldX = halfWidth - offsetX
         val worldY = halfHeight - offsetY
-        val pixel = transformationInverse * Point(worldX, worldY, -1.0)
+        val pixel = transformation.inverse() * Point(worldX, worldY, -1.0)
         val direction = (pixel - origin).normalized()
         return Ray(origin, direction)
     }

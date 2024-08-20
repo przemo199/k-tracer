@@ -12,7 +12,7 @@ data class Ray(val origin: Point, val direction: Vector) {
     }
 
     fun <T> intersect(shape: T, intersections: Intersections) where T: Transformable, T: Intersectable {
-        val localRay = transform(shape.transformationInverse)
+        val localRay = transform(shape.transformation.inverse())
         shape.localIntersect(localRay, intersections)
     }
 

@@ -13,40 +13,29 @@ interface Intersectable {
 }
 
 interface Transformable {
-    var transformation: Transformation
-        get() {
-            return transformationInverse.inverse()
-        }
-        set(value) {
-            transformationInverse = value.inverse()
-        }
-    var transformationInverse: Transformation
+    val transformation: Transformation
 }
 
 interface Boxable {
     fun boundingBox(): BoundingBox
 }
 
-abstract class Shape : Intersectable, Transformable, Boxable {
-    var material: Material
-    override var transformationInverse: Transformation = Transformation.IDENTITY
+abstract class Shape(
+    var material: Material,
+    override var transformation: Transformation
+) : Intersectable, Transformable, Boxable {
     var parent: Shape? = null
-
-    constructor(material: Material, transformation: Transformation) {
-        this.material = material
-        this.transformationInverse = transformation.inverse()
-    }
 
     fun normalAt(worldPoint: Point): Vector {
         return worldPoint.run(::worldToObject).run(::localNormalAt).run(::normalToWorld)
     }
 
     fun worldToObject(point: Point): Point {
-        return transformationInverse * (parent?.worldToObject(point) ?: point)
+        return transformation.inverse() * (parent?.worldToObject(point) ?: point)
     }
 
     fun normalToWorld(normal: Vector): Vector {
-        val worldNormal = (transformationInverse.transpose() * normal).normalized()
+        val worldNormal = (transformation.inverse().transpose() * normal).normalized()
         return parent?.normalToWorld(worldNormal) ?: worldNormal
     }
 
@@ -66,13 +55,13 @@ abstract class Shape : Intersectable, Transformable, Boxable {
 
     override fun equals(other: Any?): Boolean {
         return other is Shape &&
-            material == other.material &&
-            transformationInverse == other.transformationInverse &&
-            parent == other.parent
+                material == other.material &&
+                transformation == other.transformation &&
+                parent == other.parent
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(material, transformationInverse, parent)
+        return Objects.hash(material, transformation, parent)
     }
 
     abstract override fun toString(): String

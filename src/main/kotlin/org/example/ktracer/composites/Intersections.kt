@@ -1,6 +1,6 @@
 package org.example.ktracer.composites
 
-class Intersections : ArrayList<Intersection>() {
+class Intersections : MutableList<Intersection> by ArrayList<Intersection>() {
     fun hit(): Intersection? {
         return this.filter { it.distance >= 0.0 }.minOrNull()
     }
@@ -15,20 +15,15 @@ class Intersections : ArrayList<Intersection>() {
 }
 
 //@JvmInline
-//value class Intersections2(val intersections: ArrayList<Intersection>) {
+//value class Intersections(val intersections: ArrayList<Intersection> = ArrayList()) {
+//    val size
+//        get() = intersections.size
+//
 //    fun hit(): Intersection? {
-//        var maybeHit: Intersection? = null
-//        var hitDistance = MAX
-//        intersections.forEach {
-//            if (it.isWithinDistance(hitDistance)) {
-//                maybeHit = it
-//                hitDistance = it.distance
-//            }
-//        }
-//        return maybeHit
+//        return intersections.filter { it.distance >= 0.0 }.minOrNull()
 //    }
 //
-//    fun sortByDistance() {
+//    fun sort() {
 //        intersections.sortBy { it.distance }
 //    }
 //
@@ -36,7 +31,7 @@ class Intersections : ArrayList<Intersection>() {
 //        intersections.add(intersection)
 //    }
 //
-//    operator fun plusAssign(intersections: Intersections2) {
+//    operator fun plusAssign(intersections: Intersections) {
 //        this.intersections.addAll(intersections.intersections)
 //    }
 //
@@ -60,9 +55,21 @@ class Intersections : ArrayList<Intersection>() {
 //        return intersections.any(predicate)
 //    }
 //
+//    operator fun get(index: Int): Intersection {
+//        return intersections[index]
+//    }
+//
+//    fun first(): Intersection {
+//        return intersections.first()
+//    }
+//
 //    companion object {
-//        operator fun invoke(vararg intersection: Intersection): Intersections2 {
-//            return Intersections2().apply { intersections += intersection }
+//        operator fun invoke(vararg intersections: Intersection): Intersections {
+//            val a = Intersections()
+//            intersections.forEach {
+//                a += it
+//            }
+//            return a
 //        }
 //    }
 //}

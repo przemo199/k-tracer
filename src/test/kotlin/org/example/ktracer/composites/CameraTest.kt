@@ -19,7 +19,7 @@ class CameraTest {
         assertEquals(horizontalSize, camera.horizontalSize)
         assertEquals(verticalSize, camera.verticalSize)
         assertEquals(fieldOfView, camera.fieldOfView)
-        assertEquals(Matrix.IDENTITY, camera.transformationInverse)
+        assertEquals(Matrix.IDENTITY, camera.transformation)
     }
 
     @Test
