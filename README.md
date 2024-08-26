@@ -12,13 +12,13 @@ Implementation of ray tracer from Ray Tracer Challenge book by [Jamis Buck](mail
 ## Usage
 
 ```
-Usage: ktracer options_list
-Arguments:
-    scenePath { String }
-    imageOutputPath { String }
+Usage: ktracer [<options>] <scenepath> <imageoutputpath>
+
+  Render scene to image
+
 Options:
-    --rendering-mode, -r [PARALLEL] { Value should be one of [serial, parallel] }
-    --help, -h -> Usage info
+  -r, --rendering-mode=(SERIAL|PARALLEL)
+  -h, --help                              Show this message and exit
 ```
 
 ## Examples

@@ -97,12 +97,10 @@ class ConstructiveSolidGeometry(
             leftHit: Boolean,
             inLeft: Boolean,
             inRight: Boolean,
-        ): Boolean {
-            return when (operand) {
-                Operand.UNION -> (leftHit && !inRight) || (!leftHit && !inLeft)
-                Operand.INTERSECTION -> (leftHit && inRight) || (!leftHit && inLeft)
-                Operand.DIFFERENCE -> (leftHit && !inRight) || (!leftHit && inLeft)
-            }
+        ) = when (operand) {
+            Operand.UNION -> (leftHit && !inRight) || (!leftHit && !inLeft)
+            Operand.INTERSECTION -> (leftHit && inRight) || (!leftHit && inLeft)
+            Operand.DIFFERENCE -> (leftHit && !inRight) || (!leftHit && inLeft)
         }
     }
 }

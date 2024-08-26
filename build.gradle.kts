@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "2.0.20"
     application
 }
 
@@ -22,7 +22,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.3")
     implementation("dev.reimer:progressbar-ktx:0.1.0")
     implementation("me.tongfei:progressbar:0.10.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.6")
+    implementation("com.github.ajalt.clikt:clikt:4.4.0")
 }
 
 application {

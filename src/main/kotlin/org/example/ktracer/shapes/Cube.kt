@@ -14,19 +14,15 @@ import org.example.ktracer.primitives.Transformation
 class Cube(
     material: Material = Material(),
     transformation: Transformation = Transformation.IDENTITY
-) :
-    Shape(material, transformation) {
+) : Shape(material, transformation) {
 
     override fun localNormalAt(point: Point): Vector {
         val absPoint = point.abs()
-        val maxValue = absPoint.asDoubleArray().max()
 
-        return if (maxValue == absPoint.x) {
-            Vector(x = point.x)
-        } else if (maxValue == absPoint.y) {
-            Vector(y = point.y)
-        } else {
-            Vector(z = point.z)
+        return when (absPoint.max()) {
+            absPoint.x -> Vector(x = point.x)
+            absPoint.y -> Vector(y = point.y)
+            else -> Vector(z = point.z)
         }
     }
 

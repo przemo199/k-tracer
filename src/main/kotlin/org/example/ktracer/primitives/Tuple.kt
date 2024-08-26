@@ -12,18 +12,20 @@ abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0
 
     abstract operator fun component4(): Double
 
-    operator fun get(index: Int): Double {
-        return when(index) {
-            0 -> x
-            1 -> y
-            2 -> z
-            3 -> component4()
-            else -> throw IndexOutOfBoundsException(index)
-        }
+    operator fun get(index: Int) = when (index) {
+        0 -> x
+        1 -> y
+        2 -> z
+        3 -> component4()
+        else -> throw IndexOutOfBoundsException(index)
     }
 
     fun asDoubleArray(): DoubleArray {
-        return doubleArrayOf(x,y,z)
+        return doubleArrayOf(x, y, z)
+    }
+
+    fun max(): Double {
+        return kotlin.math.max(x, kotlin.math.max(y, z))
     }
 
     override fun equals(other: Any?): Boolean {
