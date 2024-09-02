@@ -105,16 +105,16 @@ class VectorTest {
     @Test
     fun `reflected vector`() {
         val vector = Vector(1, -1, 0)
-        val normal = Vector(0, 1, 0)
+        val normal = Vector.UP
         val reflected = vector.reflect(normal)
         assertEquals(Vector(1, 1, 0), reflected)
     }
 
     @Test
     fun `reflected vector on a slanted surface`() {
-        val vector = Vector(0, -1, 0)
+        val vector = Vector.DOWN
         val normal = Vector(sqrt(2.0) / 2.0, sqrt(2.0) / 2.0, 0)
         val reflected = vector.reflect(normal)
-        assertEquals(Vector(1, 0, 0), reflected)
+        assertEquals(Vector.RIGHT, reflected)
     }
 }

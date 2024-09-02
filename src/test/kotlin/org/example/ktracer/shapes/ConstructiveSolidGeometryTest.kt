@@ -63,7 +63,7 @@ class ConstructiveSolidGeometryTest {
     @Test
     fun `ray misses csg`() {
         val csg = ConstructiveSolidGeometry(ConstructiveSolidGeometry.Operand.UNION, Sphere(), Cube())
-        val ray = Ray(Point(0, 2, -5), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 2, -5), Vector.FORWARD)
         val intersections = Intersections()
         csg.localIntersect(ray, intersections)
         assertTrue(intersections.isEmpty())
@@ -75,7 +75,7 @@ class ConstructiveSolidGeometryTest {
         val sphere2 = Sphere()
         sphere2.transformation = translation(0, 0, 0.5)
         val csg = ConstructiveSolidGeometry(ConstructiveSolidGeometry.Operand.UNION, sphere1, sphere2)
-        val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val intersections = Intersections()
         csg.localIntersect(ray, intersections)
         assertEquals(2, intersections.size)

@@ -1,5 +1,8 @@
 package org.example.ktracer.shapes
 
+import kotlin.math.absoluteValue
+import kotlin.math.min
+import kotlin.math.max
 import org.example.ktracer.EPSILON
 import org.example.ktracer.composites.Intersection
 import org.example.ktracer.composites.Intersections
@@ -7,7 +10,6 @@ import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.Ray
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Vector
-import kotlin.math.absoluteValue
 import org.example.ktracer.MAX
 import org.example.ktracer.primitives.Transformation
 
@@ -15,7 +17,6 @@ class Cube(
     material: Material = Material(),
     transformation: Transformation = Transformation.IDENTITY
 ) : Shape(material, transformation) {
-
     override fun localNormalAt(point: Point): Vector {
         val absPoint = point.abs()
 
@@ -31,8 +32,8 @@ class Cube(
         val (yDistanceMin, yDistanceMax) = checkAxis(ray.origin.y, ray.direction.y, AXIS_MIN, AXIS_MAX)
         val (zDistanceMin, zDistanceMax) = checkAxis(ray.origin.z, ray.direction.z, AXIS_MIN, AXIS_MAX)
 
-        val distanceMin = doubleArrayOf(xDistanceMin, yDistanceMin, zDistanceMin).max()
-        val distanceMax = doubleArrayOf(xDistanceMax, yDistanceMax, zDistanceMax).min()
+        val distanceMin = max(max(xDistanceMin, yDistanceMin), zDistanceMin)
+        val distanceMax = min(min(xDistanceMax, yDistanceMax), zDistanceMax)
 
         if (distanceMin < distanceMax && distanceMax >= 0) {
             intersections += Intersection(distanceMin, this)

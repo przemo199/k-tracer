@@ -33,7 +33,7 @@ class GroupTest {
     @Test
     fun `intersecting ray with an empty group`() {
         val group = Group()
-        val ray = Ray(Point(0, 0, 0), Vector.FORWARD)
+        val ray = Ray(Point.ORIGIN, Vector.FORWARD)
         val intersections = Intersections()
         ray.intersect(group, intersections)
         assertTrue(intersections.isEmpty())

@@ -14,8 +14,8 @@ class PlaneTest {
     @Test
     fun `normal is constant`() {
         val plane = Plane()
-        val trueNormal = Vector(0, 1, 0)
-        val normal1 = plane.normalAt(Point(0, 0, 0))
+        val trueNormal = Vector.UP
+        val normal1 = plane.normalAt(Point.ORIGIN)
         val normal2 = plane.normalAt(Point(10, 0, -10))
         val normal3 = plane.normalAt(Point(-5, 0, 150))
         assertEquals(trueNormal, normal1)
@@ -26,7 +26,7 @@ class PlaneTest {
     @Test
     fun `ray doesn't intersect plane in parallel`() {
         val plane = Plane()
-        val ray = Ray(Point(0, 10, 0), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 10, 0), Vector.FORWARD)
         val intersections = Intersections()
         plane.localIntersect(ray, intersections)
         assertTrue(intersections.isEmpty())
@@ -35,7 +35,7 @@ class PlaneTest {
     @Test
     fun `ray intersects plane from above`() {
         val plane = Plane()
-        val ray = Ray(Point(0, 1, 0), Vector(0, -1, 0))
+        val ray = Ray(Point(0, 1, 0), Vector.DOWN)
         val intersections = Intersections()
         plane.localIntersect(ray, intersections)
         assertEquals(1, intersections.size)
@@ -46,7 +46,7 @@ class PlaneTest {
     @Test
     fun `ray intersects plane from below`() {
         val plane = Plane()
-        val ray = Ray(Point(0, -1, 0), Vector(0, 1, 0))
+        val ray = Ray(Point(0, -1, 0), Vector.UP)
         val intersections = Intersections()
         plane.localIntersect(ray, intersections)
         assertEquals(1, intersections.size)

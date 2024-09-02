@@ -41,7 +41,7 @@ class PointTest {
     @Test
     fun `negate point`() {
         listOf(
-            Point(-0, 0, 0) to Point(0, 0, 0),
+            Point(-0, 0, 0) to Point.ORIGIN,
             Point(1, -2, 3) to Point(-1, 2, -3),
             Point(4, -4, 3) to Point(-4, 4, -3),
         ).forEach { (original, negated) ->

@@ -166,19 +166,19 @@ class BoundingBoxTest {
         @JvmStatic
         fun `intersecting ray with bounding box at the origin data`(): Stream<Arguments> {
             return Stream.of(
-                arguments(Point(5, 0.5, 0), Vector(-1, 0, 0), true),
-                arguments(Point(-5, 0.5, 0), Vector(1, 0, 0) , true),
-                arguments(Point(0.5, 5, 0), Vector(0, -1, 0), true),
-                arguments(Point(0.5, -5, 0), Vector(0, 1, 0) , true),
-                arguments(Point(0.5, 0, 5), Vector(0, 0, -1), true),
-                arguments(Point(0.5, 0, -5), Vector(0, 0, 1) , true),
-                arguments(Point(0, 0.5, 0), Vector(0, 0, 1) , true),
+                arguments(Point(5, 0.5, 0), Vector.LEFT, true),
+                arguments(Point(-5, 0.5, 0), Vector.RIGHT , true),
+                arguments(Point(0.5, 5, 0), Vector.DOWN, true),
+                arguments(Point(0.5, -5, 0), Vector.UP , true),
+                arguments(Point(0.5, 0, 5), Vector.BACKWARD, true),
+                arguments(Point(0.5, 0, -5), Vector.FORWARD , true),
+                arguments(Point(0, 0.5, 0), Vector.FORWARD , true),
                 arguments(Point(-2, 0, 0), Vector(2, 4, 6) , false),
                 arguments(Point(0, -2, 0), Vector(6, 2, 4) , false),
                 arguments(Point(0, 0, -2), Vector(4, 6, 2) , false),
-                arguments(Point(2, 0, 2), Vector(0, 0, -1), false),
-                arguments(Point(0, 2, 2), Vector(0, -1, 0), false),
-                arguments(Point(2, 2, 0), Vector(-1, 0, 0), false),
+                arguments(Point(2, 0, 2), Vector.BACKWARD, false),
+                arguments(Point(0, 2, 2), Vector.DOWN, false),
+                arguments(Point(2, 2, 0), Vector.LEFT, false),
             )
         }
     }

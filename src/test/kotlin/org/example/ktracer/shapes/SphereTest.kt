@@ -22,11 +22,11 @@ class SphereTest {
     fun `sphere normal`() {
         val sphere = Sphere()
         val normal = sphere.normalAt(Point(1, 0, 0))
-        assertEquals(Vector(1, 0, 0), normal)
+        assertEquals(Vector.RIGHT, normal)
         val normal2 = sphere.normalAt(Point(0, 1, 0))
-        assertEquals(Vector(0, 1, 0), normal2)
+        assertEquals(Vector.UP, normal2)
         val normal3 = sphere.normalAt(Point(0, 0, 1))
-        assertEquals(Vector(0, 0, 1), normal3)
+        assertEquals(Vector.FORWARD, normal3)
         val thirdOfSqrt3 = sqrt(3.0) / 3.0
         val normal4 = sphere.normalAt(Point(thirdOfSqrt3, thirdOfSqrt3, thirdOfSqrt3))
         assertEquals(Vector(thirdOfSqrt3, thirdOfSqrt3, thirdOfSqrt3), normal4)

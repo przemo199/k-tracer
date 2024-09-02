@@ -36,9 +36,9 @@ class MaterialTest {
     @Test
     fun `lightning with the camera between light and surface`() {
         val shape = Sphere()
-        val position = Point(0, 0, 0)
-        val camera = Vector(0, 0, -1)
-        val normal = Vector(0, 0, -1)
+        val position = Point.ORIGIN
+        val camera = Vector.BACKWARD
+        val normal = Vector.BACKWARD
         val light = Light(Point(0, 0, -10), Color.WHITE)
         val result = shape.material.lighting(shape, light, position, camera, normal, false)
         assertEquals(Color(1.9, 1.9, 1.9), result)
@@ -48,9 +48,9 @@ class MaterialTest {
     fun `lightning with the camera between light and surface, camera offset 45 degree`() {
         val shape = Sphere()
         val halfSqrtOf2 = sqrt(2.0) / 2.0
-        val position = Point(0, 0, 0)
+        val position = Point.ORIGIN
         val camera = Vector(0, halfSqrtOf2, -halfSqrtOf2)
-        val normal = Vector(0, 0, -1)
+        val normal = Vector.BACKWARD
         val light = Light(Point(0, 0, -10), Color.WHITE)
         val result = shape.material.lighting(shape, light, position, camera, normal, false)
         assertEquals(Color(1.0, 1.0, 1.0), result)
@@ -59,9 +59,9 @@ class MaterialTest {
     @Test
     fun `lightning with the camera opposite surface, light offset 45 degree`() {
         val shape = Sphere()
-        val position = Point(0, 0, 0)
-        val camera = Vector(0, 0, -1)
-        val normal = Vector(0, 0, -1)
+        val position = Point.ORIGIN
+        val camera = Vector.BACKWARD
+        val normal = Vector.BACKWARD
         val light = Light(Point(0, 10, -10), Color.WHITE)
         val result = shape.material.lighting(shape, light, position, camera, normal, false)
         assertEquals(Color(0.7363961, 0.7363961, 0.7363961), result)

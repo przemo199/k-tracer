@@ -75,7 +75,7 @@ class CubeTest {
                 arguments(Point(2, 0, 2), Vector.BACKWARD),
                 arguments(Point(0, 2, 2), Vector.DOWN),
                 arguments(Point(2, 2, 0), Vector.LEFT),
-                arguments(Point(0, 0, 2), Vector(0, 0, 1)),
+                arguments(Point(0, 0, 2), Vector.FORWARD),
             )
         }
 

@@ -2,6 +2,8 @@ package org.example.ktracer.shapes
 
 import java.util.Objects
 import kotlin.math.absoluteValue
+import kotlin.math.max
+import kotlin.math.min
 import org.example.ktracer.MAX
 import org.example.ktracer.MIN
 import org.example.ktracer.composites.Ray
@@ -86,8 +88,8 @@ class BoundingBox(
         val (yDistanceMin, yDistanceMax) = Cube.checkAxis(ray.origin.y, ray.direction.y, min.y, max.y)
         val (zDistanceMin, zDistanceMax) = Cube.checkAxis(ray.origin.z, ray.direction.z, min.z, max.z)
 
-        val distanceMin = doubleArrayOf(xDistanceMin, yDistanceMin, zDistanceMin).max()
-        val distanceMax = doubleArrayOf(xDistanceMax, yDistanceMax, zDistanceMax).min()
+        val distanceMin = max(max(xDistanceMin, yDistanceMin), zDistanceMin)
+        val distanceMax = min(min(xDistanceMax, yDistanceMax), zDistanceMax)
 
         return !(distanceMin > distanceMax || distanceMax < 0)
     }
@@ -97,7 +99,7 @@ class BoundingBox(
         val dimensionY = (max.y - min.y).absoluteValue
         val dimensionZ = (max.z - min.z).absoluteValue
 
-        val maxDimension = doubleArrayOf(dimensionX, dimensionY, dimensionZ).max()
+        val maxDimension = max(max(dimensionX, dimensionY), dimensionZ)
 
         var (xMin, yMin, zMin) = min
         var (xMax, yMax, zMax) = max
@@ -144,7 +146,7 @@ class BoundingBox(
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), min, max)
+        return Objects.hash(min, max)
     }
 
     override fun toString(): String {

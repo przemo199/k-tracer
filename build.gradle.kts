@@ -29,8 +29,6 @@ application {
     mainClass.set("org.example.ktracer.KTracerKt")
 }
 
-tasks {
-    test {
-        useJUnitPlatform()
-    }
+tasks.test {
+    useJUnitPlatform()
 }

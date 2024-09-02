@@ -22,7 +22,7 @@ class StripePatternTest {
     @Test
     fun `test pattern alternates in x`() {
         val pattern = StripePattern(Color.WHITE, Color.BLACK)
-        assertEquals(pattern.colorAt(Point(0, 0, 0)), Color.WHITE)
+        assertEquals(pattern.colorAt(Point.ORIGIN), Color.WHITE)
         assertEquals(pattern.colorAt(Point(0.9, 0, 0)), Color.WHITE)
         assertEquals(pattern.colorAt(Point(1, 0, 0)), Color.BLACK)
         assertEquals(pattern.colorAt(Point(-0.1, 0, 0)), Color.BLACK)
@@ -33,7 +33,7 @@ class StripePatternTest {
     @Test
     fun `test pattern is constant in y`() {
         val pattern = StripePattern(Color.WHITE, Color.BLACK)
-        assertEquals(pattern.colorAt(Point(0, 0, 0)), Color.WHITE)
+        assertEquals(pattern.colorAt(Point.ORIGIN), Color.WHITE)
         assertEquals(pattern.colorAt(Point(0, 1, 0)), Color.WHITE)
         assertEquals(pattern.colorAt(Point(0, 2, 0)), Color.WHITE)
     }
@@ -41,7 +41,7 @@ class StripePatternTest {
     @Test
     fun `test pattern is constant in z`() {
         val pattern = StripePattern(Color.WHITE, Color.BLACK)
-        assertEquals(pattern.colorAt(Point(0, 0, 0)), Color.WHITE)
+        assertEquals(pattern.colorAt(Point.ORIGIN), Color.WHITE)
         assertEquals(pattern.colorAt(Point(0, 0, 1)), Color.WHITE)
         assertEquals(pattern.colorAt(Point(0, 0, 2)), Color.WHITE)
     }
@@ -55,8 +55,8 @@ class StripePatternTest {
             diffuse = 0.0
             specular = 0.0
         }
-        val camera = Vector(0, 0, -1)
-        val normal = Vector(0, 0, -1)
+        val camera = Vector.BACKWARD
+        val normal = Vector.BACKWARD
         val light = Light(Point(0, 10, -10), Color.WHITE)
         val color1 = material.lighting(sphere, light, Point(0.9, 0, 0), camera, normal, false)
         val color2 = material.lighting(sphere, light, Point(1.1, 0, 0), camera, normal, false)

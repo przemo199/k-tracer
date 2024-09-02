@@ -23,20 +23,20 @@ class IntersectionTest {
 
     @Test
     fun `precomputing intersection state`() {
-        val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val shape = Sphere()
         val intersection = Intersection(4.0, shape)
         val computedHit = intersection.prepareComputations(ray, Intersections())
         assertEquals(intersection.distance, computedHit.distance)
         assertEquals(shape, computedHit.shape)
         assertEquals(Point(0, 0, -1), computedHit.point)
-        assertEquals(Vector(0, 0, -1), computedHit.cameraDirection)
-        assertEquals(Vector(0, 0, -1), computedHit.normal)
+        assertEquals(Vector.BACKWARD, computedHit.cameraDirection)
+        assertEquals(Vector.BACKWARD, computedHit.normal)
     }
 
     @Test
     fun `hit with intersection outside`() {
-        val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val shape = Sphere()
         val intersection = Intersection(4.0, shape)
         val computedHit = intersection.prepareComputations(ray, Intersections())
@@ -45,18 +45,18 @@ class IntersectionTest {
 
     @Test
     fun `hit with intersection inside`() {
-        val ray = Ray(Point(0, 0, 0), Vector(0, 0, 1))
+        val ray = Ray(Point.ORIGIN, Vector.FORWARD)
         val shape = Sphere()
         val intersection = Intersection(1.0, shape)
         val computedHit = intersection.prepareComputations(ray, Intersections())
         assertTrue(computedHit.isInside)
         assertEquals(Point(0, 0, 1), computedHit.point)
-        assertEquals(Vector(0, 0, -1), computedHit.cameraDirection)
+        assertEquals(Vector.BACKWARD, computedHit.cameraDirection)
     }
 
     @Test
     fun `hit offsets point`() {
-        val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val shape = Sphere()
         shape.transformation = Transformations.translation(0, 0, 1)
         val intersection = Intersection(5.0, shape)

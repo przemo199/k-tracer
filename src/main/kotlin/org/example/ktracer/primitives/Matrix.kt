@@ -13,15 +13,15 @@ data class Matrix(val elements: DoubleArray) {
     constructor(elements: Iterable<Number>) : this(elements.map(Number::toDouble).toDoubleArray())
 
     fun transpose(): Matrix {
-        val result = elements.copyOf()
+        val result = Matrix(elements.copyOf())
         for (row in 0..<SIDE_LENGTH) {
             for (column in row..<SIDE_LENGTH) {
-                result[rowColToIndex(row, column)] = result[rowColToIndex(column, row)].also {
-                    result[rowColToIndex(column, row)] = result[rowColToIndex(row, column)]
+                result[row, column] = result[column, row].also {
+                    result[column, row] = result[row, column]
                 }
             }
         }
-        return Matrix(result)
+        return result
     }
 
     fun determinant(): Double {
@@ -136,22 +136,26 @@ data class Matrix(val elements: DoubleArray) {
         return elements[rowColToIndex(x, y)]
     }
 
+    operator fun set(x: Int, y: Int, value: Double) {
+        elements[rowColToIndex(x, y)] = value
+    }
+
     operator fun set(x: Int, y: Int, value: Number) {
         elements[rowColToIndex(x, y)] = value.toDouble()
     }
 
     operator fun times(other: Matrix): Matrix {
-        val result = DoubleArray(INDICES) { 0.0 }
+        val result = EMPTY
         for (row in 0..<SIDE_LENGTH) {
             for (column in 0..<SIDE_LENGTH) {
                 var sum = 0.0
                 for (index in 0..<SIDE_LENGTH) {
                     sum += this[row, index] * other[index, column]
                 }
-                result[rowColToIndex(row, column)] = sum
+                result[row, column] = sum
             }
         }
-        return Matrix(result)
+        return result
     }
 
     operator fun times(other: Point): Point {
@@ -193,11 +197,9 @@ data class Matrix(val elements: DoubleArray) {
     }
 
     companion object {
-        @JvmStatic
-        val SIDE_LENGTH = 4
+        const val SIDE_LENGTH = 4
 
-        @JvmStatic
-        val INDICES = SIDE_LENGTH * SIDE_LENGTH
+        const val INDICES = SIDE_LENGTH * SIDE_LENGTH
 
         /**
          * Empty matrix
@@ -220,11 +222,11 @@ data class Matrix(val elements: DoubleArray) {
          * Creates identity matrix
          */
         operator fun invoke(): Matrix {
-            val elements = DoubleArray(INDICES)
+            val matrix = EMPTY
             for (index in 0..<SIDE_LENGTH) {
-                elements[rowColToIndex(index, index)] = 1.0
+                matrix[index, index] = 1.0
             }
-            return Matrix(elements)
+            return matrix
         }
     }
 }

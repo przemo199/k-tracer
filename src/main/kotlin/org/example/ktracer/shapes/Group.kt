@@ -61,11 +61,11 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
     }
 
     fun addSubGroup(shapes: List<Shape>) {
-        if (shapes.isNotEmpty()) {
-            val group = Group()
-            shapes.forEach(group::add)
-            add(group)
-        }
+        if (shapes.isEmpty()) return
+
+        val group = Group()
+        shapes.forEach(group::add)
+        add(group)
     }
 
     override fun divide(threshold: Int) {

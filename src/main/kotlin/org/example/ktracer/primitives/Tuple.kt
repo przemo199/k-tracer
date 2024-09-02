@@ -1,6 +1,8 @@
 package org.example.ktracer.primitives
 
 import java.util.Objects
+import kotlin.math.min
+import kotlin.math.max
 import org.example.ktracer.coarseEquals
 
 abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0.0) {
@@ -20,12 +22,16 @@ abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0
         else -> throw IndexOutOfBoundsException(index)
     }
 
-    fun asDoubleArray(): DoubleArray {
+    fun toDoubleArray(): DoubleArray {
         return doubleArrayOf(x, y, z)
     }
 
+    fun min(): Double {
+        return min(x, min(y, z))
+    }
+
     fun max(): Double {
-        return kotlin.math.max(x, kotlin.math.max(y, z))
+        return max(x, max(y, z))
     }
 
     override fun equals(other: Any?): Boolean {

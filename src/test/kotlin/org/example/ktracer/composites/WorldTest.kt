@@ -33,7 +33,7 @@ class WorldTest {
     @Test
     fun `intersect world with ray`() {
         val world = World.default()
-        val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val intersections = Intersections()
         world.collectIntersections(ray, intersections)
         intersections.sort()
@@ -47,7 +47,7 @@ class WorldTest {
     @Test
     fun `shading intersection_from_inside`() {
         val world = World.default()
-        val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val intersection = Intersection(4.0, world.shapes[0])
         val computedHit = intersection.prepareComputations(ray, Intersections())
         val color = world.shadeHit(computedHit, Intersections(), 1)
@@ -57,7 +57,7 @@ class WorldTest {
     @Test
     fun `color when ray misses`() {
         val world = World.default()
-        val ray = Ray(Point(0, 0, -5), Vector(0, 1, 0))
+        val ray = Ray(Point(0, 0, -5), Vector.UP)
         val color = world.colorAt(ray)
         assertEquals(Color.BLACK, color)
     }
@@ -65,7 +65,7 @@ class WorldTest {
     @Test
     fun `color when ray hits`() {
         val world = World.default()
-        val ray = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val color = world.colorAt(ray)
         assertEquals(Color(0.3806611928908177, 0.47582649111352215, 0.28549589466811326), color)
     }
@@ -87,7 +87,7 @@ class WorldTest {
         }
         world.shapes[1] = sphere2
 
-        val ray = Ray(Point(0, 0, 0.75), Vector(0, 0, -1))
+        val ray = Ray(Point(0, 0, 0.75), Vector.BACKWARD)
         val color = world.colorAt(ray)
         assertEquals(color, world.shapes[1].material.color)
     }
@@ -130,7 +130,7 @@ class WorldTest {
         sphere.transformation = Transformations.translation(0, 0, 10)
         world.shapes.add(sphere)
 
-        val ray = Ray(Point(0, 0, 5), Vector(0, 0, 1))
+        val ray = Ray(Point(0, 0, 5), Vector.FORWARD)
         val intersection = Intersection(4, sphere)
         val computedHit = intersection.prepareComputations(ray, Intersections())
         val color = world.shadeHit(computedHit, Intersections(), 1)

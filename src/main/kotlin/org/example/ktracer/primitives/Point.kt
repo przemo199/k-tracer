@@ -41,9 +41,7 @@ class Point(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) 
         return Point(x, y, z)
     }
 
-    override fun component4(): Double {
-        return 1.0
-    }
+    override fun component4() = 1.0
 
     override fun equals(other: Any?): Boolean {
         return this === other || other is Point && super.equals(other)

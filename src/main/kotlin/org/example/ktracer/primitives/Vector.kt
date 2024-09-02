@@ -61,9 +61,7 @@ class Vector(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z)
         return Vector(x, y, z)
     }
 
-    override fun component4(): Double {
-        return 0.0
-    }
+    override fun component4() = 0.0
 
     override fun equals(other: Any?): Boolean {
         return this === other || other is Vector && super.equals(other)

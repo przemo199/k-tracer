@@ -64,7 +64,7 @@ class RayTest {
 
     @Test
     fun `ray origin inside sphere`() {
-        val ray = Ray(Point(0, 0, 0), Vector.FORWARD)
+        val ray = Ray(Point.ORIGIN, Vector.FORWARD)
         val sphere = Sphere()
         val intersections = Intersections()
         ray.intersect(sphere, intersections)
@@ -94,7 +94,7 @@ class RayTest {
         val matrix = Transformations.translation(3, 4, 5)
         val transformedRay = ray.transform(matrix)
         assertEquals(Point(4, 6, 8), transformedRay.origin)
-        assertEquals(Vector(0, 1, 0), transformedRay.direction)
+        assertEquals(Vector.UP, transformedRay.direction)
     }
 
     @Test
