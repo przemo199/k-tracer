@@ -49,8 +49,8 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
         )
     }
 
-    fun isWithinDistance(distance: Number): Boolean {
-        return this.distance >= 0.0 && this.distance < distance.toDouble()
+    fun isWithinDistance(distance: Double): Boolean {
+        return this.distance >= 0.0 && this.distance < distance
     }
 
     override fun compareTo(other: Intersection): Int {

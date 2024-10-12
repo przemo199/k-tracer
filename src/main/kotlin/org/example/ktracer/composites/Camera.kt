@@ -64,7 +64,7 @@ class Camera : Transformable {
         return Ray(origin, direction)
     }
 
-    inline fun renderPixel(world: World, x: Int, y: Int, intersections: Intersections = Intersections()): Color {
+    fun renderPixel(world: World, x: Int, y: Int, intersections: Intersections = Intersections()): Color {
         val ray = rayForPixel(x, y)
         return world.colorAt(ray, intersections)
     }
@@ -121,7 +121,7 @@ class Camera : Transformable {
 
     companion object {
         @JvmStatic
-        fun <T, S : BaseStream<T, S>> S.wrapInProgressBar(): Stream<T> {
+        fun <T, S: BaseStream<T, S>> S.wrapInProgressBar(): Stream<T> {
             return this.progressBar {
                 unitSize = 1
                 style = ProgressBarStyle.ASCII

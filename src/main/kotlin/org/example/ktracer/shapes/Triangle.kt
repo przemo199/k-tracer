@@ -63,13 +63,11 @@ class Triangle(
             vertex1 == other.vertex1 &&
             vertex2 == other.vertex2 &&
             vertex3 == other.vertex3 &&
-            edge1 == other.edge1 &&
-            edge2 == other.edge2 &&
             normal == other.normal
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), vertex1, vertex2, vertex3, edge1, edge2)
+        return Objects.hash(super.hashCode(), vertex1, vertex2, vertex3)
     }
 
     override fun toString(): String {

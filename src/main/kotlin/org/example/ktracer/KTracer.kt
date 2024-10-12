@@ -1,6 +1,7 @@
 package org.example.ktracer
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -9,7 +10,9 @@ import kotlin.time.DurationUnit
 import kotlin.time.measureTimedValue
 import org.example.ktracer.scene.SceneLoader
 
-class KTracer : CliktCommand(help = "Render scene to image", printHelpOnEmptyArgs = true) {
+class KTracer : CliktCommand(name = "Render scene to image") {
+    override val printHelpOnEmptyArgs: Boolean = true
+
     val scenePath by argument()
     val imageOutputPath by argument()
     val renderingMode by option("--rendering-mode", "-r").enum<RenderingMode>().default(RenderingMode.PARALLEL)
