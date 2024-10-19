@@ -11,6 +11,7 @@ import org.example.ktracer.composites.Ray
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Vector
 import org.example.ktracer.MAX
+import org.example.ktracer.coarseEquals
 import org.example.ktracer.primitives.Transformation
 
 class Cube(
@@ -19,10 +20,10 @@ class Cube(
 ) : Shape(material, transformation) {
     override fun localNormalAt(point: Point): Vector {
         val absPoint = point.abs()
-
-        return when (absPoint.max()) {
-            absPoint.x -> Vector(x = point.x)
-            absPoint.y -> Vector(y = point.y)
+        val maxValue = absPoint.max()
+        return when {
+            absPoint.x coarseEquals maxValue -> Vector(x = point.x)
+            absPoint.y coarseEquals maxValue -> Vector(y = point.y)
             else -> Vector(z = point.z)
         }
     }
