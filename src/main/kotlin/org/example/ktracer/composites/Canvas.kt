@@ -9,38 +9,33 @@ import java.io.IOException
 import kotlin.jvm.Throws
 import kotlin.math.roundToInt
 
-class Canvas(val width: Int, val height: Int) {
-    private val pixels: Array<Color> = Array(width * height) { DEFAULT_COLOR }
+class Canvas(val width: Int, val height: Int): Iterable<Color> {
     val size = width * height
+    private val _pixels: Array<Color> = Array(size) { DEFAULT_COLOR }
+    val pixels: List<Color> = _pixels.asList()
 
     fun coordinatesToIndex(x: Int, y: Int) = (y * width) + x
 
     fun indexToCoordinates(index: Int) = Pair(index % width, index / width)
 
-    operator fun get(index: Int): Color {
-        return pixels[index]
-    }
+    operator fun get(index: Int): Color = _pixels[index]
 
     operator fun set(index: Int, color: Color) {
-        pixels[index] = color
+        _pixels[index] = color
     }
 
-    operator fun get(x: Int, y: Int): Color {
-        return pixels[coordinatesToIndex(x, y)]
-    }
+    operator fun get(x: Int, y: Int): Color = _pixels[coordinatesToIndex(x, y)]
 
     operator fun set(x: Int, y: Int, color: Color) {
-        pixels[coordinatesToIndex(x, y)] = color
+        _pixels[coordinatesToIndex(x, y)] = color
     }
 
-    operator fun iterator(): Iterator<Color> {
-        return pixels.iterator()
-    }
+    override operator fun iterator(): Iterator<Color> = _pixels.iterator()
 
     @Throws(IOException::class)
     fun saveAsPng(path: String) {
         val image = ImmutableImage.create(width, height, BufferedImage.TYPE_INT_RGB).blank()
-        pixels
+        _pixels
             .withIndex()
             .forEach { (index, color) -> image.setColor(index, color.toRGBColor()) }
         image.forWriter(PngWriter().withMaxCompression()).write(path)
@@ -55,7 +50,7 @@ class Canvas(val width: Int, val height: Int) {
         val DEFAULT_COLOR = World.DEFAULT_COLOR
 
         fun Color.toRGBColor(): RGBColor {
-            val (red, green, blue) = clamped().map { it * MAX_COLOR_VALUE }
+            val (red, green, blue) = clamped().map(MAX_COLOR_VALUE::times)
             return RGBColor(red.roundToInt(), green.roundToInt(), blue.roundToInt())
         }
     }
