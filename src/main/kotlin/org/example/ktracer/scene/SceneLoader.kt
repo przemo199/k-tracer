@@ -41,6 +41,7 @@ class SceneLoader {
                 when {
                     name.endsWith("-color") -> colorDefinitions[name] = parseColor(it)
                     name.endsWith("-material") -> materialDefinitions[name] = parseMaterial(it)
+                    name.endsWith("-pattern") -> patternDefinitions[name] = parsePattern(it)
                     name.endsWith("-transform") || name.endsWith("-object") -> {
                         transformationDefinitions[name] = parseTransformation(it)
                     }
@@ -50,11 +51,7 @@ class SceneLoader {
     }
 
     fun parseArray(yaml: Iterable<JsonNode>): List<Double> {
-        val result = mutableListOf<Double>()
-        for (jsonNode in yaml) {
-            result.add(jsonNode.doubleValue())
-        }
-        return result
+        return yaml.map(JsonNode::doubleValue)
     }
 
     private fun parseColor(yaml: JsonNode): Color {
@@ -69,21 +66,15 @@ class SceneLoader {
         val colors = yaml[Keyword.COLORS]
         val colorA = parseColor(colors[0])
         val colorB = parseColor(colors[1])
-        val transformation =
-            yaml[Keyword.TRANSFORM]?.let {
-                parseTransformation(it)
-            }
-        val pattern =
-            when (yaml[Keyword.TYPE].asText()) {
-                "stripes" -> StripePattern(colorA, colorB)
-                "gradient" -> GradientPattern(colorA, colorB)
-                "rings" -> RingPattern(colorA, colorB)
-                "checkers" -> CheckerPattern(colorA, colorB)
-                else -> throw UnsupportedOperationException()
-            }
-        transformation?.let {
-            pattern.transformation = it
+        val transformation = yaml[Keyword.TRANSFORM]?.let(::parseTransformation)
+        val pattern = when (yaml[Keyword.TYPE].asText()) {
+            "stripes" -> StripePattern(colorA, colorB)
+            "gradient" -> GradientPattern(colorA, colorB)
+            "rings" -> RingPattern(colorA, colorB)
+            "checkers" -> CheckerPattern(colorA, colorB)
+            else -> throw UnsupportedOperationException()
         }
+        transformation?.let(pattern::transformation::set)
         return pattern
     }
 
@@ -153,7 +144,7 @@ class SceneLoader {
                 }
                 it.isArray -> {
                     val array = it as ArrayNode
-                    when (array.remove(0).asText()) {
+                    when (val operation = array.remove(0).asText()) {
                         "scale" -> {
                             val values = parseArray(array)
                             transformation = Transformations.scaling(values[0], values[1], values[2]) * transformation
@@ -175,8 +166,7 @@ class SceneLoader {
                             val value = array[0].doubleValue()
                             transformation = Transformations.rotationZ(value) * transformation
                         }
-
-                        else -> throw UnsupportedOperationException()
+                        else -> throw UnsupportedOperationException(operation)
                     }
                 }
             }
@@ -223,49 +213,37 @@ class SceneLoader {
                         val intensityValues = parseArray(it["intensity"])
                         val position = Point(positionValues[0], positionValues[1], positionValues[2])
                         val intensity = Color(intensityValues[0], intensityValues[1], intensityValues[2])
-                        world.lights.add(Light(position, intensity))
+                        world.lights += Light(position, intensity)
                     }
                     "plane" -> {
                         val (material, transformation) = parseMaterialAndTransform(it)
-                        world.shapes.add(Plane(material, transformation))
+                        world.shapes += Plane(material, transformation)
                     }
                     "sphere" -> {
                         val (material, transformation) = parseMaterialAndTransform(it)
-                        world.shapes.add(Sphere(material, transformation))
+                        world.shapes += Sphere(material, transformation)
                     }
                     "cube" -> {
                         val (material, transformation) = parseMaterialAndTransform(it)
-                        world.shapes.add(Cube(material, transformation))
+                        world.shapes += Cube(material, transformation)
                     }
                     "cone" -> {
                         val (material, transformation) = parseMaterialAndTransform(it)
                         val (closed, min, max) = parseClosedAndMinAndMax(it)
                         val cone = Cone(material = material, transformation = transformation)
-                        closed?.let { that ->
-                            cone.closed = that
-                        }
-                        min?.let { that ->
-                            cone.min = that
-                        }
-                        max?.let { that ->
-                            cone.max = that
-                        }
-                        world.shapes.add(cone)
+                        closed?.let(cone::closed::set)
+                        min?.let(cone::min::set)
+                        max?.let(cone::max::set)
+                        world.shapes += cone
                     }
                     "cylinder" -> {
                         val (material, transformation) = parseMaterialAndTransform(it)
                         val (closed, min, max) = parseClosedAndMinAndMax(it)
                         val cylinder = Cylinder(material = material, transformation = transformation)
-                        closed?.let { that ->
-                            cylinder.closed = that
-                        }
-                        min?.let { that ->
-                            cylinder.min = that
-                        }
-                        max?.let { that ->
-                            cylinder.max = that
-                        }
-                        world.shapes.add(cylinder)
+                        closed?.let(cylinder::closed::set)
+                        min?.let(cylinder::min::set)
+                        max?.let(cylinder::max::set)
+                        world.shapes += cylinder
                     }
                 }
             }

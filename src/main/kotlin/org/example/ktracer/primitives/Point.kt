@@ -3,6 +3,10 @@ package org.example.ktracer.primitives
 import kotlin.math.absoluteValue
 
 class Point(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) {
+    override val w get() = 1.0
+
+    constructor(fn: (Int) -> Double) : this(fn(0), fn(1), fn(2))
+
     operator fun plus(other: Vector): Point {
         return Point(x + other.x, y + other.y, z + other.z)
     }
@@ -41,14 +45,8 @@ class Point(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) 
         return Point(x, y, z)
     }
 
-    override fun component4() = 1.0
-
     override fun equals(other: Any?): Boolean {
         return this === other || other is Point && super.equals(other)
-    }
-
-    override fun hashCode(): Int {
-        return super.hashCode()
     }
 
     override fun toString(): String {

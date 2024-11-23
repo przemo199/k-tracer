@@ -17,7 +17,7 @@ import org.example.ktracer.primitives.Vector
 import org.example.ktracer.solveQuadratic
 import org.example.ktracer.squared
 
-class Cone(
+open class Cone(
     min: Number = MIN,
     max: Number = MAX,
     var closed: Boolean = false,

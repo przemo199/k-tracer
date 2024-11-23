@@ -189,4 +189,19 @@ class MatrixTest {
         val matrix3 = matrix * matrix2
         assertEquals(matrix, matrix3 * matrix2.inverse())
     }
+
+    @Test
+    fun `negate matrix`() {
+        val matrix = Matrix.IDENTITY
+        val negatedMatrix = Matrix(
+            listOf(
+                -1, 0, 0, 0,
+                0, -1, 0, 0,
+                0, 0, -1, 0,
+                0, 0, 0, -1,
+            ),
+        )
+        assertEquals(negatedMatrix, -matrix)
+        assertEquals(Matrix.IDENTITY, matrix)
+    }
 }

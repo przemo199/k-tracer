@@ -3,13 +3,14 @@ package org.example.ktracer
 import kotlin.math.absoluteValue
 import kotlin.math.sqrt
 
-const val EPSILON = 0.000000008
+const val EPSILON = 0.00000008
 
 const val MIN = -Double.MAX_VALUE
 
 const val MAX = Double.MAX_VALUE
 
 infix fun Double.coarseEquals(other: Double): Boolean {
+    if (this == other) return true
     return (this - other).absoluteValue < EPSILON
 }
 

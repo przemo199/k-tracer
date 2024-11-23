@@ -14,7 +14,7 @@ import org.example.ktracer.MAX
 import org.example.ktracer.coarseEquals
 import org.example.ktracer.primitives.Transformation
 
-class Cube(
+open class Cube(
     material: Material = Material(),
     transformation: Transformation = Transformation.IDENTITY
 ) : Shape(material, transformation) {

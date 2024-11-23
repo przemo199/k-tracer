@@ -1,6 +1,6 @@
 package org.example.ktracer.composites
 
-class Intersections : MutableList<Intersection> by ArrayList<Intersection>() {
+class Intersections : MutableList<Intersection> by ArrayList() {
     fun hit(): Intersection? {
         return this.filter { it.distance >= 0.0 }.minOrNull()
     }

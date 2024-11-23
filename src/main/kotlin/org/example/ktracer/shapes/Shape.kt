@@ -18,6 +18,12 @@ interface Transformable {
 
 interface Boxable {
     fun boundingBox(): BoundingBox
+
+    fun divide(threshold: Int) {
+        // noop for most of the shapes
+    }
+
+    fun parentSpaceBounds(): BoundingBox
 }
 
 abstract class Shape(
@@ -43,12 +49,8 @@ abstract class Shape(
         return this == other
     }
 
-    fun parentSpaceBounds(): BoundingBox {
+    override fun parentSpaceBounds(): BoundingBox {
         return boundingBox().transform(transformation)
-    }
-
-    open fun divide(threshold: Int) {
-        // noop for most of the shapes
     }
 
     abstract fun localNormalAt(point: Point): Vector

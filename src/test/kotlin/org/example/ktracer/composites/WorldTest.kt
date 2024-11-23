@@ -15,9 +15,10 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class WorldTest {
+    private val world = defaultWorld()
+
     @Test
     fun `default world`() {
-        val world = World.default()
         val sphere1 = Sphere().apply {
             material.color = Color(0.8, 1.0, 0.6)
             material.diffuse = 0.7
@@ -32,7 +33,6 @@ class WorldTest {
 
     @Test
     fun `intersect world with ray`() {
-        val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val intersections = Intersections()
         world.collectIntersections(ray, intersections)
@@ -46,7 +46,6 @@ class WorldTest {
 
     @Test
     fun `shading intersection_from_inside`() {
-        val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val intersection = Intersection(4.0, world.shapes[0])
         val computedHit = intersection.prepareComputations(ray, Intersections())
@@ -56,7 +55,6 @@ class WorldTest {
 
     @Test
     fun `color when ray misses`() {
-        val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector.UP)
         val color = world.colorAt(ray)
         assertEquals(Color.BLACK, color)
@@ -64,7 +62,6 @@ class WorldTest {
 
     @Test
     fun `color when ray hits`() {
-        val world = World.default()
         val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val color = world.colorAt(ray)
         assertEquals(Color(0.3806611928908177, 0.47582649111352215, 0.28549589466811326), color)
@@ -72,8 +69,6 @@ class WorldTest {
 
     @Test
     fun `color with intersection behind ray`() {
-        val world = World.default()
-
         val sphere1 = Sphere().apply {
             material.color = Color(0.8, 1, 0.6)
             material.diffuse = 0.7
@@ -94,35 +89,30 @@ class WorldTest {
 
     @Test
     fun `no shadow when nothing obscures light`() {
-        val world = World.default()
         val point = Point(0, 0, 10)
         assertFalse(world.isShadowed(point, world.lights.first(), Intersections()))
     }
 
     @Test
     fun `no shadow when light is behind hit`() {
-        val world = World.default()
         val point = Point(-20, 20, -20)
         assertFalse(world.isShadowed(point, world.lights.first(), Intersections()))
     }
 
     @Test
     fun `no shadow when object is behind hit`() {
-        val world = World.default()
         val point = Point(-2, 2, -2)
         assertFalse(world.isShadowed(point, world.lights.first(), Intersections()))
     }
 
     @Test
     fun `shadow when object is between hit and light`() {
-        val world = World.default()
         val point = Point(10, -10, 10)
         assertTrue(world.isShadowed(point, world.lights.first(), Intersections()))
     }
 
     @Test
     fun `shade hit is given intersection in shadow`() {
-        val world = World.default()
         world.lights[0] = Light(Point(0, 0, -10), Color.WHITE)
         world.shapes.add(Sphere())
 
@@ -139,7 +129,6 @@ class WorldTest {
 
     @Test
     fun `reflected color for a non-reflective material`() {
-        val world = World.default()
         val ray = Ray(Point.ORIGIN, Vector.FORWARD)
         val secondShape = world.shapes[1]
         secondShape.material.ambient = 1.0
@@ -152,7 +141,6 @@ class WorldTest {
 
     @Test
     fun `reflected color for a reflective material`() {
-        val world = World.default()
         val shape = Plane().apply {
             material.reflectiveness = 0.5
             transformation = Transformations.translation(0, -1, 0)
@@ -168,7 +156,6 @@ class WorldTest {
 
     @Test
     fun `shade hit with a reflective material`() {
-        val world = World.default()
         val shape = Plane().apply {
             material.reflectiveness = 0.5
             transformation = Transformations.translation(0, -1, 0)
@@ -184,7 +171,6 @@ class WorldTest {
 
     @Test
     fun `no infinite recursion in reflections`() {
-        val world = World.default()
         world.shapes = mutableListOf()
         world.lights = mutableListOf(Light(Point.ORIGIN, Color(1, 1, 1)))
         val lower = Plane().apply {
@@ -203,7 +189,6 @@ class WorldTest {
 
     @Test
     fun `reflected color at max recursion depth`() {
-        val world = World.default()
         world.shapes = mutableListOf()
         world.lights = mutableListOf(Light(Point.ORIGIN, Color(1, 1, 1)))
         val plane = Plane().apply {
@@ -220,7 +205,6 @@ class WorldTest {
 
     @Test
     fun `refracted color with opaque material`() {
-        val world = World.default()
         val shape = world.shapes[0]
         val intersections = Intersections(Intersection(4, shape), Intersection(6, shape))
         val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
@@ -231,7 +215,6 @@ class WorldTest {
 
     @Test
     fun `refracted color at max recursion depth`() {
-        val world = World.default()
         val shape = world.shapes[0].apply {
             material.transparency = 1.0
             material.refractiveIndex = 1.5
@@ -248,7 +231,6 @@ class WorldTest {
 
     @Test
     fun `refracted color under total internal reflection`() {
-        val world = World.default()
         val shape = world.shapes[0].apply {
             material.transparency = 1.0
             material.refractiveIndex = 1.5
@@ -265,7 +247,6 @@ class WorldTest {
 
     @Test
     fun `refracted color with refracted ray`() {
-        val world = World.default()
         val firstShape = world.shapes[0].apply {
             material.ambient = 1.0
             material.pattern = TestPattern()
@@ -289,7 +270,6 @@ class WorldTest {
 
     @Test
     fun `shade hit with transparent material`() {
-        val world = World.default()
         val floor = Plane().apply {
             transformation = Transformations.translation(0, -1, 0)
             material.transparency = 0.5
@@ -311,7 +291,6 @@ class WorldTest {
 
     @Test
     fun `shade hit with reflective and transparent material`() {
-        val world = World.default()
         val floor = Plane().apply {
             transformation = Transformations.translation(0, -1, 0)
             material.reflectiveness = 0.5
@@ -330,5 +309,19 @@ class WorldTest {
         val computedHit = intersections[0].prepareComputations(ray, intersections)
         val color = world.shadeHit(computedHit, Intersections(), 5)
         assertEquals(Color(0.933915140358792, 0.6964342261158358, 0.6924306911639343), color)
+    }
+
+    private companion object {
+        fun defaultWorld(): World {
+            val sphere1 = Sphere()
+            sphere1.material.apply {
+                color = Color(0.8, 1, 0.6)
+                diffuse = 0.7
+                specular = 0.2
+            }
+            val sphere2 = Sphere()
+            sphere2.transformation = Transformations.scaling(0.5, 0.5, 0.5)
+            return World(mutableListOf(Light()), mutableListOf(sphere1, sphere2))
+        }
     }
 }

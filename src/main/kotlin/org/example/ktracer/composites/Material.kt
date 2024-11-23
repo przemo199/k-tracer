@@ -17,7 +17,7 @@ data class Material(
     var specular: Double = 0.9,
     var shininess: Double = 200.0,
     var reflectiveness: Double = 0.0,
-    var refractiveIndex: Double = 1.0,
+    var refractiveIndex: Double = DEFAULT_REFRACTIVE_INDEX,
     var transparency: Double = 0.0,
     var castsShadow: Boolean = true,
     var pattern: Pattern? = null,
@@ -59,7 +59,7 @@ data class Material(
         return ambient + diffuse + specular
     }
 
-    fun lightingFromComputedHit(computedHit: ComputedHit, light: Light, inShadow: Boolean): Color {
+    fun calculateLighting(computedHit: ComputedHit, light: Light, inShadow: Boolean): Color {
         return lighting(
             computedHit.shape,
             light,
@@ -109,34 +109,13 @@ data class Material(
     }
 
     companion object {
+        /**
+         * Refractive index of air
+         */
+        const val DEFAULT_REFRACTIVE_INDEX = 1.0
+
         @JvmStatic
         val GLASS
             get() = Material(transparency = 1.0, refractiveIndex = 1.5)
-
-        operator fun invoke(
-            color: Color = Color.WHITE,
-            ambient: Number = 0.1,
-            diffuse: Number = 0.9,
-            specular: Number = 0.9,
-            shininess: Number = 200,
-            reflectiveness: Number = 0,
-            refractiveIndex: Number = 1,
-            transparency: Number = 0,
-            castsShadow: Boolean = true,
-            pattern: Pattern? = null
-        ): Material {
-            return Material(
-                color,
-                ambient.toDouble(),
-                diffuse.toDouble(),
-                specular.toDouble(),
-                shininess.toDouble(),
-                reflectiveness.toDouble(),
-                refractiveIndex.toDouble(),
-                transparency.toDouble(),
-                castsShadow,
-                pattern
-            )
-        }
     }
 }

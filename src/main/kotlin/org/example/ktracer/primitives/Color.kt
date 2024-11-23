@@ -4,6 +4,9 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
     val red by this::x
     val green by this::y
     val blue by this::z
+    override val w get() = 1.0
+
+    constructor(fn: (Int) -> Double) : this(fn(0), fn(1), fn(2))
 
     operator fun plus(other: Color): Color {
         return Color(red + other.red, green + other.green, blue + other.blue)
@@ -22,8 +25,8 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
     }
 
     operator fun div(other: Number): Color {
-        return other.toDouble().let {
-            map { that -> that / it}
+        return other.toDouble().let { that ->
+            map { it / that }
         }
     }
 
@@ -39,17 +42,9 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
         return map(::clamp)
     }
 
-    override fun component4(): Double {
-        return 1.0
-    }
-
     override fun equals(other: Any?): Boolean {
         return this === other ||
             other is Color && super.equals(other)
-    }
-
-    override fun hashCode(): Int {
-        return super.hashCode()
     }
 
     override fun toString(): String {
@@ -57,27 +52,27 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
     }
 
     companion object {
-        const val MIN_COLOR_VALUE = 0.0
+        const val MIN_VALUE = 0.0
 
-        const val MAX_COLOR_VALUE = 1.0
-
-        @JvmField
-        val BLACK = Color(MIN_COLOR_VALUE, MIN_COLOR_VALUE, MIN_COLOR_VALUE)
+        const val MAX_VALUE = 1.0
 
         @JvmField
-        val WHITE = Color(MAX_COLOR_VALUE, MAX_COLOR_VALUE, MAX_COLOR_VALUE)
+        val BLACK = Color(MIN_VALUE, MIN_VALUE, MIN_VALUE)
 
         @JvmField
-        val RED = Color(MAX_COLOR_VALUE, MIN_COLOR_VALUE, MIN_COLOR_VALUE)
+        val WHITE = Color(MAX_VALUE, MAX_VALUE, MAX_VALUE)
 
         @JvmField
-        val GREEN = Color(MIN_COLOR_VALUE, MAX_COLOR_VALUE, MIN_COLOR_VALUE)
+        val RED = Color(MAX_VALUE, MIN_VALUE, MIN_VALUE)
 
         @JvmField
-        val BLUE = Color(MIN_COLOR_VALUE, MIN_COLOR_VALUE, MAX_COLOR_VALUE)
+        val GREEN = Color(MIN_VALUE, MAX_VALUE, MIN_VALUE)
+
+        @JvmField
+        val BLUE = Color(MIN_VALUE, MIN_VALUE, MAX_VALUE)
 
         fun clamp(value: Double): Double {
-            return value.coerceIn(MIN_COLOR_VALUE, MAX_COLOR_VALUE)
+            return value.coerceIn(MIN_VALUE, MAX_VALUE)
         }
 
         operator fun invoke(x: Number, y: Number, z: Number): Color {

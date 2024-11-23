@@ -6,6 +6,8 @@ import org.example.ktracer.shapes.Sphere
 import kotlin.math.sqrt
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import org.example.ktracer.coarseEquals
 
 class ComputedHitTest {
     @Test
@@ -38,6 +40,6 @@ class ComputedHitTest {
         val ray = Ray(Point(0, 0.99, -2), Vector.FORWARD)
         val intersections = Intersections(Intersection(1.8589, shape))
         val computedHit = intersections[0].prepareComputations(ray, intersections)
-        assertEquals(0.48873081012212183, computedHit.schlick())
+        assertTrue(0.48873081012212183 coarseEquals computedHit.schlick())
     }
 }

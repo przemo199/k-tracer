@@ -9,7 +9,7 @@ import org.example.ktracer.primitives.Transformation
 import org.example.ktracer.primitives.Vector
 import org.example.ktracer.solveQuadratic
 
-class Sphere(
+open class Sphere(
     material: Material = Material(),
     transformation: Transformation = Transformation.IDENTITY
 ) : Shape(material, transformation) {

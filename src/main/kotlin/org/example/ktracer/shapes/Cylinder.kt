@@ -16,7 +16,7 @@ import org.example.ktracer.MAX
 import org.example.ktracer.MIN
 import org.example.ktracer.primitives.Transformation
 
-class Cylinder(
+open class Cylinder(
     min: Number = MIN,
     max: Number = MAX,
     var closed: Boolean = false,
@@ -60,7 +60,7 @@ class Cylinder(
         val a = ray.direction.x.squared() + ray.direction.z.squared()
 
         if (a.absoluteValue > 0.0) {
-            val b = 2.0 * (ray.origin.x * ray.direction.x + ray.origin.z * ray.direction.z)
+            val b = 2.0 * ((ray.origin.x * ray.direction.x) + (ray.origin.z * ray.direction.z))
             val c = ray.origin.x.squared() + ray.origin.z.squared() - 1.0
             solveQuadratic(a, b, c)?.let {
                 var distance1 = it.first

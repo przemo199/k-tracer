@@ -5,7 +5,10 @@ import org.example.ktracer.squared
 import kotlin.math.sqrt
 
 class Vector(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) {
+    override val w get() = 0.0
     val magnitude: Double by lazy(LazyThreadSafetyMode.NONE) { sqrt(x.squared() + y.squared() + z.squared()) }
+
+    constructor(fn: (Int) -> Double) : this(fn(0), fn(1), fn(2))
 
     fun normalized(): Vector {
         return map { it / magnitude }
@@ -61,14 +64,9 @@ class Vector(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z)
         return Vector(x, y, z)
     }
 
-    override fun component4() = 0.0
-
     override fun equals(other: Any?): Boolean {
-        return this === other || other is Vector && super.equals(other)
-    }
-
-    override fun hashCode(): Int {
-        return super.hashCode()
+        return this === other ||
+                other is Vector && super.equals(other)
     }
 
     override fun toString(): String {

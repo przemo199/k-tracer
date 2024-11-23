@@ -75,9 +75,7 @@ class Camera : Transformable {
 
         if (parallel) {
             val intersections = object : ThreadLocal<Intersections>() {
-                override fun initialValue(): Intersections {
-                    return Intersections()
-                }
+                override fun initialValue(): Intersections = Intersections()
             }
 
             createForkJoinPool().use {

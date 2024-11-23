@@ -13,16 +13,16 @@ import kotlin.test.assertTrue
 import org.example.ktracer.composites.Intersections
 
 class GroupTest {
+    private val group = Group()
+
     @Test
     fun `creating group`() {
-        val group = Group()
         assertEquals(Matrix.IDENTITY, group.transformation)
         assertTrue(group.children.isEmpty())
     }
 
     @Test
     fun `add child to a group`() {
-        val group = Group()
         val sphere = Sphere()
         group.add(sphere)
         assertTrue(group.children.isNotEmpty())
@@ -32,7 +32,6 @@ class GroupTest {
 
     @Test
     fun `intersecting ray with an empty group`() {
-        val group = Group()
         val ray = Ray(Point.ORIGIN, Vector.FORWARD)
         val intersections = Intersections()
         ray.intersect(group, intersections)
@@ -41,7 +40,6 @@ class GroupTest {
 
     @Test
     fun `intersecting ray with non-empty group`() {
-        val group = Group()
         val sphere1 = Sphere()
         val sphere2 = Sphere()
         sphere2.transformation = Transformations.translation(0, 0, -3)
@@ -62,7 +60,6 @@ class GroupTest {
 
     @Test
     fun `intersecting ray with transformed group`() {
-        val group = Group()
         group.transformation = Transformations.scaling(2, 2, 2)
         val sphere = Sphere()
         sphere.transformation = Transformations.translation(5, 0, 0)
@@ -75,7 +72,6 @@ class GroupTest {
 
     @Test
     fun `converting point from world to object space`() {
-        val group = Group()
         group.transformation = Transformations.rotationY(PI / 2.0)
         val group2 = Group()
         group2.transformation = Transformations.scaling(2, 2, 2)
@@ -89,7 +85,6 @@ class GroupTest {
 
     @Test
     fun `converting normal from world to object space`() {
-        val group = Group()
         group.transformation = Transformations.rotationY(PI / 2.0)
         val group2 = Group()
         group2.transformation = Transformations.scaling(1, 2, 3)
@@ -103,7 +98,6 @@ class GroupTest {
 
     @Test
     fun `finding normal on a child shape`() {
-        val group = Group()
         group.transformation = Transformations.rotationY(PI / 2.0)
         val group2 = Group()
         group2.transformation = Transformations.scaling(1, 2, 3)
@@ -140,7 +134,6 @@ class GroupTest {
     fun `creating subgroup from a list of children`() {
         val sphere1 = Sphere()
         val sphere2 = Sphere()
-        val group = Group()
         group.addSubGroup(listOf(sphere1, sphere2))
 
         assertEquals(1, group.children.size)

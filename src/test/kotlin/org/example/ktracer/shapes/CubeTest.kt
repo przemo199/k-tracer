@@ -14,10 +14,11 @@ import kotlin.test.assertTrue
 import org.example.ktracer.composites.Intersections
 
 class CubeTest {
+    private val cube = Cube()
+
     @ParameterizedTest
     @MethodSource("ray intersects cube data")
     fun `ray intersects cube`(origin: Point, direction: Vector, distance1: Double, distance2: Double) {
-        val cube = Cube()
         val ray = Ray(origin, direction)
         val intersections = Intersections()
         cube.localIntersect(ray, intersections)
@@ -29,7 +30,6 @@ class CubeTest {
     @ParameterizedTest
     @MethodSource("ray misses cube data")
     fun `ray misses cube`(origin: Point, direction: Vector) {
-        val cube = Cube()
         val ray = Ray(origin, direction)
         val intersections = Intersections()
         cube.localIntersect(ray, intersections)
@@ -39,14 +39,12 @@ class CubeTest {
     @ParameterizedTest
     @MethodSource("normal on surface of cube data")
     fun `normal on surface of cube`(point: Point, expectedNormal: Vector) {
-        val cube = Cube()
         val normal = cube.localNormalAt(point)
         assertEquals(expectedNormal, normal)
     }
 
     @Test
     fun `cube has bounding box`() {
-        val cube = Cube()
         val boundingBox = cube.boundingBox()
         assertEquals(Point(-1, -1, -1), boundingBox.min)
         assertEquals(Point(1, 1, 1), boundingBox.max)

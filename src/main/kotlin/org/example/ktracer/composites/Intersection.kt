@@ -2,6 +2,7 @@ package org.example.ktracer.composites
 
 import java.util.Objects
 import org.example.ktracer.coarseEquals
+import org.example.ktracer.composites.Material.Companion.DEFAULT_REFRACTIVE_INDEX
 import org.example.ktracer.shapes.Shape
 
 data class Intersection(val distance: Double, val shape: Shape) : Comparable<Intersection> {
@@ -18,12 +19,12 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
         val reflectionDirection = ray.direction.reflect(normal)
 
         val containers: MutableList<Shape> = mutableListOf()
-        var refractiveIndex1 = 1.0
-        var refractiveIndex2 = 1.0
+        var refractiveIndex1 = DEFAULT_REFRACTIVE_INDEX
+        var refractiveIndex2 = DEFAULT_REFRACTIVE_INDEX
         for (intersection in intersections) {
             val isThis = intersection === this
             if (isThis) {
-                refractiveIndex1 = if (containers.isEmpty()) 1.0 else containers.last().material.refractiveIndex
+                refractiveIndex1 = if (containers.isEmpty()) DEFAULT_REFRACTIVE_INDEX else containers.last().material.refractiveIndex
             }
 
             if (!containers.remove(intersection.shape)) {
@@ -31,7 +32,7 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
             }
 
             if (isThis) {
-                refractiveIndex2 = if (containers.isEmpty()) 1.0 else containers.last().material.refractiveIndex
+                refractiveIndex2 = if (containers.isEmpty()) DEFAULT_REFRACTIVE_INDEX else containers.last().material.refractiveIndex
                 break
             }
         }
@@ -43,9 +44,9 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
             camera,
             normal,
             reflectionDirection,
-            isInside,
             refractiveIndex1,
             refractiveIndex2,
+            isInside,
         )
     }
 

@@ -2,20 +2,24 @@ package org.example.ktracer.primitives
 
 import org.example.ktracer.coarseEquals
 
-typealias Transformation = Matrix
-
 /**
  * Square matrix
  */
-data class Matrix(val elements: DoubleArray) {
+data class Matrix private constructor(private val elements: DoubleArray) : Iterable<Double> {
     private var inverseCache: Matrix? = null
+
+    constructor(elements: Collection<Double>) : this(elements.toDoubleArray())
 
     constructor(elements: Iterable<Number>) : this(elements.map(Number::toDouble).toDoubleArray())
 
+    private constructor() : this(EMPTY.apply {
+        SIDE_LENGTH_RANGE.forEach { this[it, it] = 1.0 }
+    })
+
     fun transpose(): Matrix {
         val result = Matrix(elements.copyOf())
-        for (row in 0..<SIDE_LENGTH) {
-            for (column in row..<SIDE_LENGTH) {
+        for (row in SIDE_LENGTH_RANGE) {
+            for (column in row until SIDE_LENGTH) {
                 result[row, column] = result[column, row].also {
                     result[column, row] = result[row, column]
                 }
@@ -53,16 +57,11 @@ data class Matrix(val elements: DoubleArray) {
     }
 
     fun isIdentity(): Boolean {
-        for (row in 0..SIDE_LENGTH) {
-            for (column in 0..SIDE_LENGTH) {
-                if ((row == column && !(get(row, column) coarseEquals 1.0)) ||
-                    !(get(row, column) coarseEquals 0.0)) {
-                    return false
-                }
+        return SIDE_LENGTH_RANGE.all { rowIndex ->
+            SIDE_LENGTH_RANGE.all { columnIndex ->
+                this[rowIndex, columnIndex] coarseEquals if (rowIndex == columnIndex) { 0.0 } else { 1.0 }
             }
         }
-
-        return true
     }
 
     fun inverse(): Matrix {
@@ -132,60 +131,65 @@ data class Matrix(val elements: DoubleArray) {
         return inverse
     }
 
-    operator fun get(x: Int, y: Int): Double {
-        return elements[rowColToIndex(x, y)]
+    operator fun get(row: Int, col: Int): Double {
+        return elements[rowColToIndex(row, col)]
     }
 
-    operator fun set(x: Int, y: Int, value: Double) {
-        elements[rowColToIndex(x, y)] = value
+    operator fun set(row: Int, col: Int, value: Double) {
+        elements[rowColToIndex(row, col)] = value
     }
 
-    operator fun set(x: Int, y: Int, value: Number) {
-        elements[rowColToIndex(x, y)] = value.toDouble()
+    operator fun set(row: Int, col: Int, value: Number) {
+        elements[rowColToIndex(row, col)] = value.toDouble()
     }
 
     operator fun times(other: Matrix): Matrix {
         val result = EMPTY
-        for (row in 0..<SIDE_LENGTH) {
-            for (column in 0..<SIDE_LENGTH) {
-                var sum = 0.0
-                for (index in 0..<SIDE_LENGTH) {
-                    sum += this[row, index] * other[index, column]
-                }
-                result[row, column] = sum
+        for (rowIndex in SIDE_LENGTH_RANGE) {
+            for (columnIndex in SIDE_LENGTH_RANGE) {
+                result[rowIndex, columnIndex] = SIDE_LENGTH_RANGE
+                    .fold(0.0) { accumulator, index ->
+                        accumulator + (this[rowIndex, index] * other[index, columnIndex])
+                    }
             }
         }
         return result
     }
 
     operator fun times(other: Point): Point {
-        val result = DoubleArray(SIDE_LENGTH) { 0.0 }
-        for (row in 0..<SIDE_LENGTH) {
-            var sum = 0.0
-            for (col in 0..<SIDE_LENGTH) {
-                sum += this[row, col] * other[col]
+        return Point { rowIndex ->
+            other.withIndex().fold(0.0) { accumulator, (colIndex, value) ->
+                accumulator + (this[rowIndex, colIndex] * value)
             }
-            result[row] = sum
         }
-        return Point(result[0], result[1], result[2])
     }
 
     operator fun times(other: Vector): Vector {
-        val result = DoubleArray(SIDE_LENGTH) { 0.0 }
-        for (row in 0..<SIDE_LENGTH) {
-            var sum = 0.0
-            for (col in 0..<SIDE_LENGTH) {
-                sum += this[row, col] * other[col]
+        return Vector { rowIndex ->
+            other.withIndex().fold(0.0) { accumulator, (colIndex, value) ->
+                accumulator + (this[rowIndex, colIndex] * value)
             }
-            result[row] = sum
         }
-        return Vector(result[0], result[1], result[2])
+    }
+
+    operator fun unaryMinus(): Matrix {
+        return IDENTITY.apply{
+            elements.forEachIndexed { index, value ->
+                elements[index] = -value
+            }
+        }
+    }
+
+    override fun iterator(): DoubleIterator {
+        return elements.iterator()
     }
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
             other is Matrix &&
-            elements.zip(other.elements).all { it.first coarseEquals it.second }
+            elements.asSequence()
+                .zip(other.elements.asSequence())
+                .all { it.first coarseEquals it.second }
     }
 
     override fun hashCode(): Int {
@@ -193,19 +197,21 @@ data class Matrix(val elements: DoubleArray) {
     }
 
     override fun toString(): String {
-        return "Matrix(elements=${arrayOf(elements).contentDeepToString()})"
+        return "Matrix(elements=${elements.contentToString()})"
     }
 
     companion object {
         const val SIDE_LENGTH = 4
 
-        const val INDICES = SIDE_LENGTH * SIDE_LENGTH
+        const val SIZE = SIDE_LENGTH * SIDE_LENGTH
+
+        val SIDE_LENGTH_RANGE = 0 until SIDE_LENGTH
 
         /**
          * Empty matrix
          */
         @JvmStatic
-        val EMPTY get() = Matrix(DoubleArray(INDICES) { 0.0 })
+        val EMPTY get() = Matrix(DoubleArray(SIZE))
 
         /**
          * Identity matrix
@@ -214,19 +220,8 @@ data class Matrix(val elements: DoubleArray) {
         val IDENTITY get() = Matrix()
 
         @JvmStatic
-        private fun rowColToIndex(x: Int, y: Int): Int {
-            return (x * SIDE_LENGTH) + y
-        }
-
-        /**
-         * Creates identity matrix
-         */
-        operator fun invoke(): Matrix {
-            val matrix = EMPTY
-            for (index in 0..<SIDE_LENGTH) {
-                matrix[index, index] = 1.0
-            }
-            return matrix
+        private fun rowColToIndex(row: Int, col: Int): Int {
+            return (row * SIDE_LENGTH) + col
         }
     }
 }

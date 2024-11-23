@@ -11,7 +11,7 @@ import org.example.ktracer.primitives.Vector
 import kotlin.math.absoluteValue
 import org.example.ktracer.primitives.Transformation
 
-class Triangle(
+open class Triangle(
     val vertex1: Point,
     val vertex2: Point,
     val vertex3: Point,

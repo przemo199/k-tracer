@@ -6,8 +6,6 @@ import com.sksamuel.scrimage.nio.PngWriter
 import org.example.ktracer.primitives.Color
 import java.awt.image.BufferedImage
 import java.io.IOException
-import java.util.stream.IntStream
-import java.util.stream.Stream
 import kotlin.jvm.Throws
 import kotlin.math.roundToInt
 
@@ -18,10 +16,6 @@ class Canvas(val width: Int, val height: Int) {
     fun coordinatesToIndex(x: Int, y: Int) = (y * width) + x
 
     fun indexToCoordinates(index: Int) = Pair(index % width, index / width)
-
-    fun coordinateStream(): Stream<Pair<Int, Int>> {
-        return IntStream.range(0, size).mapToObj(::indexToCoordinates)
-    }
 
     operator fun get(index: Int): Color {
         return pixels[index]
@@ -46,11 +40,9 @@ class Canvas(val width: Int, val height: Int) {
     @Throws(IOException::class)
     fun saveAsPng(path: String) {
         val image = ImmutableImage.create(width, height, BufferedImage.TYPE_INT_RGB).blank()
-        pixels.asSequence()
-            .map(Color::clamped)
-            .map { it.toRGBColor() }
+        pixels
             .withIndex()
-            .forEach { (index, color) -> image.setColor(index, color) }
+            .forEach { (index, color) -> image.setColor(index, color.toRGBColor()) }
         image.forWriter(PngWriter().withMaxCompression()).write(path)
     }
 
@@ -63,7 +55,7 @@ class Canvas(val width: Int, val height: Int) {
         val DEFAULT_COLOR = World.DEFAULT_COLOR
 
         fun Color.toRGBColor(): RGBColor {
-            val (red, green, blue) = map { it * MAX_COLOR_VALUE }
+            val (red, green, blue) = clamped().map { it * MAX_COLOR_VALUE }
             return RGBColor(red.roundToInt(), green.roundToInt(), blue.roundToInt())
         }
     }

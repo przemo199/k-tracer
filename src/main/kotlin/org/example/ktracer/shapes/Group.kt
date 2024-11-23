@@ -55,8 +55,8 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
                 }
             }
         }
-        leftGroup.forEach(children::remove)
-        rightGroup.forEach(children::remove)
+        children.removeAll(leftGroup)
+        children.removeAll(rightGroup)
         return Pair(leftGroup, rightGroup)
     }
 

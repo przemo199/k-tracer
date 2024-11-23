@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.1.0-Beta1"
+    kotlin("jvm") version "2.1.0-RC2"
     application
 }
 

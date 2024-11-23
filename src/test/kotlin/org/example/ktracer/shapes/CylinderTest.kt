@@ -15,9 +15,10 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 class CylinderTest {
+    private val cylinder = Cylinder()
+
     @Test
     fun `default cylinder`() {
-        val cylinder = Cylinder()
         assertEquals(MIN, cylinder.min)
         assertEquals(MAX, cylinder.max)
         assertEquals(false, cylinder.closed)
@@ -26,7 +27,6 @@ class CylinderTest {
     @ParameterizedTest
     @MethodSource("ray misses cylinder data")
     fun `ray misses cylinder`(origin: Point, direction: Vector) {
-        val cylinder = Cylinder()
         val ray = Ray(origin, direction.normalized())
         val intersections = Intersections()
         cylinder.localIntersect(ray, intersections)
@@ -36,7 +36,6 @@ class CylinderTest {
     @ParameterizedTest
     @MethodSource("ray intersects cylinder data")
     fun `ray intersects cylinder`(origin: Point, direction: Vector, distance1: Double, distance2: Double) {
-        val cylinder = Cylinder()
         val ray = Ray(origin, direction.normalized())
         val intersections = Intersections()
         cylinder.localIntersect(ray, intersections)
@@ -48,7 +47,6 @@ class CylinderTest {
     @ParameterizedTest
     @MethodSource("normal vector on cylinder data")
     fun `normal vector on cylinder`(point: Point, expectedNormal: Vector) {
-        val cylinder = Cylinder()
         val normal = cylinder.localNormalAt(point)
         assertEquals(expectedNormal, normal)
     }
@@ -65,7 +63,6 @@ class CylinderTest {
 
     @Test
     fun `unbounded cylinder has bounding box`() {
-        val cylinder = Cylinder()
         val boundingBox = cylinder.boundingBox()
         assertEquals(Point(-1, MIN, -1), boundingBox.min)
         assertEquals(Point(1, MAX, 1), boundingBox.max)

@@ -15,9 +15,9 @@ data class ComputedHit(
     val cameraDirection: Vector,
     val normal: Vector,
     val reflectionDirection: Vector,
-    val isInside: Boolean,
     val refractiveIndex1: Double,
     val refractiveIndex2: Double,
+    val isInside: Boolean,
 ) {
     val overPoint = point + (normal * EPSILON)
     val underPoint = point - (normal * EPSILON)
@@ -35,8 +35,8 @@ data class ComputedHit(
 
             cos = sqrt(1.0 - sin2t)
         }
-        val r0 = ((refractiveIndex1 - refractiveIndex2) / (refractiveIndex1 + refractiveIndex2)).squared()
-        return r0 + (1.0 - r0) * (1.0 - cos).pow(5)
+        val refractionCoefficient = ((refractiveIndex1 - refractiveIndex2) / (refractiveIndex1 + refractiveIndex2)).squared()
+        return refractionCoefficient + ((1.0 - refractionCoefficient) * (1.0 - cos).pow(5))
     }
 
     companion object {
@@ -47,9 +47,9 @@ data class ComputedHit(
             cameraDirection: Vector,
             normal: Vector,
             reflectionDirection: Vector,
-            isInside: Boolean,
             refractiveIndex1: Number,
-            refractiveIndex2: Number
+            refractiveIndex2: Number,
+            isInside: Boolean,
         ): ComputedHit {
             return ComputedHit(
                 distance.toDouble(),
@@ -58,9 +58,9 @@ data class ComputedHit(
                 cameraDirection,
                 normal,
                 reflectionDirection,
-                isInside,
                 refractiveIndex1.toDouble(),
-                refractiveIndex2.toDouble()
+                refractiveIndex2.toDouble(),
+                isInside,
             )
         }
     }

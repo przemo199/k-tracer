@@ -18,8 +18,8 @@ class CanvasTest {
     @Test
     fun `writing pixel canvas`() {
         val canvas = Canvas(10, 20)
-        val red = Color.BLACK
-        canvas[2, 3] = red
-        assertEquals(red, canvas[2, 3])
+        val color = Color.BLACK
+        canvas[2, 3] = color
+        assertEquals(color, canvas[2, 3])
     }
 }

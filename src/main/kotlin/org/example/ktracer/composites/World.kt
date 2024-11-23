@@ -3,9 +3,7 @@ package org.example.ktracer.composites
 import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Light
 import org.example.ktracer.primitives.Point
-import org.example.ktracer.primitives.Transformations
 import org.example.ktracer.shapes.Shape
-import org.example.ktracer.shapes.Sphere
 import org.example.ktracer.squared
 import kotlin.math.sqrt
 
@@ -20,7 +18,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         val material = computedHit.shape.material
         val surfaceColor = lights.map {
             val inShadow = isShadowed(computedHit.overPoint, it, intersections)
-            material.lightingFromComputedHit(computedHit, it, inShadow)
+            material.calculateLighting(computedHit, it, inShadow)
         }.fold(Color(0, 0, 0), Color::plus)
 
         val reflectedColor = reflectedColor(computedHit, intersections, remainingIterations)
@@ -59,6 +57,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         if (remainingIterations == 0 || computedHit.shape.material.reflectiveness == 0.0) {
             return DEFAULT_COLOR
         }
+
         val reflectedRay = Ray(computedHit.overPoint, computedHit.reflectionDirection)
         val reflectedColor = localColorAt(reflectedRay, intersections, remainingIterations - 1)
         return reflectedColor * computedHit.shape.material.reflectiveness
@@ -79,7 +78,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         }
 
         val cosT = sqrt(1.0 - sin2t)
-        val direction = computedHit.normal * (nRatio * cosI - cosT) - (computedHit.cameraDirection * nRatio)
+        val direction = (computedHit.normal * ((nRatio * cosI) - cosT)) - (computedHit.cameraDirection * nRatio)
         val refractedRay = Ray(computedHit.underPoint, direction)
         val refractedColor = localColorAt(refractedRay, intersections, remainingIterations - 1)
         return refractedColor * computedHit.shape.material.transparency
@@ -94,17 +93,5 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
 
         @JvmField
         val DEFAULT_COLOR = Color.BLACK
-
-        fun default(): World {
-            val sphere1 = Sphere()
-            sphere1.material.apply {
-                color = Color(0.8, 1, 0.6)
-                diffuse = 0.7
-                specular = 0.2
-            }
-            val sphere2 = Sphere()
-            sphere2.transformation = Transformations.scaling(0.5, 0.5, 0.5)
-            return World(mutableListOf(Light()), mutableListOf(sphere1, sphere2))
-        }
     }
 }

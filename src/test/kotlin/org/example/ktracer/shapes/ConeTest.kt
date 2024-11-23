@@ -17,9 +17,10 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 class ConeTest {
+    private val cone = Cone()
+
     @Test
     fun `default cone`() {
-        val cone = Cone()
         assertEquals(MIN, cone.min)
         assertEquals(MAX, cone.max)
         assertTrue(!cone.closed)
@@ -28,7 +29,6 @@ class ConeTest {
     @ParameterizedTest
     @MethodSource("intersecting ray with cone data")
     fun `intersecting ray with cone`(origin: Point, direction: Vector, distance1: Double, distance2: Double) {
-        val cone = Cone()
         val ray = Ray(origin, direction.normalized())
         val intersections = Intersections()
         cone.localIntersect(ray, intersections)
@@ -39,7 +39,6 @@ class ConeTest {
 
     @Test
     fun `intersecting ray with cone parallel to one of cone halves`() {
-        val cone = Cone()
         val ray = Ray(Point(0, 0, -1), Vector(0, 1, 1).normalized())
         val intersections = Intersections()
         cone.localIntersect(ray, intersections)
@@ -60,14 +59,12 @@ class ConeTest {
     @ParameterizedTest
     @MethodSource("computing normal vector on cone data")
     fun `computing normal vector on cone`(point: Point, expectedNormal: Vector) {
-        val cone = Cone()
         val normal = cone.localNormalAt(point)
         assertEquals(expectedNormal, normal)
     }
 
     @Test
     fun `unbounded cone has bounding box`() {
-        val cone = Cone()
         val boundingBox = cone.boundingBox()
         assertEquals(Point(MIN, MIN, MIN), boundingBox.min)
         assertEquals(Point(MAX, MAX, MAX), boundingBox.max)

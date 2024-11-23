@@ -11,9 +11,10 @@ import org.example.ktracer.MIN
 import org.example.ktracer.composites.Intersections
 
 class PlaneTest {
+    private val plane = Plane()
+
     @Test
     fun `normal is constant`() {
-        val plane = Plane()
         val trueNormal = Vector.UP
         val normal1 = plane.normalAt(Point.ORIGIN)
         val normal2 = plane.normalAt(Point(10, 0, -10))
@@ -25,7 +26,6 @@ class PlaneTest {
 
     @Test
     fun `ray doesn't intersect plane in parallel`() {
-        val plane = Plane()
         val ray = Ray(Point(0, 10, 0), Vector.FORWARD)
         val intersections = Intersections()
         plane.localIntersect(ray, intersections)
@@ -34,7 +34,6 @@ class PlaneTest {
 
     @Test
     fun `ray intersects plane from above`() {
-        val plane = Plane()
         val ray = Ray(Point(0, 1, 0), Vector.DOWN)
         val intersections = Intersections()
         plane.localIntersect(ray, intersections)
@@ -45,7 +44,6 @@ class PlaneTest {
 
     @Test
     fun `ray intersects plane from below`() {
-        val plane = Plane()
         val ray = Ray(Point(0, -1, 0), Vector.UP)
         val intersections = Intersections()
         plane.localIntersect(ray, intersections)
@@ -56,7 +54,6 @@ class PlaneTest {
 
     @Test
     fun `plane has bounding box`() {
-        val plane = Plane()
         val boundingBox = plane.boundingBox()
         assertEquals(Point(MIN, 0, MIN), boundingBox.min)
         assertEquals(Point(MAX, 0, MAX), boundingBox.max)

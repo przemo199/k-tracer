@@ -3,6 +3,8 @@ package org.example.ktracer.primitives
 import kotlin.math.cos
 import kotlin.math.sin
 
+typealias Transformation = Matrix
+
 object Transformations {
     @JvmStatic
     fun translation(x: Number, y: Number, z: Number): Transformation {
