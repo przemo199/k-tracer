@@ -11,7 +11,5 @@ data class StripePattern(val colorA: Color, val colorB: Color) : Pattern() {
         return if (distance % 2.0 == 0.0) colorA else colorB
     }
 
-    override fun toString(): String {
-        return "StripePattern(colorA=$colorA, colorB=$colorB)"
-    }
+    override fun toString(): String = "StripePattern(colorA=$colorA, colorB=$colorB)"
 }

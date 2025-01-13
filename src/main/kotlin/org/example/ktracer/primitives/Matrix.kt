@@ -52,9 +52,7 @@ data class Matrix private constructor(private val elements: DoubleArray) : Itera
                 (d * ((e * ((j * o) - (k * n))) - (f * ((i * o) - (k * m))) + (g * ((i * n) - (j * m)))))
     }
 
-    fun invertible(): Boolean {
-        return determinant() != 0.0
-    }
+    fun invertible(): Boolean = determinant() != 0.0
 
     fun isIdentity(): Boolean {
         return SIDE_LENGTH_RANGE.all { rowIndex ->
@@ -131,9 +129,7 @@ data class Matrix private constructor(private val elements: DoubleArray) : Itera
         return inverse
     }
 
-    operator fun get(row: Int, col: Int): Double {
-        return elements[rowColToIndex(row, col)]
-    }
+    operator fun get(row: Int, col: Int): Double = elements[rowColToIndex(row, col)]
 
     operator fun set(row: Int, col: Int, value: Double) {
         elements[rowColToIndex(row, col)] = value
@@ -156,33 +152,25 @@ data class Matrix private constructor(private val elements: DoubleArray) : Itera
         return result
     }
 
-    operator fun times(other: Point): Point {
-        return Point { rowIndex ->
-            other.withIndex().fold(0.0) { accumulator, (colIndex, value) ->
-                accumulator + (this[rowIndex, colIndex] * value)
-            }
+    operator fun times(other: Point): Point = Point { rowIndex ->
+        other.withIndex().fold(0.0) { accumulator, (colIndex, value) ->
+            accumulator + (this[rowIndex, colIndex] * value)
         }
     }
 
-    operator fun times(other: Vector): Vector {
-        return Vector { rowIndex ->
-            other.withIndex().fold(0.0) { accumulator, (colIndex, value) ->
-                accumulator + (this[rowIndex, colIndex] * value)
-            }
+    operator fun times(other: Vector): Vector = Vector { rowIndex ->
+        other.withIndex().fold(0.0) { accumulator, (colIndex, value) ->
+            accumulator + (this[rowIndex, colIndex] * value)
         }
     }
 
-    operator fun unaryMinus(): Matrix {
-        return IDENTITY.apply{
-            elements.forEachIndexed { index, value ->
-                elements[index] = -value
-            }
+    operator fun unaryMinus(): Matrix = IDENTITY.apply{
+        elements.forEachIndexed { index, value ->
+            elements[index] = -value
         }
     }
 
-    override fun iterator(): DoubleIterator {
-        return elements.iterator()
-    }
+    override fun iterator(): DoubleIterator = elements.iterator()
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
@@ -192,13 +180,9 @@ data class Matrix private constructor(private val elements: DoubleArray) : Itera
                 .all { it.first coarseEquals it.second }
     }
 
-    override fun hashCode(): Int {
-        return elements.contentHashCode()
-    }
+    override fun hashCode(): Int = elements.contentHashCode()
 
-    override fun toString(): String {
-        return "Matrix(elements=${elements.contentToString()})"
-    }
+    override fun toString(): String = "Matrix(elements=${elements.contentToString()})"
 
     companion object {
         const val SIDE_LENGTH = 4
@@ -220,8 +204,6 @@ data class Matrix private constructor(private val elements: DoubleArray) : Itera
         val IDENTITY get() = Matrix()
 
         @JvmStatic
-        private fun rowColToIndex(row: Int, col: Int): Int {
-            return (row * SIDE_LENGTH) + col
-        }
+        private fun rowColToIndex(row: Int, col: Int): Int = (row * SIDE_LENGTH) + col
     }
 }

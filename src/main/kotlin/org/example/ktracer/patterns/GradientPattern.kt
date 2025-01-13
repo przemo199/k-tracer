@@ -14,7 +14,5 @@ data class GradientPattern(val colorA: Color, val colorB: Color) : Pattern() {
         return colorA + (distance * fraction)
     }
 
-    override fun toString(): String {
-        return "GradientPattern(colorA=$colorA, colorB=$colorB)"
-    }
+    override fun toString(): String = "GradientPattern(colorA=$colorA, colorB=$colorB)"
 }

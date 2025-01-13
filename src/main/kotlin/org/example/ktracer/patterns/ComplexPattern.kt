@@ -10,7 +10,5 @@ data class ComplexPattern(val patternA: Pattern, val patternB: Pattern) : Patter
         return if (distance % 2.0 == 0.0) patternA.colorAt(point) else patternB.colorAt(point)
     }
 
-    override fun toString(): String {
-        return "ComplexPattern(patternA=$patternA, patternB=$patternB)"
-    }
+    override fun toString(): String = "ComplexPattern(patternA=$patternA, patternB=$patternB)"
 }

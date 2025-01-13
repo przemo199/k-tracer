@@ -13,9 +13,7 @@ open class Sphere(
     material: Material = Material(),
     transformation: Transformation = Transformation.IDENTITY
 ) : Shape(material, transformation) {
-    override fun localNormalAt(point: Point): Vector {
-        return Vector(point.x, point.y, point.z)
-    }
+    override fun localNormalAt(point: Point): Vector = Vector(point.x, point.y, point.z)
 
     override fun localIntersect(ray: Ray, intersections: Intersections) {
         val sphereToRayDistance = Vector(ray.origin.x, ray.origin.y, ray.origin.z)
@@ -29,19 +27,9 @@ open class Sphere(
         }
     }
 
-    override fun boundingBox(): BoundingBox {
-        return BoundingBox(Point(-1, -1, -1), Point(1, 1, 1))
-    }
+    override fun boundingBox(): BoundingBox = BoundingBox(Point(-1, -1, -1), Point(1, 1, 1))
 
-    override fun equals(other: Any?): Boolean {
-        return this === other || other is Sphere && super.equals(other)
-    }
+    override fun equals(other: Any?): Boolean = this === other || other is Sphere && super.equals(other)
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
-
-    override fun toString(): String {
-        return "Sphere(material=$material, transformation=$transformation)"
-    }
+    override fun toString(): String = "Sphere(material=$material, transformation=$transformation)"
 }

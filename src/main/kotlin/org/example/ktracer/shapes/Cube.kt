@@ -42,22 +42,11 @@ open class Cube(
         }
     }
 
-    override fun boundingBox(): BoundingBox {
-        return BoundingBox(Point(-1, -1, -1), Point(1, 1, 1))
-    }
+    override fun boundingBox(): BoundingBox = BoundingBox(Point(-1, -1, -1), Point(1, 1, 1))
 
-    override fun equals(other: Any?): Boolean {
-        return this === other ||
-            other is Cube && super.equals(other)
-    }
+    override fun equals(other: Any?): Boolean = this === other || other is Cube && super.equals(other)
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
-
-    override fun toString(): String {
-        return "Cube(material=$material, transformation=$transformation)"
-    }
+    override fun toString(): String = "Cube(material=$material, transformation=$transformation)"
 
     companion object {
         private const val AXIS_MIN = -1.0

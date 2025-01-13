@@ -20,9 +20,7 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
         return Color(red * other.red, green * other.green, blue * other.blue)
     }
 
-    operator fun times(other: Number): Color {
-        return map(other.toDouble()::times)
-    }
+    operator fun times(other: Number): Color = map(other.toDouble()::times)
 
     operator fun div(other: Number): Color {
         return other.toDouble().let { that ->
@@ -30,26 +28,17 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
         }
     }
 
-    inline fun map(fn: (Double) -> Double): Color {
-        return Color(fn(red), fn(green), fn(blue))
-    }
+    inline fun map(fn: (Double) -> Double): Color = Color(fn(red), fn(green), fn(blue))
 
     fun copy(red: Double = this.red, green: Double = this.green, blue: Double = this.blue): Color {
         return Color(red, green, blue)
     }
 
-    fun clamped(): Color {
-        return map(::clamp)
-    }
+    fun clamped(): Color = map(::clamp)
 
-    override fun equals(other: Any?): Boolean {
-        return this === other ||
-            other is Color && super.equals(other)
-    }
+    override fun equals(other: Any?): Boolean = this === other || other is Color && super.equals(other)
 
-    override fun toString(): String {
-        return "Color(red=$x, green=$y, blue=$z)"
-    }
+    override fun toString(): String = "Color(red=$x, green=$y, blue=$z)"
 
     companion object {
         const val MIN_VALUE = 0.0
@@ -75,8 +64,6 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
             return value.coerceIn(MIN_VALUE, MAX_VALUE)
         }
 
-        operator fun invoke(x: Number, y: Number, z: Number): Color {
-            return Color(x.toDouble(), y.toDouble(), z.toDouble())
-        }
+        operator fun invoke(x: Number, y: Number, z: Number): Color = Color(x.toDouble(), y.toDouble(), z.toDouble())
     }
 }

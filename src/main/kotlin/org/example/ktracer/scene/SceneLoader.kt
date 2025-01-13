@@ -50,9 +50,7 @@ class SceneLoader {
         }
     }
 
-    fun parseArray(yaml: Iterable<JsonNode>): List<Double> {
-        return yaml.map(JsonNode::doubleValue)
-    }
+    fun parseArray(yaml: Iterable<JsonNode>): List<Double> = yaml.map(JsonNode::doubleValue)
 
     private fun parseColor(yaml: JsonNode): Color {
         if (yaml.isArray) {

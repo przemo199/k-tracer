@@ -16,9 +16,7 @@ class Plane(
     material: Material = Material(),
     transformation: Transformation = Transformation.IDENTITY,
 ) : Shape(material, transformation) {
-    override fun localNormalAt(point: Point): Vector {
-        return Vector.UP
-    }
+    override fun localNormalAt(point: Point): Vector = Vector.UP
 
     override fun localIntersect(ray: Ray, intersections: Intersections) {
         if (ray.direction.y.absoluteValue < EPSILON) {
@@ -29,23 +27,9 @@ class Plane(
         intersections += Intersection(distance, this)
     }
 
-    override fun boundingBox(): BoundingBox {
-        return BoundingBox(
-            Point(MIN, 0, MIN),
-            Point(MAX, 0, MAX),
-        )
-    }
+    override fun boundingBox(): BoundingBox = BoundingBox(Point(MIN, 0, MIN), Point(MAX, 0, MAX))
 
-    override fun equals(other: Any?): Boolean {
-        return this === other ||
-            other is Plane && super.equals(other)
-    }
+    override fun equals(other: Any?): Boolean = this === other || other is Plane && super.equals(other)
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
-
-    override fun toString(): String {
-        return "Plane(material=$material, transformation=$transformation)"
-    }
+    override fun toString(): String = "Plane(material=$material, transformation=$transformation)"
 }

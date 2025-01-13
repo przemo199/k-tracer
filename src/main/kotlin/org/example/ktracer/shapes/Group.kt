@@ -17,9 +17,7 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
         children += shape
     }
 
-    override fun localNormalAt(point: Point): Vector {
-        throw UnsupportedOperationException()
-    }
+    override fun localNormalAt(point: Point): Vector = throw UnsupportedOperationException()
 
     override fun localIntersect(ray: Ray, intersections: Intersections) {
         if (!boundingBox().intersects(ray)) {
@@ -31,13 +29,9 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
         intersections.sort()
     }
 
-    override fun contains(other: Shape): Boolean {
-        return children.any { other in it }
-    }
+    override fun contains(other: Shape): Boolean = children.any { other in it }
 
-    override fun boundingBox(): BoundingBox {
-        return BoundingBox(children)
-    }
+    override fun boundingBox(): BoundingBox = BoundingBox(children)
 
     fun partitionChildren(): Pair<List<Shape>, List<Shape>> {
         val (leftBox, rightBox) = parentSpaceBounds().splitBounds()
@@ -87,11 +81,7 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
             children == other.children
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), children)
-    }
+    override fun hashCode(): Int = Objects.hash(super.hashCode(), children)
 
-    override fun toString(): String {
-        return "Group(elements=$children)"
-    }
+    override fun toString(): String = "Group(elements=$children)"
 }

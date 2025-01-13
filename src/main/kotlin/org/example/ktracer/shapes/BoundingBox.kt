@@ -15,7 +15,7 @@ class BoundingBox(
     var max: Point = Point(MIN, MIN, MIN),
 ) {
     constructor(shapes: Iterable<Shape>) : this() {
-        shapes.map(Shape::parentSpaceBounds).forEach(::add)
+        shapes.asSequence().map(Shape::parentSpaceBounds).forEach(::add)
     }
 
     fun transform(transformation: Transformation): BoundingBox {
@@ -67,21 +67,13 @@ class BoundingBox(
         add(box.max)
     }
 
-    fun add(shape: Boxable) {
-        add(shape.boundingBox())
-    }
+    fun add(shape: Boxable) = add(shape.boundingBox())
 
-    operator fun plusAssign(point: Point) {
-        add(point)
-    }
+    operator fun plusAssign(point: Point) = add(point)
 
-    operator fun plusAssign(box: BoundingBox) {
-        add(box)
-    }
+    operator fun plusAssign(box: BoundingBox) = add(box)
 
-    operator fun plusAssign(box: Boxable) {
-        add(box)
-    }
+    operator fun plusAssign(box: Boxable) = add(box)
 
     internal fun intersects(ray: Ray): Boolean {
         val (xDistanceMin, xDistanceMax) = Cube.checkAxis(ray.origin.x, ray.direction.x, min.x, max.x)
@@ -134,9 +126,7 @@ class BoundingBox(
             min.z <= point.z && point.z <= max.z
     }
 
-    operator fun contains(box: BoundingBox): Boolean {
-        return box.min in this && box.max in this
-    }
+    operator fun contains(box: BoundingBox): Boolean = box.min in this && box.max in this
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
@@ -145,11 +135,7 @@ class BoundingBox(
             max == other.max
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(min, max)
-    }
+    override fun hashCode(): Int = Objects.hash(min, max)
 
-    override fun toString(): String {
-        return "BoundingBox(min=$min, max=$max)"
-    }
+    override fun toString(): String = "BoundingBox(min=$min, max=$max)"
 }

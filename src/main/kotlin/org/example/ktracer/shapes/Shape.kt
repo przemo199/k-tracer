@@ -1,6 +1,7 @@
 package org.example.ktracer.shapes
 
 import java.util.Objects
+import jdk.javadoc.internal.doclets.toolkit.util.DocPath.parent
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.Ray
@@ -24,6 +25,8 @@ interface Boxable {
     }
 
     fun parentSpaceBounds(): BoundingBox
+
+    operator fun div(threshold: Int) = divide(threshold)
 }
 
 abstract class Shape(
@@ -32,26 +35,18 @@ abstract class Shape(
 ) : Intersectable, Transformable, Boxable {
     var parent: Shape? = null
 
-    fun normalAt(worldPoint: Point): Vector {
-        return worldPoint.run(::worldToObject).run(::localNormalAt).run(::normalToWorld)
-    }
+    fun normalAt(worldPoint: Point): Vector = worldPoint.run(::worldToObject).run(::localNormalAt).run(::normalToWorld)
 
-    fun worldToObject(point: Point): Point {
-        return transformation.inverse() * (parent?.worldToObject(point) ?: point)
-    }
+    fun worldToObject(point: Point): Point = transformation.inverse() * (parent?.worldToObject(point) ?: point)
 
     fun normalToWorld(normal: Vector): Vector {
         val worldNormal = (transformation.inverse().transpose() * normal).normalized()
         return parent?.normalToWorld(worldNormal) ?: worldNormal
     }
 
-    open operator fun contains(other: Shape): Boolean {
-        return this == other
-    }
+    open operator fun contains(other: Shape): Boolean = this == other
 
-    override fun parentSpaceBounds(): BoundingBox {
-        return boundingBox().transform(transformation)
-    }
+    override fun parentSpaceBounds(): BoundingBox = boundingBox().transform(transformation)
 
     abstract fun localNormalAt(point: Point): Vector
 
@@ -62,9 +57,7 @@ abstract class Shape(
                 parent == other.parent
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(material, transformation, parent)
-    }
+    override fun hashCode(): Int = Objects.hash(material, transformation, parent)
 
     abstract override fun toString(): String
 }

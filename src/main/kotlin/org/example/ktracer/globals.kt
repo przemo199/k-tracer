@@ -14,9 +14,7 @@ infix fun Double.coarseEquals(other: Double): Boolean {
     return (this - other).absoluteValue < EPSILON
 }
 
-fun Double.squared(): Double {
-    return this * this
-}
+fun Double.squared(): Double = this * this
 
 fun solveQuadratic(a: Double, b: Double, c: Double): Pair<Double, Double>? {
     val discriminant = b.squared() - 4.0 * a * c

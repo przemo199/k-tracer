@@ -16,9 +16,7 @@ abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0
 
     operator fun component4(): Double = w
 
-    operator fun contains(value: Double): Boolean {
-        return x coarseEquals value || y coarseEquals value || z coarseEquals value
-    }
+    operator fun contains(value: Double): Boolean = x coarseEquals value || y coarseEquals value || z coarseEquals value
 
     operator fun get(index: Int) = when (index) {
         0 -> x
@@ -28,21 +26,13 @@ abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0
         else -> throw IndexOutOfBoundsException(index)
     }
 
-    fun toDoubleArray(): DoubleArray {
-        return doubleArrayOf(x, y, z)
-    }
+    fun toDoubleArray(): DoubleArray = doubleArrayOf(x, y, z)
 
-    fun min(): Double {
-        return min(x, min(y, z))
-    }
+    fun min(): Double = min(x, min(y, z))
 
-    fun max(): Double {
-        return max(x, max(y, z))
-    }
+    fun max(): Double = max(x, max(y, z))
 
-    override fun iterator(): DoubleIterator {
-        return TupleIterator(this)
-    }
+    override fun iterator(): DoubleIterator = TupleIterator(this)
 
     override fun equals(other: Any?): Boolean {
         return other is Tuple &&
@@ -51,9 +41,7 @@ abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0
             z coarseEquals other.z
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(x, y, z, w)
-    }
+    override fun hashCode(): Int = Objects.hash(x, y, z, w)
 
     abstract override fun toString(): String
 

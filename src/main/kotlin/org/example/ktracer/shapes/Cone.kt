@@ -115,9 +115,7 @@ open class Cone(
             max coarseEquals other.max
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), closed, min, max)
-    }
+    override fun hashCode(): Int = Objects.hash(super.hashCode(), closed, min, max)
 
     override fun toString(): String {
         return "Cone(material=$material, transformation=$transformation, min=$min, max=$max, closed=$closed)"

@@ -50,13 +50,9 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
         )
     }
 
-    fun isWithinDistance(distance: Double): Boolean {
-        return this.distance >= 0.0 && this.distance < distance
-    }
+    fun isWithinDistance(distance: Double): Boolean = this.distance >= 0.0 && this.distance < distance
 
-    override fun compareTo(other: Intersection): Int {
-        return distance.compareTo(other.distance)
-    }
+    override fun compareTo(other: Intersection): Int = distance.compareTo(other.distance)
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
@@ -65,17 +61,11 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
             shape == other.shape
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(distance, shape)
-    }
+    override fun hashCode(): Int = Objects.hash(distance, shape)
 
-    override fun toString(): String {
-        return "Intersection(distance=$distance, shape=$shape)"
-    }
+    override fun toString(): String = "Intersection(distance=$distance, shape=$shape)"
 
     companion object {
-        operator fun invoke(distance: Number, shape: Shape): Intersection {
-            return Intersection(distance.toDouble(), shape)
-        }
+        operator fun invoke(distance: Number, shape: Shape): Intersection = Intersection(distance.toDouble(), shape)
     }
 }

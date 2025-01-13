@@ -85,12 +85,7 @@ open class Cylinder(
         intersectCaps(ray, intersections)
     }
 
-    override fun boundingBox(): BoundingBox {
-        return BoundingBox(
-            Point(-1, min, -1),
-            Point(1, max, 1)
-        )
-    }
+    override fun boundingBox(): BoundingBox = BoundingBox(Point(-1, min, -1), Point(1, max, 1))
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
@@ -101,9 +96,7 @@ open class Cylinder(
             max coarseEquals other.max
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), closed, min, max)
-    }
+    override fun hashCode(): Int = Objects.hash(super.hashCode(), closed, min, max)
 
     override fun toString(): String {
         return "Cylinder(material=$material, transformation=$transformation, min=$min, max=$max, closed=$closed)"

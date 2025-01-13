@@ -22,9 +22,7 @@ open class Triangle(
     val edge2: Vector = vertex3 - vertex1
     val normal: Vector = (edge2 cross edge1).normalized()
 
-    override fun localNormalAt(point: Point): Vector {
-        return normal
-    }
+    override fun localNormalAt(point: Point): Vector = normal
 
     override fun localIntersect(ray: Ray, intersections: Intersections) {
         val directionCrossEdge2 = ray.direction cross edge2
@@ -48,12 +46,10 @@ open class Triangle(
         intersections += Intersection(distance, this)
     }
 
-    override fun boundingBox(): BoundingBox {
-        return BoundingBox().apply {
-            add(vertex1)
-            add(vertex2)
-            add(vertex3)
-        }
+    override fun boundingBox(): BoundingBox = BoundingBox().apply {
+        add(vertex1)
+        add(vertex2)
+        add(vertex3)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -66,9 +62,7 @@ open class Triangle(
             normal == other.normal
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), vertex1, vertex2, vertex3)
-    }
+    override fun hashCode(): Int = Objects.hash(super.hashCode(), vertex1, vertex2, vertex3)
 
     override fun toString(): String {
         return "Triangle(material=$material, " +

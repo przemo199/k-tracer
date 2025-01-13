@@ -1,5 +1,6 @@
 package org.example.ktracer.composites
 
+import kotlin.coroutines.EmptyCoroutineContext.fold
 import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Light
 import org.example.ktracer.primitives.Point
@@ -16,7 +17,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
 
     fun shadeHit(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {
         val material = computedHit.shape.material
-        val surfaceColor = lights.map {
+        val surfaceColor = lights.asSequence().map {
             val inShadow = isShadowed(computedHit.overPoint, it, intersections)
             material.calculateLighting(computedHit, it, inShadow)
         }.fold(Color(0, 0, 0), Color::plus)

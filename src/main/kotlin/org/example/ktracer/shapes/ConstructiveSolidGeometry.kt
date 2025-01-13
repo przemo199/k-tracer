@@ -37,9 +37,7 @@ class ConstructiveSolidGeometry(
         return result
     }
 
-    override fun localNormalAt(point: Point): Vector {
-        throw UnsupportedOperationException()
-    }
+    override fun localNormalAt(point: Point): Vector = throw UnsupportedOperationException()
 
     override fun localIntersect(ray: Ray, intersections: Intersections) {
         if (!boundingBox().intersects(ray)) {
@@ -58,15 +56,11 @@ class ConstructiveSolidGeometry(
         intersections += filterIntersections(localIntersections)
     }
 
-    override fun contains(other: Shape): Boolean {
-        return left == other || right == other
-    }
+    override fun contains(other: Shape): Boolean = left == other || right == other
 
-    override fun boundingBox(): BoundingBox {
-        return BoundingBox().apply {
-            add(left.parentSpaceBounds())
-            add(right.parentSpaceBounds())
-        }
+    override fun boundingBox(): BoundingBox = BoundingBox().apply {
+        add(left.parentSpaceBounds())
+        add(right.parentSpaceBounds())
     }
 
     override fun divide(threshold: Int) {
@@ -82,13 +76,9 @@ class ConstructiveSolidGeometry(
             right == other.right
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), left, right)
-    }
+    override fun hashCode(): Int = Objects.hash(super.hashCode(), left, right)
 
-    override fun toString(): String {
-        return "ConstructiveSolidGeometry(operand=$operand, left=$left, right=$right)"
-    }
+    override fun toString(): String = "ConstructiveSolidGeometry(operand=$operand, left=$left, right=$right)"
 
     companion object {
         @JvmStatic

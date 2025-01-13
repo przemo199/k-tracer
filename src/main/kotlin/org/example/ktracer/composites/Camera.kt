@@ -50,7 +50,7 @@ class Camera : Transformable {
         this.origin = transformation * Point.ORIGIN
     }
 
-    fun updateOrigin() {
+    private fun updateOrigin() {
         origin = transformation.inverse() * Point.ORIGIN
     }
 
