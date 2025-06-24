@@ -41,6 +41,11 @@ class Canvas(val width: Int, val height: Int): Iterable<Color> {
         image.forWriter(PngWriter().withMaxCompression()).write(path)
     }
 
+    private fun Color.toRGBColor(): RGBColor {
+        val (red, green, blue) = clamped().map(MAX_COLOR_VALUE::times)
+        return RGBColor(red.roundToInt(), green.roundToInt(), blue.roundToInt())
+    }
+
     companion object {
         const val MIN_COLOR_VALUE = 0.0
 
@@ -48,10 +53,5 @@ class Canvas(val width: Int, val height: Int): Iterable<Color> {
 
         @JvmField
         val DEFAULT_COLOR = World.DEFAULT_COLOR
-
-        fun Color.toRGBColor(): RGBColor {
-            val (red, green, blue) = clamped().map(MAX_COLOR_VALUE::times)
-            return RGBColor(red.roundToInt(), green.roundToInt(), blue.roundToInt())
-        }
     }
 }

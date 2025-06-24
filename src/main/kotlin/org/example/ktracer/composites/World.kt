@@ -1,6 +1,5 @@
 package org.example.ktracer.composites
 
-import kotlin.coroutines.EmptyCoroutineContext.fold
 import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Light
 import org.example.ktracer.primitives.Point
@@ -20,11 +19,11 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         val surfaceColor = lights.asSequence().map {
             val inShadow = isShadowed(computedHit.overPoint, it, intersections)
             material.calculateLighting(computedHit, it, inShadow)
-        }.fold(Color(0, 0, 0), Color::plus)
+        }.fold(DEFAULT_COLOR, Color::plus)
 
         val reflectedColor = reflectedColor(computedHit, intersections, remainingIterations)
         val refractedColor = refractedColor(computedHit, intersections, remainingIterations)
-        if (material.reflectiveness > 0.0 && material.transparency > 0.0) {
+        if (material.isReflective && material.isTransparent) {
             val reflectance = computedHit.schlick()
             return surfaceColor + (reflectedColor * reflectance) + (refractedColor * (1.0 - reflectance))
         } else {
@@ -55,7 +54,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
     }
 
     fun reflectedColor(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {
-        if (remainingIterations == 0 || computedHit.shape.material.reflectiveness == 0.0) {
+        if (remainingIterations == 0 || computedHit.shape.material.isUnreflective) {
             return DEFAULT_COLOR
         }
 
@@ -65,7 +64,7 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
     }
 
     fun refractedColor(computedHit: ComputedHit, intersections: Intersections, remainingIterations: Int): Color {
-        if (remainingIterations == 0 || computedHit.shape.material.transparency == 0.0) {
+        if (remainingIterations == 0 || computedHit.shape.material.isOpaque) {
             return DEFAULT_COLOR
         }
 

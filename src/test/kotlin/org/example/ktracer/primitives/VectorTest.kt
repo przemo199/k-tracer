@@ -31,7 +31,7 @@ class VectorTest {
     @Test
     fun `negate vector`() {
         listOf(
-            Vector(-0, 0, 0) to Vector(0, 0, 0),
+            Vector(-0, 0, 0) to Vector.ZERO,
             Vector(1, -2, 3) to Vector(-1, 2, -3),
             Vector(4, -4, 3) to Vector(-4, 4, -3),
         ).forEach { (original, negated) ->

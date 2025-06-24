@@ -3,9 +3,9 @@ package org.example.ktracer.primitives
 import org.example.ktracer.coarseEquals
 
 /**
- * Square matrix
+ * 4x4 matrix
  */
-data class Matrix private constructor(private val elements: DoubleArray) : Iterable<Double> {
+data class Matrix(private val elements: DoubleArray) : Iterable<Double> {
     private var inverseCache: Matrix? = null
 
     constructor(elements: Collection<Double>) : this(elements.toDoubleArray())
@@ -54,11 +54,9 @@ data class Matrix private constructor(private val elements: DoubleArray) : Itera
 
     fun invertible(): Boolean = determinant() != 0.0
 
-    fun isIdentity(): Boolean {
-        return SIDE_LENGTH_RANGE.all { rowIndex ->
-            SIDE_LENGTH_RANGE.all { columnIndex ->
-                this[rowIndex, columnIndex] coarseEquals if (rowIndex == columnIndex) { 0.0 } else { 1.0 }
-            }
+    fun isIdentity(): Boolean = SIDE_LENGTH_RANGE.all { rowIndex ->
+        SIDE_LENGTH_RANGE.all { columnIndex ->
+            this[rowIndex, columnIndex] coarseEquals if (rowIndex == columnIndex) { 0.0 } else { 1.0 }
         }
     }
 
@@ -204,6 +202,6 @@ data class Matrix private constructor(private val elements: DoubleArray) : Itera
         val IDENTITY get() = Matrix()
 
         @JvmStatic
-        private fun rowColToIndex(row: Int, col: Int): Int = (row * SIDE_LENGTH) + col
+        private fun rowColToIndex(row: Int, col: Int) = (row * SIDE_LENGTH) + col
     }
 }

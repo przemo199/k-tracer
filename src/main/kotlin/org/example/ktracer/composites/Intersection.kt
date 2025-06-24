@@ -1,6 +1,5 @@
 package org.example.ktracer.composites
 
-import java.util.Objects
 import org.example.ktracer.coarseEquals
 import org.example.ktracer.composites.Material.Companion.DEFAULT_REFRACTIVE_INDEX
 import org.example.ktracer.shapes.Shape
@@ -60,8 +59,6 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
             distance coarseEquals other.distance &&
             shape == other.shape
     }
-
-    override fun hashCode(): Int = Objects.hash(distance, shape)
 
     override fun toString(): String = "Intersection(distance=$distance, shape=$shape)"
 

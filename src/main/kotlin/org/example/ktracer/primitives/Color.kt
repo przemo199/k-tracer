@@ -22,11 +22,7 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
 
     operator fun times(other: Number): Color = map(other.toDouble()::times)
 
-    operator fun div(other: Number): Color {
-        return other.toDouble().let { that ->
-            map { it / that }
-        }
-    }
+    operator fun div(other: Number): Color = other.toDouble().let { map { that -> that / it } }
 
     inline fun map(fn: (Double) -> Double): Color = Color(fn(red), fn(green), fn(blue))
 
@@ -60,9 +56,7 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
         @JvmField
         val BLUE = Color(MIN_VALUE, MIN_VALUE, MAX_VALUE)
 
-        fun clamp(value: Double): Double {
-            return value.coerceIn(MIN_VALUE, MAX_VALUE)
-        }
+        fun clamp(value: Double) = value.coerceIn(MIN_VALUE, MAX_VALUE)
 
         operator fun invoke(x: Number, y: Number, z: Number): Color = Color(x.toDouble(), y.toDouble(), z.toDouble())
     }

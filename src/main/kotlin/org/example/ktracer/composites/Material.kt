@@ -22,6 +22,11 @@ data class Material(
     var castsShadow: Boolean = true,
     var pattern: Pattern? = null,
 ) {
+    val isReflective get() = reflectiveness > 0.0
+    val isUnreflective get() = reflectiveness == 0.0
+    val isTransparent get() = transparency > 0.0
+    val isOpaque get() = transparency == 0.0
+
     fun lighting(
         shape: Shape,
         light: Light,

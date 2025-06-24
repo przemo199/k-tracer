@@ -1,5 +1,7 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
+
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.2.0"
     application
 }
 
@@ -8,6 +10,9 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvmToolchain(21)
+    compilerOptions {
+        jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
+    }
 }
 
 repositories {
@@ -17,12 +22,12 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.1")
     implementation("com.sksamuel.scrimage:scrimage-core:4.3.0")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.3")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.1")
     implementation("dev.reimer:progressbar-ktx:0.1.0")
     implementation("me.tongfei:progressbar:0.10.1")
-    implementation("com.github.ajalt.clikt:clikt:5.0.2")
+    implementation("com.github.ajalt.clikt:clikt:5.0.3")
 }
 
 application {

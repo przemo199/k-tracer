@@ -9,10 +9,7 @@ const val MIN = -Double.MAX_VALUE
 
 const val MAX = Double.MAX_VALUE
 
-infix fun Double.coarseEquals(other: Double): Boolean {
-    if (this == other) return true
-    return (this - other).absoluteValue < EPSILON
-}
+infix fun Double.coarseEquals(other: Double): Boolean = this == other || (this - other).absoluteValue < EPSILON
 
 fun Double.squared(): Double = this * this
 

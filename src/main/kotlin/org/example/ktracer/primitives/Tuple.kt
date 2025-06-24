@@ -14,9 +14,9 @@ abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0
 
     operator fun component3() = z
 
-    operator fun component4(): Double = w
+    operator fun component4() = w
 
-    operator fun contains(value: Double): Boolean = x coarseEquals value || y coarseEquals value || z coarseEquals value
+    operator fun contains(value: Double) = x coarseEquals value || y coarseEquals value || z coarseEquals value
 
     operator fun get(index: Int) = when (index) {
         0 -> x
@@ -26,11 +26,11 @@ abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0
         else -> throw IndexOutOfBoundsException(index)
     }
 
-    fun toDoubleArray(): DoubleArray = doubleArrayOf(x, y, z)
+    fun toDoubleArray() = doubleArrayOf(x, y, z)
 
-    fun min(): Double = min(x, min(y, z))
+    fun min() = min(x, min(y, z))
 
-    fun max(): Double = max(x, max(y, z))
+    fun max() = max(x, max(y, z))
 
     override fun iterator(): DoubleIterator = TupleIterator(this)
 
@@ -41,7 +41,7 @@ abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0
             z coarseEquals other.z
     }
 
-    override fun hashCode(): Int = Objects.hash(x, y, z, w)
+    override fun hashCode() = Objects.hash(x, y, z, w)
 
     abstract override fun toString(): String
 

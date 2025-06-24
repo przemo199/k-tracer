@@ -1,7 +1,6 @@
 package org.example.ktracer.shapes
 
 import java.util.Objects
-import jdk.javadoc.internal.doclets.toolkit.util.DocPath.parent
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.Ray
@@ -35,7 +34,11 @@ abstract class Shape(
 ) : Intersectable, Transformable, Boxable {
     var parent: Shape? = null
 
-    fun normalAt(worldPoint: Point): Vector = worldPoint.run(::worldToObject).run(::localNormalAt).run(::normalToWorld)
+    fun normalAt(worldPoint: Point): Vector {
+        val objectPoint = worldToObject(worldPoint)
+        val localNormal = localNormalAt(objectPoint)
+        return normalToWorld(localNormal)
+    }
 
     fun worldToObject(point: Point): Point = transformation.inverse() * (parent?.worldToObject(point) ?: point)
 
@@ -52,9 +55,9 @@ abstract class Shape(
 
     override fun equals(other: Any?): Boolean {
         return other is Shape &&
-                material == other.material &&
-                transformation == other.transformation &&
-                parent == other.parent
+            material == other.material &&
+            transformation == other.transformation &&
+            parent == other.parent
     }
 
     override fun hashCode(): Int = Objects.hash(material, transformation, parent)

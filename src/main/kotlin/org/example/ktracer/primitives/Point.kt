@@ -15,7 +15,7 @@ class Point(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) 
 
     operator fun times(other: Number): Point = map(other.toDouble()::times)
 
-    operator fun div(other: Number): Point = other.toDouble().let { map { that -> that / it} }
+    operator fun div(other: Number): Point = other.toDouble().let { map { that -> that / it } }
 
     operator fun unaryMinus(): Point = map(Double::unaryMinus)
 

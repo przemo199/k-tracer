@@ -19,8 +19,6 @@ import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
 import org.example.ktracer.primitives.Transformations
 import org.example.ktracer.primitives.Vector
-import org.example.ktracer.scene.Keyword.DEFINE
-import org.example.ktracer.scene.Keyword.EXTEND
 import org.example.ktracer.shapes.Cone
 import org.example.ktracer.shapes.Cube
 import org.example.ktracer.shapes.Cylinder
@@ -36,8 +34,8 @@ class SceneLoader {
 
     fun processDefinitions(yaml: JsonNode) {
         yaml.forEach {
-            if (it.has(DEFINE)) {
-                val name = it[DEFINE]!!.asText()
+            if (it.has(Keyword.DEFINE)) {
+                val name = it[Keyword.DEFINE]!!.asText()
                 when {
                     name.endsWith("-color") -> colorDefinitions[name] = parseColor(it)
                     name.endsWith("-material") -> materialDefinitions[name] = parseMaterial(it)
@@ -64,7 +62,6 @@ class SceneLoader {
         val colors = yaml[Keyword.COLORS]
         val colorA = parseColor(colors[0])
         val colorB = parseColor(colors[1])
-        val transformation = yaml[Keyword.TRANSFORM]?.let(::parseTransformation)
         val pattern = when (yaml[Keyword.TYPE].asText()) {
             "stripes" -> StripePattern(colorA, colorB)
             "gradient" -> GradientPattern(colorA, colorB)
@@ -72,7 +69,7 @@ class SceneLoader {
             "checkers" -> CheckerPattern(colorA, colorB)
             else -> throw UnsupportedOperationException()
         }
-        transformation?.let(pattern::transformation::set)
+        yaml[Keyword.TRANSFORM]?.let(::parseTransformation)?.let(pattern::transformation::set)
         return pattern
     }
 
@@ -82,7 +79,7 @@ class SceneLoader {
         }
 
         val material =
-            yaml[EXTEND]?.let {
+            yaml[Keyword.EXTEND]?.let {
                 materialDefinitions[it.asText()]?.copy()
             } ?: Material()
 
