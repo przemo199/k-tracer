@@ -1,0 +1,74 @@
+name: ci
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore: [ '**.md', 'rendered_images/**', '.claude/**' ]
+  pull_request:
+    branches: [ master ]
+    paths-ignore: [ '**.md', 'rendered_images/**', '.claude/**' ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same PR makes the running check pointless; runs on master are left to finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  KOTLIN_CLI_NO_WELCOME_BANNER: 1
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      # Report every OS: a failure on one should not hide the result of the others.
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # The wrapper and the toolchain keep everything they download (their own JRE, the build JDK, Maven
+      # dependencies) in one per-OS directory; only the one for the runner's OS exists.
+      - name: Cache Kotlin Toolchain, JDK and dependencies
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cache/JetBrains/Kotlin
+            ~/Library/Caches/JetBrains/Kotlin
+            ~/AppData/Local/JetBrains/Kotlin
+          key: kotlin-${{ runner.os }}-${{ hashFiles('kotlin', 'kotlin.bat', 'project.yaml', '*.module-template.yaml', '**/module.yaml') }}
+          restore-keys: kotlin-${{ runner.os }}-
+
+      # Compiles every module (including benchmarks) and runs the tests.
+      - name: Test
+        if: runner.os != 'Windows'
+        run: ./kotlin test
+
+      # Windows goes through kotlin.bat, the wrapper Windows users run.
+      - name: Test
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: kotlin.bat test
+
+      # Generates and compiles the JMH harness and runs each benchmark's setup (including its hit/miss checks)
+      # once, in-process. Timings on shared runners are meaningless, so none are compared.
+      - name: Benchmark smoke run
+        if: runner.os == 'Linux'
+        run: ./kotlin run -m benchmarks -- -f 0 -wi 0 -i 1 -r 1ms
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports-${{ runner.os }}
+          path: build/reports/
+          if-no-files-found: ignore
+          retention-days: 7

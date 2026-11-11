@@ -58,7 +58,7 @@ This project deliberately runs on bleeding-edge tooling. Some of the syntax post
   - `-Xcompanion-blocks-and-extensions`: companions are written as `companion { ... }`, **not** `companion object { ... }`. Every file in the project uses this form. Follow it.
   - `-Xfull-value-classes`: multi-field `value class` declarations, such as `Color` and `Coordinates`, are valid here.
 - Do not bump Kotlin, the toolchain (the version pinned in the `kotlin` and `kotlin.bat` wrappers), the JDK or dependency versions, or add or remove compiler flags, unless the task asks for it.
-- CI (`.github/workflows/tests.yaml`) runs `./kotlin test` (`kotlin.bat` on Windows) on Windows, Linux and macOS.
+- CI (`.github/workflows/ci.yaml`) runs `./kotlin test` (`kotlin.bat` on Windows) on Windows, Linux and macOS, plus a benchmark smoke run on Linux (`-f 0 -wi 0 -i 1 -r 1ms`: it checks the JMH harness and each benchmark's setup, not timings). Changes that only touch `*.md`, `rendered_images/` or `.claude/` don't trigger CI. When a run fails, the JUnit reports are uploaded as the `test-reports-<OS>` artifact. Validate workflow edits with [actionlint](https://github.com/rhysd/actionlint).
 
 ## Architecture
 

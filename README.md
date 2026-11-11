@@ -1,6 +1,6 @@
 # k-tracer
 
-[![Tests](https://github.com/przemo199/k-tracer/actions/workflows/tests.yaml/badge.svg)](https://github.com/przemo199/k-tracer/actions/workflows/tests.yaml)
+[![ci](https://github.com/przemo199/k-tracer/actions/workflows/ci.yaml/badge.svg)](https://github.com/przemo199/k-tracer/actions/workflows/ci.yaml)
 
 Implementation of ray tracer from Ray Tracer Challenge book by [Jamis Buck](mailto:jamis@jamisbuck.org) using Kotlin programming language.
 
