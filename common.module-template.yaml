@@ -1,0 +1,13 @@
+# Compiler and JDK settings shared by every module (applied via `apply:`), so the app and the
+# benchmarks are always compiled the same way.
+settings:
+  kotlin:
+    version: 2.5.0-Beta2
+    # Needed by every module that *uses* these features too, not only the one that declares them.
+    freeCompilerArgs:
+      - -Xfull-value-classes
+      - -Xcompanion-blocks-and-extensions
+  jvm:
+    jdk:
+      # Kotlin 2.5.0 (Beta2 and RC) supports JDK up to 26; Kotlin Toolchain enforces this, Gradle did not.
+      version: 26

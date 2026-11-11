@@ -1,0 +1,22 @@
+# JMH microbenchmarks for the ray tracer. Run through scripts/bench.cmd (see AGENTS.md, Performance).
+product: jvm/app
+
+apply:
+  - ../common.module-template.yaml
+
+dependencies:
+  - ..
+  - org.openjdk.jmh:jmh-core:1.37
+  # Generates JMH's harness code from the compiled Kotlin benchmark classes at launch
+  # (JMH's annotation processor only sees Java sources).
+  - org.openjdk.jmh:jmh-generator-bytecode:1.37
+
+settings:
+  kotlin:
+    # JMH subclasses @State classes in its generated code, so they must not be final.
+    allOpen:
+      enabled: true
+      annotations:
+        - org.openjdk.jmh.annotations.State
+  jvm:
+    mainClass: org.example.ktracer.benchmarks.BenchmarkLauncherKt

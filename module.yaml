@@ -1,5 +1,8 @@
 product: jvm/app
 
+apply:
+  - common.module-template.yaml
+
 repositories:
   - https://jitpack.io
 
@@ -14,14 +17,6 @@ test-dependencies:
   - org.junit.jupiter:junit-jupiter-params:6.1.0
 
 settings:
-  kotlin:
-    version: 2.5.0-Beta2
-    freeCompilerArgs:
-      - -Xfull-value-classes
-      - -Xcompanion-blocks-and-extensions
   jvm:
     # The entry point lives in KTracer.kt, not main.kt, so it is not auto-detected.
     mainClass: org.example.ktracer.KTracerKt
-    jdk:
-      # Kotlin 2.5.0 (Beta2 and RC) supports JDK up to 26; Kotlin Toolchain enforces this, Gradle did not.
-      version: 26

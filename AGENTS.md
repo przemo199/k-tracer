@@ -12,7 +12,7 @@ It is a CLI: it reads a YAML scene and writes a PNG.
 ktracer [-r SERIAL|PARALLEL] <scene.yaml> <output.png>
 ```
 
-Single module built with **Kotlin Toolchain** (JetBrains' `kotlin` CLI, formerly called *Amper*), **not Gradle**. No runtime services, no network access at runtime. About 5k lines of code, with roughly 290 unit tests.
+Built with **Kotlin Toolchain** (JetBrains' `kotlin` CLI, formerly called *Amper*), **not Gradle**. Two modules: the app `k-tracer` (the project root) and `benchmarks/` (JMH microbenchmarks, see [Performance](#performance)). No runtime services, no network access at runtime. About 5k lines of code, with roughly 290 unit tests.
 
 ## Commands
 
@@ -24,12 +24,16 @@ Always use the project wrapper. In bash, Git Bash or CI use `./kotlin`; on Windo
 | Run one test class (wildcards allowed) | `./kotlin test --include-classes 'org.example.ktracer.shapes.SphereTest'` |
 | Run one test method | `./kotlin test --include-test 'org.example.ktracer.shapes.SphereTest.sphere normal'` |
 | Compile (main and test) | `./kotlin build` |
-| Render a scene | `./kotlin run -- scenes/cover.yaml out/cover.png` |
+| Render a scene | `./kotlin run -m k-tracer -- scenes/cover.yaml out/cover.png` (`-m` is required: there are two application modules) |
+| Benchmarks (~2.5 min) | `cmd //c "scripts\bench.cmd"`; see [Performance](#performance) |
 | Executable JAR | `./kotlin package`, which writes `build/tasks/_k-tracer_executableJarJvm/k-tracer-jvm-executable.jar` |
 | Effective configuration | `./kotlin show settings` / `./kotlin show dependencies` |
 | Clean | `./kotlin clean` |
 
-- The build is configured entirely in `module.yaml`. There are no `build.gradle.kts`, `settings.gradle.kts` or `gradlew` files. Don't add them back.
+- The build is configured entirely in YAML. There are no `build.gradle.kts`, `settings.gradle.kts` or `gradlew` files. Don't add them back.
+  - `project.yaml` lists the modules besides the root one.
+  - `common.module-template.yaml` holds the Kotlin version, compiler flags and JDK, applied by every module. Change them there, never per module.
+  - `module.yaml` is the app (dependencies, main class); `benchmarks/module.yaml` is the benchmarks module.
 - The `module.yaml` schema is documented at <https://kotlin-toolchain.org/latest/reference/module/>. It is new; don't guess keys from old Amper or Gradle knowledge. Check them with `./kotlin show settings`, which prints every setting with its source.
 - JUnit XML results (with failure messages) are written to `build/reports/k-tracer/jvm/`.
 - A warm `./kotlin test` takes about 3 s, and a clean one about 15 s.
@@ -50,7 +54,7 @@ Do **not** overwrite `rendered_images/*.png` unless you were asked to regenerate
 This project deliberately runs on bleeding-edge tooling. Some of the syntax postdates many models' training data. **Do not "fix" it back to older forms.**
 
 - **Kotlin `2.5.0-Beta2`** (`settings.kotlin.version`) and **JDK 26** (`settings.jvm.jdk.version`, auto-provisioned). Kotlin Toolchain refuses JDK 27 with Kotlin 2.5.0 (Beta2 and RC support JDK up to 26), so don't raise it until a Kotlin version that supports 27 is pinned.
-- Experimental compiler flags in `module.yaml` (`settings.kotlin.freeCompilerArgs`):
+- Experimental compiler flags in `common.module-template.yaml` (`settings.kotlin.freeCompilerArgs`). Every module needs them, including modules that only *use* these features:
   - `-Xcompanion-blocks-and-extensions`: companions are written as `companion { ... }`, **not** `companion object { ... }`. Every file in the project uses this form. Follow it.
   - `-Xfull-value-classes`: multi-field `value class` declarations, such as `Color` and `Coordinates`, are valid here.
 - Do not bump Kotlin, the toolchain (the version pinned in the `kotlin` and `kotlin.bat` wrappers), the JDK or dependency versions, or add or remove compiler flags, unless the task asks for it.
@@ -81,7 +85,7 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 - **Matrices are effectively immutable.** `Matrix.inverse()` is cached on the instance. Never mutate a matrix's elements after construction. Build a new transform instead.
 - **Transform order.** `A * B` applies `B` first. For example, `translation(...) * scaling(...)` scales, then translates.
 - **`Intersections` is a reused scratch buffer.** It is passed down the call stack and is per-thread in parallel rendering (`ThreadLocal`). `World.collectIntersections` clears it. Do not keep references to it across calls, and do not share one between threads.
-- **Hot path.** Intersection and shading code runs billions of times per render. Avoid allocations, lambdas that capture state, `Sequence`s and boxing in `localIntersect`, `localNormalAt` and `World` shading unless you have measured the cost.
+- **Hot path.** Intersection and shading code runs billions of times per render. Avoid allocations, lambdas that capture state, `Sequence`s and boxing in `localIntersect`, `localNormalAt` and `World` shading unless you have measured the cost (see [Performance](#performance)).
 - **Scene format coverage.** `SceneLoader` currently handles `camera`, `light`, `plane`, `sphere`, `cube`, `cone`, `cylinder` and the patterns `stripes`, `gradient`, `rings`, `checkers`. Groups, triangles, CSG and textures exist in code but are **not** yet in the YAML format. Named definitions are dispatched by suffix: `*-color`, `*-material`, `*-pattern`, `*-transform` or `*-object`.
 
 ## Conventions
@@ -110,6 +114,55 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 
 **Add a scene keyword:** add a constant to `scene/Keyword.kt` and use it from `SceneLoader`. Don't scatter string literals.
 
+## Performance
+
+### Benchmarks (JMH, `benchmarks/`)
+
+| Class | Measures |
+| --- | --- |
+| `VectorBenchmark`, `ColorBenchmark`, `MatrixBenchmark` | single math operations (`add`, `dot`, `cross`, `normalized`, `reflect`, `mulPoint`, `mulMatrix`, `inverse`, `viewTransform`, …) |
+| `IntersectBenchmark.intersect` | `Ray.intersect` per shape, param `case=<shape>/<hit\|miss>` |
+| `NormalAtBenchmark.normalAt` | `Shape.normalAt`, param `shape=sphere\|cube` |
+| `IntersectionsBenchmark.hit` | `Intersections.hit()` on lists of 8 intersections (score is per list) |
+
+Inputs come from a fixed-seed generator (`Rng` in `Common.kt`) in batches of 1024. Scores are average **ns per input**. A full run takes about 2.5 minutes. Always use the script: it pins the run to two physical cores at high priority. Comparing two runs of unchanged code, the median change was 3.6% pinned and 5.5% unpinned, and only the unpinned run produced false "regressed" or "improved" verdicts (4 of 29).
+
+```sh
+cmd //c "scripts\bench.cmd --save-baseline before"           # before the change
+cmd //c "scripts\bench.cmd --baseline before"                # after; prints a comparison table
+cmd //c "scripts\bench.cmd Intersect -p case=cube/hit --baseline before"   # filter by regex and/or param
+```
+
+- Arguments are JMH options and benchmark regexes, matched against full names: `Vector` also matches `MatrixBenchmark.mulVector`. Anchor the regex (`VectorBenchmark\.`) for exact groups. `-l` lists benchmarks.
+- Defaults are 3 forks of 3 × 200 ms warm-up and measurement iterations, set in `BenchmarkLauncher.kt`. Any option you pass wins over the default.
+- Baselines are stored in `.benchmarks/baselines/<name>.csv`. That folder is git-ignored and survives `kotlin clean`. A filtered run only replaces the scores it measured. Compare only baselines recorded on the same machine.
+- Verdicts:
+  - **no change**: within 5%.
+  - **within noise**: more than 5%, but the 99.9% confidence intervals overlap. Re-run before trusting it.
+  - **REGRESSED** or **improved**: more than 5%, and the intervals don't overlap.
+- Some allocation-heavy benchmarks are bimodal across JVM forks. For example, `MatrixBenchmark.mulVector` measured about 8.5 ns in some runs and 21–23 ns in others, with no code change. Wide error bars there are real, not a bug.
+- Close the IDE, any indexing and other heavy programs first.
+
+How it works, and the rules for adding a benchmark:
+
+- **Harness.** Kotlin Toolchain has no JMH plugin, and JMH's annotation processor only sees Java sources. `BenchmarkLauncher` therefore runs JMH's *bytecode generator* over the compiled classes, compiles the generated harness with the JDK's javac, then starts `org.openjdk.jmh.Main` in a child JVM. Generated files go to `build/benchmarks/harness/`, results to `build/benchmarks/latest.csv`.
+- **New benchmark classes:**
+  - Annotate them with `@State`. The module's `allOpen` setting makes them non-final, which JMH requires.
+  - Write parameters as `@Param(...) lateinit var x: String`. A `lateinit` property's backing field is public, which JMH's generated code needs.
+  - Add `@OperationsPerInvocation(BATCH)` and loop over batched inputs.
+- **Defeat dead-code elimination.** Write results into a preallocated output array and return it, or pass them to a `Blackhole`. Never discard a result.
+- **Shape benchmarks call `polluteShapeCallSites()` in `@Setup`.** It sends every shape type through `Ray.intersect` and `Shape.normalAt`. Otherwise each JMH fork would only ever see one shape type, and the JIT would inline calls that stay virtual in a real scene.
+- **Watch for caches.** `Matrix.inverse()` caches its result, so `MatrixBenchmark.inverse` gets fresh, uncached instances before each invocation from the `UncachedMatrices` state. Look for similar caches before benchmarking anything else.
+
+### Whole-render comparisons
+
+Microbenchmarks miss interactions such as memory traffic and megamorphic calls. For hot-path changes, also compare whole renders:
+
+1. For each variant, run `./kotlin package` and copy `build/tasks/_k-tracer_executableJarJvm/k-tracer-jvm-executable.jar` to `out/<variant>.jar`.
+2. Make a copy of a scene with the camera lowered to about 960×640.
+3. Alternate `java -jar out/<variant>.jar -r SERIAL <scene copy> out/<variant>.png` at least 7 times per variant, and compare the medians of the printed `Rendered image in …` times. Differences under about 3% are noise. Use the JDK 26 that the toolchain provisioned, under `%LOCALAPPDATA%\JetBrains\Kotlin\extract.cache\*OpenJDK26U*\jdk-26*\bin\java`.
+4. Check that the PNGs are byte-identical (`cmp`), unless the image is meant to change.
+
 ## Working rules for agents
 
 1. **Verify before you claim.** Run `./kotlin test` (or at least the affected test classes) and report real results, including failures.
@@ -118,3 +171,4 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 4. **Don't touch** `rendered_images/` or `.idea/`, the toolchain versions, or the `kotlin` and `kotlin.bat` wrapper scripts unless the task requires it.
 5. **Write scratch output** (renders, logs) outside the repo or under `out/`, which is git-ignored.
 6. When behaviour follows the book, preserve the book's semantics and name the chapter or feature in your summary.
+7. **Back performance changes with numbers.** For changes in the hot path (intersection, normals, shading, `primitives/`), record a benchmark baseline *before* editing, compare it afterwards, and report the relevant rows. Back a claimed speed-up with a whole-render comparison.

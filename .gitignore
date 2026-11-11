@@ -42,3 +42,6 @@ bin/
 
 ### Agents ###
 .claude/settings.local.json
+
+### Benchmark baselines (local, machine-specific) ###
+.benchmarks/
