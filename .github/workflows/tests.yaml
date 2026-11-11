@@ -13,15 +13,25 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
 
+    env:
+      KOTLIN_CLI_NO_WELCOME_BANNER: 1
+      # The wrapper provisions its own JRE here; the build JDK (settings.jvm.jdk) and dependencies go to the shared cache.
+      KOTLIN_CLI_BOOTSTRAP_CACHE_DIR: ${{ github.workspace }}/../kotlin-cache/cli
+      KOTLIN_SHARED_CACHE: ${{ github.workspace }}/../kotlin-cache/shared
+
     steps:
     - name: Checkout project sources
       uses: actions/checkout@v4
-    - name: Setup Java
-      uses: actions/setup-java@v4
+    - name: Cache Kotlin Toolchain, JDK and dependencies
+      uses: actions/cache@v4
       with:
-        distribution: "corretto"
-        java-version: 21
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
-    - name: Run tests
-      run: ./gradlew test
+        path: ${{ github.workspace }}/../kotlin-cache
+        key: kotlin-${{ runner.os }}-${{ hashFiles('kotlin', 'kotlin.bat', 'module.yaml') }}
+        restore-keys: kotlin-${{ runner.os }}-
+    - name: Run tests (Unix)
+      if: runner.os != 'Windows'
+      run: ./kotlin --shared-cache-dir="$KOTLIN_SHARED_CACHE" test
+    - name: Run tests (Windows)
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: kotlin.bat --shared-cache-dir="%KOTLIN_SHARED_CACHE%" test

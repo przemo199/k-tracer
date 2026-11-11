@@ -1,4 +1,4 @@
-# AGENT.md
+# AGENTS.md
 
 Guidance for AI coding agents (Claude Code, Codex, Copilot, Cursor, …) working in this repository.
 Humans are welcome too. `CLAUDE.md` simply imports this file.
@@ -12,24 +12,28 @@ It is a CLI: it reads a YAML scene and writes a PNG.
 ktracer [-r SERIAL|PARALLEL] <scene.yaml> <output.png>
 ```
 
-Single Gradle module, no runtime services, no network access at runtime. About 5k lines of code, with roughly 290 unit tests.
+Single module built with **Kotlin Toolchain** (JetBrains' `kotlin` CLI, formerly called *Amper*), **not Gradle**. No runtime services, no network access at runtime. About 5k lines of code, with roughly 290 unit tests.
 
 ## Commands
 
-Always use the Gradle wrapper. On Windows PowerShell use `.\gradlew.bat`; in bash, Git Bash or CI use `./gradlew`.
+Always use the project wrapper. In bash, Git Bash or CI use `./kotlin`; on Windows PowerShell or cmd use `.\kotlin.bat`. The wrapper pins the toolchain version (0.13.0) and downloads it, a JRE and the build JDK on first use.
 
 | Task | Command |
 | --- | --- |
-| Run all tests | `./gradlew test` |
-| Run one test class | `./gradlew test --tests "org.example.ktracer.shapes.SphereTest"` |
-| Run one test method | `./gradlew test --tests "org.example.ktracer.shapes.SphereTest.sphere normal"` |
-| Compile only (fast feedback) | `./gradlew compileKotlin compileTestKotlin` |
-| Full build | `./gradlew build` |
-| Render a scene | `./gradlew run --args="scenes/cover.yaml out/cover.png"` |
+| Run all tests | `./kotlin test` |
+| Run one test class (wildcards allowed) | `./kotlin test --include-classes 'org.example.ktracer.shapes.SphereTest'` |
+| Run one test method | `./kotlin test --include-test 'org.example.ktracer.shapes.SphereTest.sphere normal'` |
+| Compile (main and test) | `./kotlin build` |
+| Render a scene | `./kotlin run -- scenes/cover.yaml out/cover.png` |
+| Executable JAR | `./kotlin package`, which writes `build/tasks/_k-tracer_executableJarJvm/k-tracer-jvm-executable.jar` |
+| Effective configuration | `./kotlin show settings` / `./kotlin show dependencies` |
+| Clean | `./kotlin clean` |
 
-- Test reports are written to `build/reports/tests/test/index.html`, and the raw XML (with failure messages) to `build/test-results/test/`.
-- Configuration cache and build cache are enabled, so a warm `./gradlew test` takes a few seconds.
-- Pass `--console=plain` when you parse Gradle output.
+- The build is configured entirely in `module.yaml`. There are no `build.gradle.kts`, `settings.gradle.kts` or `gradlew` files. Don't add them back.
+- The `module.yaml` schema is documented at <https://kotlin-toolchain.org/latest/reference/module/>. It is new; don't guess keys from old Amper or Gradle knowledge. Check them with `./kotlin show settings`, which prints every setting with its source.
+- JUnit XML results (with failure messages) are written to `build/reports/k-tracer/jvm/`.
+- A warm `./kotlin test` takes about 3 s, and a clean one about 15 s.
+- Behind a TLS-intercepting proxy or antivirus, the JVM may fail downloads with `PKIX path building failed`. Set `JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStoreType=Windows-ROOT` on Windows so it uses the OS certificate store.
 
 ### Rendering for verification
 
@@ -45,12 +49,12 @@ Do **not** overwrite `rendered_images/*.png` unless you were asked to regenerate
 
 This project deliberately runs on bleeding-edge tooling. Some of the syntax postdates many models' training data. **Do not "fix" it back to older forms.**
 
-- **Kotlin `2.5.0-Beta2`**, **JDK 27** (Gradle toolchain, auto-provisioned through the foojay resolver), **Gradle 9.x**.
-- Experimental compiler flags in `build.gradle.kts`:
+- **Kotlin `2.5.0-Beta2`** (`settings.kotlin.version`) and **JDK 26** (`settings.jvm.jdk.version`, auto-provisioned). Kotlin Toolchain refuses JDK 27 with Kotlin 2.5.0 (Beta2 and RC support JDK up to 26), so don't raise it until a Kotlin version that supports 27 is pinned.
+- Experimental compiler flags in `module.yaml` (`settings.kotlin.freeCompilerArgs`):
   - `-Xcompanion-blocks-and-extensions`: companions are written as `companion { ... }`, **not** `companion object { ... }`. Every file in the project uses this form. Follow it.
   - `-Xfull-value-classes`: multi-field `value class` declarations, such as `Color` and `Coordinates`, are valid here.
-- Do not bump Kotlin, Gradle, the JDK or dependency versions, or add or remove compiler flags, unless the task asks for it.
-- CI (`.github/workflows/tests.yaml`) runs `./gradlew test` on Windows, Linux and macOS.
+- Do not bump Kotlin, the toolchain (the version pinned in the `kotlin` and `kotlin.bat` wrappers), the JDK or dependency versions, or add or remove compiler flags, unless the task asks for it.
+- CI (`.github/workflows/tests.yaml`) runs `./kotlin test` (`kotlin.bat` on Windows) on Windows, Linux and macOS.
 
 ## Architecture
 
@@ -108,9 +112,9 @@ All code is under `src/main/kotlin/org/example/ktracer/`:
 
 ## Working rules for agents
 
-1. **Verify before you claim.** Run `./gradlew test` (or at least the affected test classes) and report real results, including failures.
+1. **Verify before you claim.** Run `./kotlin test` (or at least the affected test classes) and report real results, including failures.
 2. **Keep the diff minimal and on task.** The working tree often holds the owner's uncommitted, in-progress refactors. Don't reformat, rename or "clean up" unrelated files, and don't revert changes you didn't make.
 3. **Don't commit, push or open PRs unless asked.** If you are asked to, work on a branch, not `master`.
-4. **Don't touch** `rendered_images/` or `.idea/`, the toolchain versions, or `gradle/wrapper/*` unless the task requires it.
+4. **Don't touch** `rendered_images/` or `.idea/`, the toolchain versions, or the `kotlin` and `kotlin.bat` wrapper scripts unless the task requires it.
 5. **Write scratch output** (renders, logs) outside the repo or under `out/`, which is git-ignored.
 6. When behaviour follows the book, preserve the book's semantics and name the chapter or feature in your summary.

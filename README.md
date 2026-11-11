@@ -9,6 +9,20 @@ Implementation of ray tracer from Ray Tracer Challenge book by [Jamis Buck](mail
 - Handling for multiple light sources
 - Groups, Constructive Solid Geometry and Bounding Boxes implemented
 
+## Building
+
+The project is built with [Kotlin Toolchain](https://github.com/JetBrains/kotlin-toolchain) (configured in `module.yaml`).
+The `kotlin` / `kotlin.bat` wrapper scripts download everything needed on first use, including the JDK.
+
+```
+./kotlin test                                       # run tests
+./kotlin run -- scenes/cover.yaml cover.png         # render a scene
+./kotlin package                                    # build an executable JAR
+```
+
+On Windows use `kotlin.bat` instead of `./kotlin`. IntelliJ IDEA needs the
+[Kotlin Toolchain plugin](https://plugins.jetbrains.com/plugin/31850-kotlin-toolchain).
+
 ## Usage
 
 ```

@@ -1,0 +1,3 @@
+# Kotlin Toolchain wrapper scripts must keep their native line endings regardless of core.autocrlf.
+kotlin      text eol=lf
+kotlin.bat  text eol=crlf
