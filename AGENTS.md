@@ -58,7 +58,7 @@ This project deliberately runs on bleeding-edge tooling. Some of the syntax post
 
 ## Architecture
 
-All code is under `src/main/kotlin/org/example/ktracer/`:
+All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `src/`, `test/`, `resources/`, `testResources/` at the project root):
 
 | Package | Role |
 | --- | --- |
@@ -93,7 +93,7 @@ All code is under `src/main/kotlin/org/example/ktracer/`:
 
 ### Tests
 
-- Tests live in `src/test/kotlin/...`, mirroring the main package, one `XxxTest` per class.
+- Tests live in `test/...`, mirroring the main package, one `XxxTest` per class.
 - Use `kotlin.test` (`@Test`, `assertEquals`, …) on JUnit Platform. Use `junit-jupiter-params` for parameterised tests.
 - Name test methods as backtick sentences, usually echoing the book's scenarios: ``fun `ray intersects sphere at two points`()``.
 - Every new shape, pattern or math routine needs unit tests. Every bug fix needs a regression test.

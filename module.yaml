@@ -1,8 +1,5 @@
 product: jvm/app
 
-# Keep the Gradle-style source layout: src/main/kotlin, src/test/kotlin, src/main/resources.
-layout: maven-like
-
 repositories:
   - https://jitpack.io
 
