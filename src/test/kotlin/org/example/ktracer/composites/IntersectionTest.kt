@@ -79,19 +79,19 @@ class IntersectionTest {
         val shape1 = Sphere().apply {
             material = Material.GLASS
             transformation = Transformations.scaling(2, 2, 2)
-            material.refractiveIndex = 1.5
+            material = material.copy(refractiveIndex = 1.5)
         }
 
         val shape2 = Sphere().apply {
             material = Material.GLASS
             transformation = Transformations.translation(0, 0, -0.25)
-            material.refractiveIndex = 2.0
+            material = material.copy(refractiveIndex = 2.0)
         }
 
         val shape3 = Sphere().apply {
             material = Material.GLASS
             transformation = Transformations.translation(0, 0, 0.25)
-            material.refractiveIndex = 2.5
+            material = material.copy(refractiveIndex = 2.5)
         }
 
         val intersections = Intersections(

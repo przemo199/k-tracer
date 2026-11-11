@@ -1,7 +1,6 @@
 package org.example.ktracer.composites
 
 import org.example.ktracer.coarseEquals
-import org.example.ktracer.composites.Material.Companion.DEFAULT_REFRACTIVE_INDEX
 import org.example.ktracer.shapes.Shape
 
 data class Intersection(val distance: Double, val shape: Shape) : Comparable<Intersection> {
@@ -18,12 +17,12 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
         val reflectionDirection = ray.direction.reflect(normal)
 
         val containers: MutableList<Shape> = mutableListOf()
-        var refractiveIndex1 = DEFAULT_REFRACTIVE_INDEX
-        var refractiveIndex2 = DEFAULT_REFRACTIVE_INDEX
+        var refractiveIndex1 = Material.DEFAULT_REFRACTIVE_INDEX
+        var refractiveIndex2 = Material.DEFAULT_REFRACTIVE_INDEX
         for (intersection in intersections) {
             val isThis = intersection === this
             if (isThis) {
-                refractiveIndex1 = if (containers.isEmpty()) DEFAULT_REFRACTIVE_INDEX else containers.last().material.refractiveIndex
+                refractiveIndex1 = getRefrctiveIndexFromContainers(containers)
             }
 
             if (!containers.remove(intersection.shape)) {
@@ -31,7 +30,7 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
             }
 
             if (isThis) {
-                refractiveIndex2 = if (containers.isEmpty()) DEFAULT_REFRACTIVE_INDEX else containers.last().material.refractiveIndex
+                refractiveIndex2 = getRefrctiveIndexFromContainers(containers)
                 break
             }
         }
@@ -49,20 +48,24 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
         )
     }
 
-    fun isWithinDistance(distance: Double): Boolean = this.distance >= 0.0 && this.distance < distance
+    private fun getRefrctiveIndexFromContainers(containers: List<Shape>): Double {
+        return if (containers.isEmpty()) Material.DEFAULT_REFRACTIVE_INDEX else containers.last().material.refractiveIndex
+    }
+
+    fun isWithinDistance(distance: Double): Boolean = this.distance in 0.0..<distance
 
     override fun compareTo(other: Intersection): Int = distance.compareTo(other.distance)
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
-            other is Intersection &&
-            distance coarseEquals other.distance &&
-            shape == other.shape
+                other is Intersection &&
+                distance coarseEquals other.distance &&
+                shape == other.shape
     }
 
     override fun toString(): String = "Intersection(distance=$distance, shape=$shape)"
 
-    companion object {
+    companion {
         operator fun invoke(distance: Number, shape: Shape): Intersection = Intersection(distance.toDouble(), shape)
     }
 }

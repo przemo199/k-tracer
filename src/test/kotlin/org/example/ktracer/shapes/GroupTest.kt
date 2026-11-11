@@ -17,14 +17,14 @@ class GroupTest {
 
     @Test
     fun `creating group`() {
-        assertEquals(Matrix.IDENTITY, group.transformation)
+        assertEquals(Matrix.identity(), group.transformation)
         assertTrue(group.children.isEmpty())
     }
 
     @Test
     fun `add child to a group`() {
         val sphere = Sphere()
-        group.add(sphere)
+        group  += sphere
         assertTrue(group.children.isNotEmpty())
         assertTrue(sphere in group.children)
         assertEquals(group, sphere.parent)
@@ -45,9 +45,9 @@ class GroupTest {
         sphere2.transformation = Transformations.translation(0, 0, -3)
         val sphere3 = Sphere()
         sphere3.transformation = Transformations.translation(5, 0, 0)
-        group.add(sphere1)
-        group.add(sphere2)
-        group.add(sphere3)
+        group += sphere1
+        group += sphere2
+        group += sphere3
         val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val intersections = Intersections()
         ray.intersect(group, intersections)
@@ -63,7 +63,7 @@ class GroupTest {
         group.transformation = Transformations.scaling(2, 2, 2)
         val sphere = Sphere()
         sphere.transformation = Transformations.translation(5, 0, 0)
-        group.add(sphere)
+        group += sphere
         val ray = Ray(Point(10, 0, -10), Vector.FORWARD)
         val intersections = Intersections()
         ray.intersect(group, intersections)
@@ -75,10 +75,10 @@ class GroupTest {
         group.transformation = Transformations.rotationY(PI / 2.0)
         val group2 = Group()
         group2.transformation = Transformations.scaling(2, 2, 2)
-        group.add(group2)
+        group += group2
         val sphere = Sphere()
         sphere.transformation = Transformations.translation(5, 0, 0)
-        group2.add(sphere)
+        group2 += sphere
         val point = sphere.worldToObject(Point(-2, 0, -10))
         assertEquals(Point(0, 0, -1), point)
     }
@@ -88,10 +88,10 @@ class GroupTest {
         group.transformation = Transformations.rotationY(PI / 2.0)
         val group2 = Group()
         group2.transformation = Transformations.scaling(1, 2, 3)
-        group.add(group2)
+        group += group2
         val sphere = Sphere()
         sphere.transformation = Transformations.translation(5, 0, 0)
-        group2.add(sphere)
+        group2 += sphere
         val normal = sphere.normalToWorld(Vector(sqrt(3.0) / 3.0, sqrt(3.0) / 3.0, sqrt(3.0) / 3.0))
         assertEquals(Vector(0.28571428571428575, 0.42857142857142855, -0.8571428571428571), normal)
     }
@@ -101,10 +101,10 @@ class GroupTest {
         group.transformation = Transformations.rotationY(PI / 2.0)
         val group2 = Group()
         group2.transformation = Transformations.scaling(1, 2, 3)
-        group.add(group2)
+        group += group2
         val sphere = Sphere()
         sphere.transformation = Transformations.translation(5, 0, 0)
-        group2.add(sphere)
+        group2 += sphere
         val normal = sphere.normalAt(Point(1.7321, 1.1547, -5.5774))
         assertEquals(Vector(0.28570368184140726, 0.42854315178114105, -0.8571605294481017), normal)
     }
@@ -117,10 +117,10 @@ class GroupTest {
         sphere2.transformation = Transformations.translation(2, 0, 0)
         val sphere3 = Sphere()
         val group = Group()
-        group.add(sphere1)
-        group.add(sphere2)
-        group.add(sphere3)
-        val (left, right) = group.partitionChildren()
+        group += sphere1
+        group += sphere2
+        group += sphere3
+        val [left, right] = group.partitionChildren()
 
         assertEquals(1, group.children.size)
         assertEquals(1, left.size)

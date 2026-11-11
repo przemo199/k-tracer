@@ -4,11 +4,11 @@ import dev.reimer.progressbar.ktx.progressBar
 import java.util.concurrent.ForkJoinPool
 import java.util.stream.BaseStream
 import java.util.stream.IntStream
-import me.tongfei.progressbar.ProgressBarStyle
-import org.example.ktracer.primitives.Point
 import java.util.stream.Stream
 import kotlin.math.tan
+import me.tongfei.progressbar.ProgressBarStyle
 import org.example.ktracer.primitives.Color
+import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
 import org.example.ktracer.shapes.Transformable
 
@@ -19,15 +19,15 @@ class Camera : Transformable {
     val halfWidth: Double
     val halfHeight: Double
     val pixelSize: Double
-    override var transformation: Transformation = Transformation.IDENTITY
+    override var transformation: Transformation = Transformation.identity()
         set(value) {
             field = value
             updateOrigin()
         }
     var origin: Point
 
-    constructor(horizontalSize: Int, verticalSize: Int, fieldOfView: Number) {
-        val halfView = tan(fieldOfView.toDouble() / 2.0)
+    constructor(horizontalSize: Int, verticalSize: Int, fieldOfView: Double) {
+        val halfView = tan(fieldOfView / 2.0)
         val aspect = horizontalSize.toDouble() / verticalSize.toDouble()
         val halfWidth: Double
         val halfHeight: Double
@@ -42,11 +42,11 @@ class Camera : Transformable {
         val pixelSize = (halfWidth * 2.0) / horizontalSize.toDouble()
         this.horizontalSize = horizontalSize
         this.verticalSize = verticalSize
-        this.fieldOfView = fieldOfView.toDouble()
+        this.fieldOfView = fieldOfView
         this.halfWidth = halfWidth
         this.halfHeight = halfHeight
         this.pixelSize = pixelSize
-        this.transformation = Transformation.IDENTITY
+        this.transformation = Transformation.identity()
         this.origin = transformation * Point.ORIGIN
     }
 
@@ -117,17 +117,15 @@ class Camera : Transformable {
                 ")"
     }
 
-    companion object {
-        @JvmStatic
-        fun <T, S: BaseStream<T, S>> S.wrapInProgressBar(): Stream<T> {
-            return this.progressBar {
-                unitSize = 1
-                style = ProgressBarStyle.ASCII
-                updateIntervalMillis = 50
-            }
+    private fun <T, S : BaseStream<T, S>> S.wrapInProgressBar(): Stream<T> {
+        return progressBar {
+            unitSize = 1
+            style = ProgressBarStyle.ASCII
+            updateIntervalMillis = 50
         }
+    }
 
-        @JvmStatic
+    companion {
         private fun createForkJoinPool() = ForkJoinPool(Runtime.getRuntime().availableProcessors())
     }
 }

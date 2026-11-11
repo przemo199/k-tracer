@@ -10,7 +10,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.measureTimedValue
 import org.example.ktracer.scene.SceneLoader
 
-class KTracer : CliktCommand(name = "Render scene to image") {
+class KTracer : CliktCommand(name = "Render a scene to an image") {
     override val printHelpOnEmptyArgs: Boolean = true
 
     val scenePath by argument()

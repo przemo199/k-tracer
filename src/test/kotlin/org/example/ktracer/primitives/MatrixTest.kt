@@ -105,7 +105,7 @@ class MatrixTest {
                 4, 8, 16, 32,
             ),
         )
-        assertEquals(matrix, matrix * Matrix.IDENTITY)
+        assertEquals(matrix, matrix * Matrix.identity())
     }
 
     @Test
@@ -131,7 +131,7 @@ class MatrixTest {
 
     @Test
     fun `transposing identity matrix`() {
-        assertEquals(Matrix.IDENTITY, Matrix.IDENTITY.transpose())
+        assertEquals(Matrix.identity(), Matrix.identity().transpose())
     }
 
     @Test
@@ -192,7 +192,7 @@ class MatrixTest {
 
     @Test
     fun `negate matrix`() {
-        val matrix = Matrix.IDENTITY
+        val matrix = Matrix.identity()
         val negatedMatrix = Matrix(
             listOf(
                 -1, 0, 0, 0,
@@ -202,6 +202,6 @@ class MatrixTest {
             ),
         )
         assertEquals(negatedMatrix, -matrix)
-        assertEquals(Matrix.IDENTITY, matrix)
+        assertEquals(Matrix.identity(), matrix)
     }
 }

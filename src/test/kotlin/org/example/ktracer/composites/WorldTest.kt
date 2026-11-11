@@ -1,6 +1,7 @@
 package org.example.ktracer.composites
 
-import org.example.ktracer.patterns.TestPattern
+import com.github.ajalt.mordant.rendering.TextColors.Companion.color
+import org.example.ktracer.colorproviders.patterns.TestPattern
 import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Light
 import org.example.ktracer.primitives.Point
@@ -20,9 +21,7 @@ class WorldTest {
     @Test
     fun `default world`() {
         val sphere1 = Sphere().apply {
-            material.color = Color(0.8, 1.0, 0.6)
-            material.diffuse = 0.7
-            material.specular = 0.2
+            material = material.copy(color = Color(0.8, 1.0, 0.6), diffuse = 0.7, specular = 0.2)
         }
         val sphere2 = Sphere()
         sphere2.transformation = Transformations.scaling(0.5, 0.5, 0.5)
@@ -70,15 +69,13 @@ class WorldTest {
     @Test
     fun `color with intersection behind ray`() {
         val sphere1 = Sphere().apply {
-            material.color = Color(0.8, 1, 0.6)
-            material.diffuse = 0.7
-            material.specular = 0.2
+            material = material.copy(color = Color(0.8, 1, 0.6), diffuse = 0.7, specular = 0.2)
         }
         world.shapes[0] = sphere1
 
         val sphere2 = Sphere().apply {
             transformation = Transformations.scaling(0.5, 0.5, 0.5)
-            material.ambient = 1.0
+            material = material.copy(ambient = 1.0)
         }
         world.shapes[1] = sphere2
 
@@ -114,11 +111,11 @@ class WorldTest {
     @Test
     fun `shade hit is given intersection in shadow`() {
         world.lights[0] = Light(Point(0, 0, -10), Color.WHITE)
-        world.shapes.add(Sphere())
+        world.shapes += Sphere()
 
         val sphere = Sphere()
         sphere.transformation = Transformations.translation(0, 0, 10)
-        world.shapes.add(sphere)
+        world.shapes += sphere
 
         val ray = Ray(Point(0, 0, 5), Vector.FORWARD)
         val intersection = Intersection(4, sphere)
@@ -131,7 +128,7 @@ class WorldTest {
     fun `reflected color for a non-reflective material`() {
         val ray = Ray(Point.ORIGIN, Vector.FORWARD)
         val secondShape = world.shapes[1]
-        secondShape.material.ambient = 1.0
+        secondShape.material = secondShape.material.copy(ambient = 1.0)
 
         val intersection = Intersection(1, secondShape)
         val computedHit = intersection.prepareComputations(ray, Intersections())
@@ -142,10 +139,10 @@ class WorldTest {
     @Test
     fun `reflected color for a reflective material`() {
         val shape = Plane().apply {
-            material.reflectiveness = 0.5
+            material = material.copy(reflectiveness = 0.5)
             transformation = Transformations.translation(0, -1, 0)
         }
-        world.shapes.add(shape)
+        world.shapes += shape
 
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersection = Intersection(sqrt(2.0), shape)
@@ -157,10 +154,10 @@ class WorldTest {
     @Test
     fun `shade hit with a reflective material`() {
         val shape = Plane().apply {
-            material.reflectiveness = 0.5
+            material = material.copy(reflectiveness = 0.5)
             transformation = Transformations.translation(0, -1, 0)
         }
-        world.shapes.add(shape)
+        world.shapes += shape
 
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersection = Intersection(sqrt(2.0), shape)
@@ -174,15 +171,15 @@ class WorldTest {
         world.shapes = mutableListOf()
         world.lights = mutableListOf(Light(Point.ORIGIN, Color(1, 1, 1)))
         val lower = Plane().apply {
-            material.reflectiveness = 1.0
+            material = material.copy(reflectiveness = 1.0)
             transformation = Transformations.translation(0, -1, 0)
         }
         val upper = Plane().apply {
-            material.reflectiveness = 1.0
+            material = material.copy(reflectiveness = 1.0)
             transformation = Transformations.translation(0, 1, 0)
         }
-        world.shapes.add(lower)
-        world.shapes.add(upper)
+        world.shapes += lower
+        world.shapes += upper
         val ray = Ray(Point.ORIGIN, Vector.UP)
         world.colorAt(ray)
     }
@@ -192,10 +189,10 @@ class WorldTest {
         world.shapes = mutableListOf()
         world.lights = mutableListOf(Light(Point.ORIGIN, Color(1, 1, 1)))
         val plane = Plane().apply {
-            material.reflectiveness = 0.5
+            material = material.copy(reflectiveness = 0.5)
             transformation = Transformations.translation(0, -1, 0)
         }
-        world.shapes.add(plane)
+        world.shapes += plane
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersection = Intersection(sqrt(2.0), plane)
         val computedHit = intersection.prepareComputations(ray, Intersections())
@@ -216,8 +213,7 @@ class WorldTest {
     @Test
     fun `refracted color at max recursion depth`() {
         val shape = world.shapes[0].apply {
-            material.transparency = 1.0
-            material.refractiveIndex = 1.5
+            material = material.copy(transparency = 1.0, refractiveIndex = 1.5)
         }
         val ray = Ray(Point(0, 0, -5), Vector.FORWARD)
         val intersections = Intersections(
@@ -232,8 +228,7 @@ class WorldTest {
     @Test
     fun `refracted color under total internal reflection`() {
         val shape = world.shapes[0].apply {
-            material.transparency = 1.0
-            material.refractiveIndex = 1.5
+            material = material.copy(transparency = 1.0, refractiveIndex = 1.5)
         }
         val ray = Ray(Point(0, 0, sqrt(2.0) / 2.0), Vector.UP)
         val intersections = Intersections(
@@ -248,13 +243,11 @@ class WorldTest {
     @Test
     fun `refracted color with refracted ray`() {
         val firstShape = world.shapes[0].apply {
-            material.ambient = 1.0
-            material.pattern = TestPattern()
+            material = material.copy(ambient = 1.0, colorProvider = TestPattern())
         }
 
         val secondShape = world.shapes[1].apply {
-            material.transparency = 1.0
-            material.refractiveIndex = 1.5
+            material = material.copy(transparency = 1.0, refractiveIndex = 1.5)
         }
         val ray = Ray(Point(0, 0, 0.1), Vector.UP)
         val intersections = Intersections(
@@ -272,16 +265,14 @@ class WorldTest {
     fun `shade hit with transparent material`() {
         val floor = Plane().apply {
             transformation = Transformations.translation(0, -1, 0)
-            material.transparency = 0.5
-            material.refractiveIndex = 1.5
+            material = material.copy(transparency = 0.5, refractiveIndex = 1.5)
         }
-        world.shapes.add(floor)
+        world.shapes += floor
         val ball = Sphere().apply {
-            material.color = Color.RED
-            material.ambient = 0.5
+            material = material.copy(color = Color.RED, ambient = 0.5)
             transformation = Transformations.translation(0, -3.5, -0.5)
         }
-        world.shapes.add(ball)
+        world.shapes += ball
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersections = Intersections(Intersection(sqrt(2.0), floor))
         val computedHit = intersections[0].prepareComputations(ray, intersections)
@@ -293,17 +284,14 @@ class WorldTest {
     fun `shade hit with reflective and transparent material`() {
         val floor = Plane().apply {
             transformation = Transformations.translation(0, -1, 0)
-            material.reflectiveness = 0.5
-            material.transparency = 0.5
-            material.refractiveIndex = 1.5
+            material = material.copy(reflectiveness = 0.5, transparency = 0.5, refractiveIndex = 1.5)
         }
-        world.shapes.add(floor)
+        world.shapes += floor
         val ball = Sphere().apply {
-            material.color = Color.RED
-            material.ambient = 0.5
+            material = material.copy(color = Color.RED, ambient = 0.5)
             transformation = Transformations.translation(0, -3.5, -0.5)
         }
-        world.shapes.add(ball)
+        world.shapes += ball
         val ray = Ray(Point(0, 0, -3), Vector(0, -sqrt(2.0) / 2.0, sqrt(2.0) / 2.0))
         val intersections = Intersections(Intersection(sqrt(2.0), floor))
         val computedHit = intersections[0].prepareComputations(ray, intersections)
@@ -311,14 +299,14 @@ class WorldTest {
         assertEquals(Color(0.933915140358792, 0.6964342261158358, 0.6924306911639343), color)
     }
 
-    private companion object {
+    companion {
         fun defaultWorld(): World {
             val sphere1 = Sphere()
-            sphere1.material.apply {
-                color = Color(0.8, 1, 0.6)
-                diffuse = 0.7
+            sphere1.material = sphere1.material.copy(
+                color = Color(0.8, 1, 0.6),
+                diffuse = 0.7,
                 specular = 0.2
-            }
+            )
             val sphere2 = Sphere()
             sphere2.transformation = Transformations.scaling(0.5, 0.5, 0.5)
             return World(mutableListOf(Light()), mutableListOf(sphere1, sphere2))

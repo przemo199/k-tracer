@@ -1,14 +1,12 @@
 package org.example.ktracer.primitives
 
 import kotlin.math.absoluteValue
-import org.example.ktracer.squared
 import kotlin.math.sqrt
+import org.example.ktracer.squared
 
-class Vector(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) {
+class Vector(override val x: Double = 0.0, override val y: Double = 0.0, override val z: Double = 0.0) : Tuple() {
     override val w get() = 0.0
     val magnitude: Double by lazy(LazyThreadSafetyMode.NONE) { sqrt(x.squared() + y.squared() + z.squared()) }
-
-    constructor(fn: (Int) -> Double) : this(fn(0), fn(1), fn(2))
 
     fun normalized(): Vector = map { it / magnitude }
 
@@ -42,27 +40,22 @@ class Vector(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z)
 
     override fun toString(): String = "Vector(x=$x, y=$y, z=$z)"
 
-    companion object {
-        @JvmField
+    companion {
         val ZERO: Vector = Vector()
 
-        @JvmField
         val UP: Vector = Vector(0, 1, 0)
 
-        @JvmField
         val DOWN: Vector = Vector(0, -1, 0)
 
-        @JvmField
         val RIGHT: Vector = Vector(1, 0, 0)
 
-        @JvmField
         val LEFT: Vector = Vector(-1, 0, 0)
 
-        @JvmField
         val FORWARD: Vector = Vector(0, 0, 1)
 
-        @JvmField
         val BACKWARD: Vector = Vector(0, 0, -1)
+
+        inline operator fun invoke(fn: (Int) -> Double): Vector = Vector(fn(0), fn(1), fn(2))
 
         operator fun invoke(x: Number, y: Number, z: Number): Vector = Vector(x.toDouble(), y.toDouble(), z.toDouble())
     }

@@ -14,12 +14,12 @@ class CameraTest {
     fun `constructing camera`() {
         val horizontalSize = 160
         val verticalSize = 120
-        val fieldOfView = (PI / 2.0).toDouble()
+        val fieldOfView = PI / 2.0
         val camera = Camera(horizontalSize, verticalSize, fieldOfView)
         assertEquals(horizontalSize, camera.horizontalSize)
         assertEquals(verticalSize, camera.verticalSize)
         assertEquals(fieldOfView, camera.fieldOfView)
-        assertEquals(Matrix.IDENTITY, camera.transformation)
+        assertEquals(Matrix.identity(), camera.transformation)
     }
 
     @Test

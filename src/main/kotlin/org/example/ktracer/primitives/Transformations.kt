@@ -8,7 +8,7 @@ typealias Transformation = Matrix
 object Transformations {
     @JvmStatic
     fun translation(x: Number, y: Number, z: Number): Transformation {
-        val matrix = Transformation.IDENTITY
+        val matrix = Transformation.identity()
         matrix[0, 3] = x
         matrix[1, 3] = y
         matrix[2, 3] = z
@@ -17,7 +17,7 @@ object Transformations {
 
     @JvmStatic
     fun scaling(x: Number, y: Number, z: Number): Transformation {
-        val matrix = Transformation.IDENTITY
+        val matrix = Transformation.identity()
         matrix[0, 0] = x
         matrix[1, 1] = y
         matrix[2, 2] = z
@@ -26,7 +26,7 @@ object Transformations {
 
     @JvmStatic
     fun rotationX(r: Number): Transformation {
-        val matrix = Transformation.IDENTITY
+        val matrix = Transformation.identity()
         r.toDouble().also {
             val cosR = cos(it)
             val sinR = sin(it)
@@ -40,7 +40,7 @@ object Transformations {
 
     @JvmStatic
     fun rotationY(r: Number): Transformation {
-        val matrix = Transformation.IDENTITY
+        val matrix = Transformation.identity()
         r.toDouble().also {
             val cosR = cos(it)
             val sinR = sin(it)
@@ -54,7 +54,7 @@ object Transformations {
 
     @JvmStatic
     fun rotationZ(r: Number): Transformation {
-        val matrix = Transformation.IDENTITY
+        val matrix = Transformation.identity()
         r.toDouble().also {
             val cosR = cos(it)
             val sinR = sin(it)
@@ -68,7 +68,7 @@ object Transformations {
 
     @JvmStatic
     fun shearing(xy: Number, xz: Number, yx: Number, yz: Number, zx: Number, zy: Number): Transformation {
-        val matrix = Transformation.IDENTITY
+        val matrix = Transformation.identity()
         matrix[0, 1] = xy
         matrix[0, 2] = xz
         matrix[1, 0] = yx

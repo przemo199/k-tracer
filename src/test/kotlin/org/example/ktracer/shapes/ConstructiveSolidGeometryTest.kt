@@ -85,8 +85,7 @@ class ConstructiveSolidGeometryTest {
         assertEquals(sphere2, intersections[1].shape)
     }
 
-    companion object {
-        @JvmStatic
+    companion {
         fun `evaluating csg union operation data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(true, true, true, false),
@@ -100,7 +99,6 @@ class ConstructiveSolidGeometryTest {
             )
         }
 
-        @JvmStatic
         fun `evaluating csg intersection operation data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(true, true, true, true),
@@ -114,7 +112,6 @@ class ConstructiveSolidGeometryTest {
             )
         }
 
-        @JvmStatic
         fun `evaluating csg difference operation data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(true, true, true, false),
@@ -128,7 +125,6 @@ class ConstructiveSolidGeometryTest {
             )
         }
 
-        @JvmStatic
         fun `filtering intersections data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(ConstructiveSolidGeometry.Operand.UNION, 0, 3),

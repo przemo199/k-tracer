@@ -27,9 +27,9 @@ class MaterialTest {
     @Test
     fun `compare materials`() {
         val material1 = Material()
-        val material2 = Material()
+        var material2 = Material()
         assertEquals(material1, material2)
-        material2.diffuse = 0.7
+        material2 = material2.copy(diffuse = 0.7)
         assertNotEquals(material1, material2)
     }
 

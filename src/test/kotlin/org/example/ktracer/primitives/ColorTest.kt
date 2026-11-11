@@ -12,9 +12,6 @@ class ColorTest {
         assertEquals(-0.5, color.red)
         assertEquals(0.4, color.green)
         assertEquals(1.7, color.blue)
-        assertEquals(-0.5, color.x)
-        assertEquals(0.4, color.y)
-        assertEquals(1.7, color.z)
     }
 
     @Test

@@ -1,4 +1,4 @@
-package org.example.ktracer.patterns
+package org.example.ktracer.colorproviders
 
 import org.example.ktracer.composites.Material
 import org.example.ktracer.primitives.Color
@@ -9,6 +9,7 @@ import org.example.ktracer.primitives.Vector
 import org.example.ktracer.shapes.Sphere
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.example.ktracer.colorproviders.patterns.StripePattern
 
 class StripePatternTest {
 
@@ -49,12 +50,12 @@ class StripePatternTest {
     @Test
     fun `lighting with stripe pattern applied`() {
         val sphere = Sphere()
-        val material = Material().apply {
-            pattern = StripePattern(Color.WHITE, Color.BLACK)
-            ambient = 1.0
-            diffuse = 0.0
+        val material = Material().copy(
+            colorProvider = StripePattern(Color.WHITE, Color.BLACK),
+            ambient = 1.0,
+            diffuse = 0.0,
             specular = 0.0
-        }
+        )
         val camera = Vector.BACKWARD
         val normal = Vector.BACKWARD
         val light = Light(Point(0, 10, -10), Color.WHITE)

@@ -13,7 +13,7 @@ class ConstructiveSolidGeometry(
     val left: Shape,
     val right: Shape,
     material: Material = Material(),
-    transformation: Transformation = Transformation.IDENTITY,
+    transformation: Transformation = Transformation.identity(),
 ) : Shape(material, transformation) {
     enum class Operand {
         UNION,
@@ -70,18 +70,17 @@ class ConstructiveSolidGeometry(
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
-            other is ConstructiveSolidGeometry &&
-            super.equals(other) &&
-            left == other.left &&
-            right == other.right
+                other is ConstructiveSolidGeometry &&
+                super.equals(other) &&
+                left == other.left &&
+                right == other.right
     }
 
     override fun hashCode(): Int = Objects.hash(super.hashCode(), left, right)
 
     override fun toString(): String = "ConstructiveSolidGeometry(operand=$operand, left=$left, right=$right)"
 
-    companion object {
-        @JvmStatic
+    companion {
         internal fun intersectionAllowed(
             operand: Operand,
             leftHit: Boolean,

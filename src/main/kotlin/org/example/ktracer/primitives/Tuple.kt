@@ -1,12 +1,15 @@
 package org.example.ktracer.primitives
 
 import java.util.Objects
-import kotlin.math.min
 import kotlin.math.max
+import kotlin.math.min
 import org.example.ktracer.coarseEquals
 
-abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0.0) : Iterable<Double> {
+abstract class Tuple constructor() : Iterable<Double> {
     abstract val w: Double
+    abstract val x: Double
+    abstract val y: Double
+    abstract val z: Double
 
     operator fun component1() = x
 
@@ -36,16 +39,23 @@ abstract class Tuple(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0
 
     override fun equals(other: Any?): Boolean {
         return other is Tuple &&
-            x coarseEquals other.x &&
-            y coarseEquals other.y &&
-            z coarseEquals other.z
+                x coarseEquals other.x &&
+                y coarseEquals other.y &&
+                z coarseEquals other.z
     }
 
     override fun hashCode() = Objects.hash(x, y, z, w)
 
+    fun coarseEquals(other: Any?): Boolean {
+        return other is Tuple &&
+                x coarseEquals other.x &&
+                y coarseEquals other.y &&
+                z coarseEquals other.z
+    }
+
     abstract override fun toString(): String
 
-    companion object {
+    companion {
         const val SIZE = 4
     }
 }

@@ -78,8 +78,7 @@ class ConeTest {
         assertEquals(Point(5, 3, 5), boundingBox.max)
     }
 
-    companion object {
-        @JvmStatic
+    companion {
         fun `intersecting ray with cone data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(Point(0, 0, -5), Vector.FORWARD, 5.0, 5.0),
@@ -88,7 +87,6 @@ class ConeTest {
             )
         }
 
-        @JvmStatic
         fun `intersecting ray with cone caps data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(Point(0, 0, -5), Vector.UP, 0),
@@ -97,7 +95,6 @@ class ConeTest {
             )
         }
 
-        @JvmStatic
         fun `computing normal vector on cone data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(Point.ORIGIN, Vector.ZERO),

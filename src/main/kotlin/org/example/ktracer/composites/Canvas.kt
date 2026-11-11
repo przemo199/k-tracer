@@ -3,13 +3,12 @@ package org.example.ktracer.composites
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.color.RGBColor
 import com.sksamuel.scrimage.nio.PngWriter
-import org.example.ktracer.primitives.Color
 import java.awt.image.BufferedImage
 import java.io.IOException
-import kotlin.jvm.Throws
 import kotlin.math.roundToInt
+import org.example.ktracer.primitives.Color
 
-class Canvas(val width: Int, val height: Int): Iterable<Color> {
+class Canvas(val width: Int, val height: Int) : Iterable<Color> {
     val size = width * height
     private val _pixels: Array<Color> = Array(size) { DEFAULT_COLOR }
     val pixels: List<Color> = _pixels.asList()
@@ -46,12 +45,11 @@ class Canvas(val width: Int, val height: Int): Iterable<Color> {
         return RGBColor(red.roundToInt(), green.roundToInt(), blue.roundToInt())
     }
 
-    companion object {
+    companion {
         const val MIN_COLOR_VALUE = 0.0
 
         const val MAX_COLOR_VALUE = 255.0
 
-        @JvmField
         val DEFAULT_COLOR = World.DEFAULT_COLOR
     }
 }

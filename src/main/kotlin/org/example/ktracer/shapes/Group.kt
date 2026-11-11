@@ -8,13 +8,17 @@ import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
 import org.example.ktracer.primitives.Vector
 
-class Group(material: Material = Material(), transformation: Transformation = Transformation.IDENTITY) :
+class Group(material: Material = Material(), transformation: Transformation = Transformation.identity()) :
     Shape(material, transformation) {
     val children = mutableListOf<Shape>()
 
     fun add(shape: Shape) {
         shape.parent = this
         children += shape
+    }
+
+    operator fun plusAssign(shape: Shape) {
+        add(shape)
     }
 
     override fun localNormalAt(point: Point): Vector = throw UnsupportedOperationException()
@@ -64,7 +68,7 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
 
     override fun divide(threshold: Int) {
         if (children.size >= threshold) {
-            val (left, right) = partitionChildren()
+            val [left, right] = partitionChildren()
             addSubGroup(left)
             addSubGroup(right)
         }
@@ -76,9 +80,9 @@ class Group(material: Material = Material(), transformation: Transformation = Tr
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
-            other is Group &&
-            super.equals(other) &&
-            children == other.children
+                other is Group &&
+                super.equals(other) &&
+                children == other.children
     }
 
     override fun hashCode(): Int = Objects.hash(super.hashCode(), children)

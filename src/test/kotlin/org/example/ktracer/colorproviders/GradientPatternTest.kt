@@ -1,9 +1,10 @@
-package org.example.ktracer.patterns
+package org.example.ktracer.colorproviders
 
 import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Point
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.example.ktracer.colorproviders.patterns.GradientPattern
 
 class GradientPatternTest {
     @Test

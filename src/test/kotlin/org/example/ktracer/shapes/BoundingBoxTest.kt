@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
+import kotlin.collections.plusAssign
 import kotlin.math.PI
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -39,7 +40,7 @@ class BoundingBoxTest {
     @Test
     fun `adding points to empty bounding box`() {
         val boundingBox = BoundingBox()
-        boundingBox.add(Point(-5, 2, 0))
+        boundingBox += Point(-5, 2, 0)
         boundingBox.add(Point(7, 0, -3))
 
         assertEquals(Point(-5, 0, -3), boundingBox.min)
@@ -137,8 +138,7 @@ class BoundingBoxTest {
         assertEquals(Point(5, 3, 7), right.max)
     }
 
-    companion object {
-        @JvmStatic
+    companion {
         fun `checking if bounding box contains given point data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(Point(5, -2, 0), true),
@@ -153,7 +153,6 @@ class BoundingBoxTest {
             )
         }
 
-        @JvmStatic
         fun `checking if bounding box contains given box data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(Point(5, -2, 0), Point(11, 4, 7), true),
@@ -163,7 +162,6 @@ class BoundingBoxTest {
             )
         }
 
-        @JvmStatic
         fun `intersecting ray with bounding box at the origin data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(Point(5, 0.5, 0), Vector.LEFT, true),

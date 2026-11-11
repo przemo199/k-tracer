@@ -15,7 +15,7 @@ class SphereTest {
 
     @Test
     fun `default sphere`() {
-        assertEquals(Matrix.IDENTITY, sphere.transformation)
+        assertEquals(Matrix.identity(), sphere.transformation)
         assertEquals(Material(), sphere.material)
     }
 

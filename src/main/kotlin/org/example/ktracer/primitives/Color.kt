@@ -1,10 +1,11 @@
 package org.example.ktracer.primitives
 
-class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(red, green, blue) {
-    val red by this::x
-    val green by this::y
-    val blue by this::z
-    override val w get() = 1.0
+import org.example.ktracer.coarseEquals
+
+value class Color(val red: Double = 0.0, val green: Double = 0.0, val blue: Double = 0.0) {
+//    val red by this::x
+//    val green by this::y
+//    val blue by this::z
 
     constructor(fn: (Int) -> Double) : this(fn(0), fn(1), fn(2))
 
@@ -32,11 +33,14 @@ class Color(red: Double = 0.0, green: Double = 0.0, blue: Double = 0.0) : Tuple(
 
     fun clamped(): Color = map(::clamp)
 
-    override fun equals(other: Any?): Boolean = this === other || other is Color && super.equals(other)
+    override fun equals(other: Any?): Boolean = other is Color
+            && red coarseEquals other.red
+            && green coarseEquals other.green
+            && blue coarseEquals other.blue
 
-    override fun toString(): String = "Color(red=$x, green=$y, blue=$z)"
+    override fun toString(): String = "Color(red=$red, green=$green, blue=$blue)"
 
-    companion object {
+    companion {
         const val MIN_VALUE = 0.0
 
         const val MAX_VALUE = 1.0

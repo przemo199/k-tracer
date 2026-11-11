@@ -76,8 +76,7 @@ class CylinderTest {
         assertEquals(Point(1, 3, 1), boundingBox.max)
     }
 
-    companion object {
-        @JvmStatic
+    companion {
         fun `ray misses cylinder data`(): Stream<Arguments> {
             return Stream.of(
                 Arguments.arguments(Point(1, 0, 0), Vector.UP),
@@ -86,7 +85,6 @@ class CylinderTest {
             )
         }
 
-        @JvmStatic
         fun `ray intersects cylinder data`(): Stream<Arguments> {
             return Stream.of(
                 Arguments.arguments(Point(1, 0, -5), Vector.FORWARD, 5.0, 5.0),
@@ -95,7 +93,6 @@ class CylinderTest {
             )
         }
 
-        @JvmStatic
         fun `normal vector on cylinder data`(): Stream<Arguments> {
             return Stream.of(
                 Arguments.arguments(Point(1, 0, 0), Vector.RIGHT),
@@ -105,7 +102,6 @@ class CylinderTest {
             )
         }
 
-        @JvmStatic
         fun `intersecting constrained cylinder data`(): Stream<Arguments> {
             return Stream.of(
                 Arguments.arguments(Point(0, 1.5, 0), Vector(0.1, 1, 0), 0),

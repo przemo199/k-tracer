@@ -12,7 +12,7 @@ data class Matrix(private val elements: DoubleArray) : Iterable<Double> {
 
     constructor(elements: Iterable<Number>) : this(elements.map(Number::toDouble).toDoubleArray())
 
-    private constructor() : this(EMPTY.apply {
+    private constructor() : this(nullMatrix().apply {
         SIDE_LENGTH_RANGE.forEach { this[it, it] = 1.0 }
     })
 
@@ -56,7 +56,7 @@ data class Matrix(private val elements: DoubleArray) : Iterable<Double> {
 
     fun isIdentity(): Boolean = SIDE_LENGTH_RANGE.all { rowIndex ->
         SIDE_LENGTH_RANGE.all { columnIndex ->
-            this[rowIndex, columnIndex] coarseEquals if (rowIndex == columnIndex) { 0.0 } else { 1.0 }
+            this[rowIndex, columnIndex] coarseEquals if (rowIndex == columnIndex) 0.0 else 1.0
         }
     }
 
@@ -138,7 +138,7 @@ data class Matrix(private val elements: DoubleArray) : Iterable<Double> {
     }
 
     operator fun times(other: Matrix): Matrix {
-        val result = EMPTY
+        val result = nullMatrix()
         for (rowIndex in SIDE_LENGTH_RANGE) {
             for (columnIndex in SIDE_LENGTH_RANGE) {
                 result[rowIndex, columnIndex] = SIDE_LENGTH_RANGE
@@ -162,7 +162,7 @@ data class Matrix(private val elements: DoubleArray) : Iterable<Double> {
         }
     }
 
-    operator fun unaryMinus(): Matrix = IDENTITY.apply{
+    operator fun unaryMinus(): Matrix = identity().apply {
         elements.forEachIndexed { index, value ->
             elements[index] = -value
         }
@@ -182,7 +182,7 @@ data class Matrix(private val elements: DoubleArray) : Iterable<Double> {
 
     override fun toString(): String = "Matrix(elements=${elements.contentToString()})"
 
-    companion object {
+    companion {
         const val SIDE_LENGTH = 4
 
         const val SIZE = SIDE_LENGTH * SIDE_LENGTH
@@ -190,18 +190,15 @@ data class Matrix(private val elements: DoubleArray) : Iterable<Double> {
         val SIDE_LENGTH_RANGE = 0 until SIDE_LENGTH
 
         /**
-         * Empty matrix
+         * @return identity matrix
          */
-        @JvmStatic
-        val EMPTY get() = Matrix(DoubleArray(SIZE))
+        fun identity() = Matrix()
 
         /**
-         * Identity matrix
+         * @return matrix full of zeroes
          */
-        @JvmStatic
-        val IDENTITY get() = Matrix()
+        fun nullMatrix() = Matrix(DoubleArray(SIZE))
 
-        @JvmStatic
         private fun rowColToIndex(row: Int, col: Int) = (row * SIDE_LENGTH) + col
     }
 }

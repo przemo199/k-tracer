@@ -1,27 +1,27 @@
 package org.example.ktracer.shapes
 
 import java.util.Objects
+import kotlin.math.absoluteValue
 import org.example.ktracer.EPSILON
+import org.example.ktracer.MAX
+import org.example.ktracer.MIN
 import org.example.ktracer.coarseEquals
 import org.example.ktracer.composites.Intersection
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.Ray
 import org.example.ktracer.primitives.Point
+import org.example.ktracer.primitives.Transformation
 import org.example.ktracer.primitives.Vector
 import org.example.ktracer.solveQuadratic
 import org.example.ktracer.squared
-import kotlin.math.absoluteValue
-import org.example.ktracer.MAX
-import org.example.ktracer.MIN
-import org.example.ktracer.primitives.Transformation
 
 open class Cylinder(
     min: Number = MIN,
     max: Number = MAX,
     var closed: Boolean = false,
     material: Material = Material(),
-    transformation: Transformation = Transformation.IDENTITY,
+    transformation: Transformation = Transformation.identity(),
 ) : Shape(material, transformation) {
     var min: Double = min.toDouble()
     var max: Double = max.toDouble()
@@ -89,11 +89,11 @@ open class Cylinder(
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
-            other is Cylinder &&
-            super.equals(other) &&
-            closed == other.closed &&
-            min coarseEquals other.min &&
-            max coarseEquals other.max
+                other is Cylinder &&
+                super.equals(other) &&
+                closed == other.closed &&
+                min coarseEquals other.min &&
+                max coarseEquals other.max
     }
 
     override fun hashCode(): Int = Objects.hash(super.hashCode(), closed, min, max)
@@ -102,8 +102,7 @@ open class Cylinder(
         return "Cylinder(material=$material, transformation=$transformation, min=$min, max=$max, closed=$closed)"
     }
 
-    companion object {
-        @JvmStatic
+    companion {
         fun checkCap(ray: Ray, distance: Number): Boolean {
             distance.toDouble().let {
                 val x = ray.origin.x + (ray.direction.x * it)

@@ -50,8 +50,7 @@ class CubeTest {
         assertEquals(Point(1, 1, 1), boundingBox.max)
     }
 
-    companion object {
-        @JvmStatic
+    companion {
         fun `ray intersects cube data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(Point(5, 0.5, 0), Vector.LEFT, 4, 6),
@@ -64,7 +63,6 @@ class CubeTest {
             )
         }
 
-        @JvmStatic
         fun `ray misses cube data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(Point(-2, 0, 0), Vector(0.2673, 0.5345, 0.8018)),
@@ -77,7 +75,6 @@ class CubeTest {
             )
         }
 
-        @JvmStatic
         fun `normal on surface of cube data`(): Stream<Arguments> {
             return Stream.of(
                 arguments(Point(1, 0.5, -0.8), Vector.RIGHT),

@@ -14,7 +14,7 @@ import org.example.ktracer.primitives.Vector
 
 class Plane(
     material: Material = Material(),
-    transformation: Transformation = Transformation.IDENTITY,
+    transformation: Transformation = Transformation.identity(),
 ) : Shape(material, transformation) {
     override fun localNormalAt(point: Point): Vector = Vector.UP
 

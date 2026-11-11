@@ -4,9 +4,9 @@ import java.util.Objects
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.Ray
-import org.example.ktracer.primitives.Vector
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
+import org.example.ktracer.primitives.Vector
 
 interface Intersectable {
     fun localIntersect(ray: Ray, intersections: Intersections)
@@ -55,9 +55,9 @@ abstract class Shape(
 
     override fun equals(other: Any?): Boolean {
         return other is Shape &&
-            material == other.material &&
-            transformation == other.transformation &&
-            parent == other.parent
+                material == other.material &&
+                transformation == other.transformation &&
+                parent == other.parent
     }
 
     override fun hashCode(): Int = Objects.hash(material, transformation, parent)

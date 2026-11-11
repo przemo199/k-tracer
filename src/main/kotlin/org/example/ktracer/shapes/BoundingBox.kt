@@ -76,9 +76,9 @@ class BoundingBox(
     operator fun plusAssign(box: Boxable) = add(box)
 
     internal fun intersects(ray: Ray): Boolean {
-        val (xDistanceMin, xDistanceMax) = Cube.checkAxis(ray.origin.x, ray.direction.x, min.x, max.x)
-        val (yDistanceMin, yDistanceMax) = Cube.checkAxis(ray.origin.y, ray.direction.y, min.y, max.y)
-        val (zDistanceMin, zDistanceMax) = Cube.checkAxis(ray.origin.z, ray.direction.z, min.z, max.z)
+        val [xDistanceMin, xDistanceMax] = Cube.checkAxis(ray.origin.x, ray.direction.x, min.x, max.x)
+        val [yDistanceMin, yDistanceMax] = Cube.checkAxis(ray.origin.y, ray.direction.y, min.y, max.y)
+        val [zDistanceMin, zDistanceMax] = Cube.checkAxis(ray.origin.z, ray.direction.z, min.z, max.z)
 
         val distanceMin = max(max(xDistanceMin, yDistanceMin), zDistanceMin)
         val distanceMax = min(min(xDistanceMax, yDistanceMax), zDistanceMax)
@@ -93,18 +93,20 @@ class BoundingBox(
 
         val maxDimension = max(max(dimensionX, dimensionY), dimensionZ)
 
-        var (xMin, yMin, zMin) = min
-        var (xMax, yMax, zMax) = max
+        (var xMin = x, var yMin = y, var zMin = z) = min
+        (var xMax = x, var yMax = y, var zMax = z) = max
 
         when (maxDimension) {
             dimensionX -> {
                 xMin += maxDimension / 2.0
                 xMax = xMin
             }
+
             dimensionY -> {
                 yMin += maxDimension / 2.0
                 yMax = yMin
             }
+
             else -> {
                 zMin += maxDimension / 2.0
                 zMax = zMin
@@ -122,17 +124,17 @@ class BoundingBox(
 
     operator fun contains(point: Point): Boolean {
         return min.x <= point.x && point.x <= max.x &&
-            min.y <= point.y && point.y <= max.y &&
-            min.z <= point.z && point.z <= max.z
+                min.y <= point.y && point.y <= max.y &&
+                min.z <= point.z && point.z <= max.z
     }
 
     operator fun contains(box: BoundingBox): Boolean = box.min in this && box.max in this
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
-            other is BoundingBox &&
-            min == other.min &&
-            max == other.max
+                other is BoundingBox &&
+                min == other.min &&
+                max == other.max
     }
 
     override fun hashCode(): Int = Objects.hash(min, max)

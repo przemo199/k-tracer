@@ -1,11 +1,11 @@
 package org.example.ktracer.composites
 
+import kotlin.math.sqrt
 import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Light
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.shapes.Shape
 import org.example.ktracer.squared
-import kotlin.math.sqrt
 
 class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
     fun collectIntersections(ray: Ray, intersections: Intersections) {
@@ -88,10 +88,9 @@ class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
         return "World(lights=${arrayOf(lights).contentDeepToString()}, shapes=${arrayOf(shapes).contentDeepToString()})"
     }
 
-    companion object {
+    companion {
         const val MAX_REFLECTION_ITERATIONS = 6
 
-        @JvmField
         val DEFAULT_COLOR = Color.BLACK
     }
 }

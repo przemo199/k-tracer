@@ -1,22 +1,22 @@
 package org.example.ktracer.shapes
 
 import kotlin.math.absoluteValue
-import kotlin.math.min
 import kotlin.math.max
+import kotlin.math.min
 import org.example.ktracer.EPSILON
+import org.example.ktracer.MAX
+import org.example.ktracer.coarseEquals
 import org.example.ktracer.composites.Intersection
 import org.example.ktracer.composites.Intersections
 import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.Ray
 import org.example.ktracer.primitives.Point
-import org.example.ktracer.primitives.Vector
-import org.example.ktracer.MAX
-import org.example.ktracer.coarseEquals
 import org.example.ktracer.primitives.Transformation
+import org.example.ktracer.primitives.Vector
 
 open class Cube(
     material: Material = Material(),
-    transformation: Transformation = Transformation.IDENTITY
+    transformation: Transformation = Transformation.identity()
 ) : Shape(material, transformation) {
     override fun localNormalAt(point: Point): Vector {
         val absPoint = point.abs()
@@ -29,9 +29,9 @@ open class Cube(
     }
 
     override fun localIntersect(ray: Ray, intersections: Intersections) {
-        val (xDistanceMin, xDistanceMax) = checkAxis(ray.origin.x, ray.direction.x, AXIS_MIN, AXIS_MAX)
-        val (yDistanceMin, yDistanceMax) = checkAxis(ray.origin.y, ray.direction.y, AXIS_MIN, AXIS_MAX)
-        val (zDistanceMin, zDistanceMax) = checkAxis(ray.origin.z, ray.direction.z, AXIS_MIN, AXIS_MAX)
+        val [xDistanceMin, xDistanceMax] = checkAxis(ray.origin.x, ray.direction.x, AXIS_MIN, AXIS_MAX)
+        val [yDistanceMin, yDistanceMax] = checkAxis(ray.origin.y, ray.direction.y, AXIS_MIN, AXIS_MAX)
+        val [zDistanceMin, zDistanceMax] = checkAxis(ray.origin.z, ray.direction.z, AXIS_MIN, AXIS_MAX)
 
         val distanceMin = max(max(xDistanceMin, yDistanceMin), zDistanceMin)
         val distanceMax = min(min(xDistanceMax, yDistanceMax), zDistanceMax)
@@ -48,12 +48,11 @@ open class Cube(
 
     override fun toString(): String = "Cube(material=$material, transformation=$transformation)"
 
-    companion object {
+    companion {
         private const val AXIS_MIN = -1.0
 
         private const val AXIS_MAX = 1.0
 
-        @JvmStatic
         fun checkAxis(origin: Double, direction: Double, min: Double, max: Double): Pair<Double, Double> {
             val distanceMinNumerator = min - origin
             val distanceMaxNumerator = max - origin

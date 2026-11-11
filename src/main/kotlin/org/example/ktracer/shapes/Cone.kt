@@ -22,7 +22,7 @@ open class Cone(
     max: Number = MAX,
     var closed: Boolean = false,
     material: Material = Material(),
-    transformation: Transformation = Transformation.IDENTITY,
+    transformation: Transformation = Transformation.identity(),
 ) : Shape(material, transformation) {
     var min: Double = min.toDouble()
     var max: Double = max.toDouble()
@@ -65,10 +65,10 @@ open class Cone(
     override fun localIntersect(ray: Ray, intersections: Intersections) {
         val a = ray.direction.x.squared() - ray.direction.y.squared() + ray.direction.z.squared()
         val b = 2.0 * (
-            (ray.origin.x * ray.direction.x) -
-            (ray.origin.y * ray.direction.y) +
-            (ray.origin.z * ray.direction.z)
-        )
+                (ray.origin.x * ray.direction.x) -
+                        (ray.origin.y * ray.direction.y) +
+                        (ray.origin.z * ray.direction.z)
+                )
         val c = ray.origin.x.squared() - ray.origin.y.squared() + ray.origin.z.squared()
 
         if (a.absoluteValue < EPSILON && b.absoluteValue > EPSILON) {
@@ -108,11 +108,11 @@ open class Cone(
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
-            other is Cone &&
-            super.equals(other) &&
-            closed == other.closed &&
-            min coarseEquals other.min &&
-            max coarseEquals other.max
+                other is Cone &&
+                super.equals(other) &&
+                closed == other.closed &&
+                min coarseEquals other.min &&
+                max coarseEquals other.max
     }
 
     override fun hashCode(): Int = Objects.hash(super.hashCode(), closed, min, max)
@@ -121,8 +121,7 @@ open class Cone(
         return "Cone(material=$material, transformation=$transformation, min=$min, max=$max, closed=$closed)"
     }
 
-    companion object {
-        @JvmStatic
+    companion {
         private fun checkCaps(ray: Ray, distance: Number, radius: Number): Boolean {
             distance.toDouble().also {
                 val x = ray.origin.x + ray.direction.x * it

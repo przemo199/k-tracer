@@ -9,7 +9,7 @@ import org.example.ktracer.shapes.Transformable
 data class Ray(val origin: Point, val direction: Vector) {
     fun position(distance: Number): Point = origin + (direction * distance.toDouble())
 
-    fun <T> intersect(shape: T, intersections: Intersections) where T: Transformable, T: Intersectable {
+    fun <T> intersect(shape: T, intersections: Intersections) where T : Transformable, T : Intersectable {
         val localRay = transform(shape.transformation.inverse())
         shape.localIntersect(localRay, intersections)
     }

@@ -2,7 +2,7 @@ package org.example.ktracer.primitives
 
 import kotlin.math.absoluteValue
 
-class Point(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) {
+class Point(override val x: Double = 0.0, override val y: Double = 0.0, override val z: Double = 0.0) : Tuple() {
     override val w get() = 1.0
 
     constructor(fn: (Int) -> Double) : this(fn(0), fn(1), fn(2))
@@ -25,12 +25,11 @@ class Point(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) : Tuple(x, y, z) 
 
     fun copy(x: Double = this.x, y: Double = this.y, z: Double = this.z): Point = Point(x, y, z)
 
-    override fun equals(other: Any?): Boolean = this === other || other is Point && super.equals(other)
+    override fun equals(other: Any?): Boolean = other is Point && super.equals(other)
 
     override fun toString(): String = "Point(x=$x, y=$y, z=$z)"
 
-    companion object {
-        @JvmField
+    companion {
         val ORIGIN: Point = Point()
 
         operator fun invoke(x: Number, y: Number, z: Number): Point = Point(x.toDouble(), y.toDouble(), z.toDouble())

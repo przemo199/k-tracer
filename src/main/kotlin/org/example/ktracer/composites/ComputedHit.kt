@@ -1,12 +1,12 @@
 package org.example.ktracer.composites
 
+import kotlin.math.pow
+import kotlin.math.sqrt
 import org.example.ktracer.EPSILON
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Vector
 import org.example.ktracer.shapes.Shape
 import org.example.ktracer.squared
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 data class ComputedHit(
     val distance: Double,
@@ -35,11 +35,12 @@ data class ComputedHit(
 
             cos = sqrt(1.0 - sin2t)
         }
-        val refractionCoefficient = ((refractiveIndex1 - refractiveIndex2) / (refractiveIndex1 + refractiveIndex2)).squared()
+        val refractionCoefficient =
+            ((refractiveIndex1 - refractiveIndex2) / (refractiveIndex1 + refractiveIndex2)).squared()
         return refractionCoefficient + ((1.0 - refractionCoefficient) * (1.0 - cos).pow(5))
     }
 
-    companion object {
+    companion {
         operator fun invoke(
             distance: Number,
             shape: Shape,

@@ -37,3 +37,9 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Kotlin 2.x compiler daemon data ###
+.kotlin/
+
+### Agents ###
+.claude/settings.local.json
