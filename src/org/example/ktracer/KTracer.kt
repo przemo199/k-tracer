@@ -1,13 +1,16 @@
 package org.example.ktracer
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.enum
+import kotlin.io.path.Path
 import kotlin.time.DurationUnit
 import kotlin.time.measureTimedValue
+import org.example.ktracer.scene.SceneException
 import org.example.ktracer.scene.SceneLoader
 
 class KTracer : CliktCommand(name = "Render a scene to an image") {
@@ -18,9 +21,13 @@ class KTracer : CliktCommand(name = "Render a scene to an image") {
     val renderingMode by option("--rendering-mode", "-r").enum<RenderingMode>().default(RenderingMode.PARALLEL)
 
     override fun run() {
-        val (world, camera) = SceneLoader.parseYamlToScene(scenePath)
+        val (world, camera) = try {
+            SceneLoader.load(Path(scenePath))
+        } catch (e: SceneException) {
+            throw CliktError(e.message)
+        }
         println("Rendering image using $scenePath scene")
-        val (canvas, duration) = measureTimedValue { camera.render(world, RenderingMode.PARALLEL == renderingMode) }
+        val [canvas, duration] = measureTimedValue { camera.render(world, RenderingMode.PARALLEL == renderingMode) }
         println(String.format("Rendered image in %.3fs", duration.toDouble(DurationUnit.SECONDS)))
         canvas.saveAsPng(imageOutputPath)
     }

@@ -21,8 +21,8 @@ Always use the project wrapper. In bash, Git Bash or CI use `./kotlin`; on Windo
 | Task | Command |
 | --- | --- |
 | Run all tests | `./kotlin test` |
-| Run one test class (wildcards allowed) | `./kotlin test --include-classes 'org.example.ktracer.shapes.SphereTest'` |
-| Run one test method | `./kotlin test --include-test 'org.example.ktracer.shapes.SphereTest.sphere normal'` |
+| Run one test class (wildcards allowed) | `./kotlin test -m k-tracer --include-classes 'org.example.ktracer.shapes.SphereTest'` (test filters need `-m`) |
+| Run one test method | `./kotlin test -m k-tracer --include-test 'org.example.ktracer.shapes.SphereTest.sphere normal'` |
 | Compile (main and test) | `./kotlin build` |
 | Render a scene | `./kotlin run -m k-tracer -- scenes/cover.yaml out/cover.png` (`-m` is required: there are two application modules) |
 | Benchmarks (~2.5 min) | `cmd //c "scripts\bench.cmd"`; see [Performance](#performance) |
@@ -72,7 +72,7 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 | `composites/` | `Ray`, `Intersection`, `Intersections` (a reusable buffer), `ComputedHit` (precomputed shading data), `Material` (Phong), `World` (shading, shadows, reflection, refraction), `Camera` (rays and serial/parallel render), `Canvas` (pixels and PNG output through scrimage). |
 | `shapes/` | `Shape` base class plus `Sphere`, `Plane`, `Cube`, `Cylinder`, `Cone`, `Triangle`, `Group`, `ConstructiveSolidGeometry`, `BoundingBox`. |
 | `colorproviders/` | `ColorProvider` interface. `patterns/` (solid 3D patterns: stripe, gradient, ring, checker), `textures/` (UV textures), `mappings/` (point → UV: planar, spherical, cylindrical, cube). |
-| `scene/` | `SceneLoader` parses the YAML scene format; `Keyword` holds the YAML keys. |
+| `scene/` | YAML scene files, in two stages. `SceneFormat.kt` is the typed model of the file (kotlinx.serialization with [kotaml](https://github.com/Heapy/kotaml)); `SceneResolver` resolves named definitions and builds the `World` and `Camera`; `SceneLoader` ties them together and reports problems as `SceneException`. |
 
 ### Render pipeline
 
@@ -86,7 +86,8 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 - **Transform order.** `A * B` applies `B` first. For example, `translation(...) * scaling(...)` scales, then translates.
 - **`Intersections` is a reused scratch buffer.** It is passed down the call stack and is per-thread in parallel rendering (`ThreadLocal`). `World.collectIntersections` clears it. Do not keep references to it across calls, and do not share one between threads.
 - **Hot path.** Intersection and shading code runs billions of times per render. Avoid allocations, lambdas that capture state, `Sequence`s and boxing in `localIntersect`, `localNormalAt` and `World` shading unless you have measured the cost (see [Performance](#performance)).
-- **Scene format coverage.** `SceneLoader` currently handles `camera`, `light`, `plane`, `sphere`, `cube`, `cone`, `cylinder` and the patterns `stripes`, `gradient`, `rings`, `checkers`. Groups, triangles, CSG and textures exist in code but are **not** yet in the YAML format. Named definitions are dispatched by suffix: `*-color`, `*-material`, `*-pattern`, `*-transform` or `*-object`.
+- **Scene format coverage.** Scenes can contain `camera`, `light`, `plane`, `sphere`, `cube`, `cone`, `cylinder` and the patterns `stripes`, `gradient`, `rings`, `checkers`. Groups, triangles, CSG and textures exist in code but are **not** yet in the YAML format.
+- **Scene format rules.** A `define` is a material (a mapping), a transform (a list of steps) or a color (three numbers), told apart by its value, not its name. Only materials can `extend`. Transform steps apply in list order, whether inline or named. Unknown keys, undefined names, non-invertible transforms and a missing camera are errors that report `file:line:column`. Keep it that way: never ignore input silently.
 
 ## Conventions
 
@@ -108,11 +109,11 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 
 1. Implement `localIntersect` (push `Intersection`s into the passed buffer), `localNormalAt`, `boundingBox()`, `equals`, `hashCode` and `toString`.
 2. Add `XxxTest` covering hits, misses, tangents, normals and the bounding box.
-3. Optionally wire it into `SceneLoader.parseScene`.
+3. Optionally add it to the scene format: a `ShapeKind` entry in `SceneFormat.kt` and a branch in `SceneResolver.shape`.
 
-**Add a pattern:** subclass `Pattern`, implement `colorAt(point)` in pattern space, add a test, and add a `type` branch in `SceneLoader.parseColorProvider`.
+**Add a pattern:** subclass `Pattern`, implement `colorAt(point)` in pattern space, add a test, then add a `PatternType` entry in `SceneFormat.kt` and a branch in `SceneResolver.pattern`.
 
-**Add a scene keyword:** add a constant to `scene/Keyword.kt` and use it from `SceneLoader`. Don't scatter string literals.
+**Add a scene key:** add a property to the matching `@Serializable` class in `SceneFormat.kt` (`@SerialName` for kebab-case keys; make it nullable or give it a default if it is optional), use it in `SceneResolver`, and add a case to `SceneLoaderTest`.
 
 ## Performance
 
