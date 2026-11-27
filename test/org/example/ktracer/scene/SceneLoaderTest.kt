@@ -1,7 +1,13 @@
 package org.example.ktracer.scene
 
+import com.sksamuel.scrimage.ImmutableImage
+import com.sksamuel.scrimage.nio.PngWriter
+import java.awt.image.BufferedImage
+import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.io.path.createDirectories
 import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.writeText
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -9,7 +15,16 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import org.example.ktracer.colorproviders.ColorProvider
+import org.example.ktracer.colorproviders.mappings.CylindricalMapping
+import org.example.ktracer.colorproviders.mappings.PlanarMapping
+import org.example.ktracer.colorproviders.mappings.SphericalMapping
 import org.example.ktracer.colorproviders.patterns.StripePattern
+import org.example.ktracer.colorproviders.textures.CubeMap
+import org.example.ktracer.colorproviders.textures.TextureMap
+import org.example.ktracer.colorproviders.textures.UvAlignCheck
+import org.example.ktracer.colorproviders.textures.UvCheckers
+import org.example.ktracer.colorproviders.textures.UvImage
 import org.example.ktracer.composites.Material
 import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Point
@@ -17,6 +32,9 @@ import org.example.ktracer.primitives.Transformations
 import org.example.ktracer.shapes.Cone
 import org.example.ktracer.shapes.Cylinder
 import org.example.ktracer.shapes.Shape
+import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 
 class SceneLoaderTest {
     private val camera = """
@@ -270,5 +288,132 @@ class SceneLoaderTest {
     fun `scene must be a list of entries`() {
         assertContains(assertFailsWith<SceneException> { SceneLoader.parse("add: sphere") }.message!!, "is a list")
         assertContains(assertFailsWith<SceneException> { SceneLoader.parse("- [unclosed") }.message!!, "scene:")
+    }
+
+    @Test
+    fun `inline materials can extend a defined one`() {
+        val shape = onlyShape(
+            """
+            - define: glossy-material
+              value: { specular: 0.4, shininess: 100 }
+            - add: sphere
+              material:
+                extend: glossy-material
+                reflective: 0.1
+            """,
+        )
+        assertEquals(Material(specular = 0.4, shininess = 100.0, reflectiveness = 0.1), shape.material)
+        assertContains(error("- add: sphere\n  material: { extend: nope-material }"), "scene:8:3: undefined material")
+    }
+
+    private fun onlyColorProvider(entries: String): ColorProvider = onlyShape(entries).material.colorProvider!!
+
+    private val checkers = """
+        uv_pattern:
+          type: checkers
+          width: 16
+          height: 8
+          colors: [[0, 0.5, 0], [1, 1, 1]]
+    """.trimIndent()
+
+    @ParameterizedTest
+    @CsvSource("planar", "spherical", "cylindrical")
+    fun `texture maps load with each mapping`(name: String) {
+        val provider = onlyColorProvider(
+            "- add: sphere\n  material:\n    pattern:\n      type: map\n      mapping: $name\n" + checkers.prependIndent("      "),
+        )
+        val mapping = mapOf("planar" to PlanarMapping, "spherical" to SphericalMapping, "cylindrical" to CylindricalMapping)
+        val expected = TextureMap(UvCheckers(16, 8, Color(0, 0.5, 0), Color.WHITE), mapping.getValue(name))
+        assertEquals<ColorProvider>(expected, provider)
+    }
+
+    @Test
+    fun `align check loads with named colors and transform`() {
+        val provider = onlyColorProvider(
+            """
+            - define: red-color
+              value: [1, 0, 0]
+            - add: cylinder
+              material:
+                pattern:
+                  type: map
+                  mapping: cylindrical
+                  transform: [[rotate-y, 1]]
+                  uv_pattern:
+                    type: align_check
+                    colors:
+                      main: [1, 1, 1]
+                      ul: red-color
+                      ur: [1, 1, 0]
+                      bl: [0, 1, 0]
+                      br: [0, 1, 1]
+            """,
+        )
+        val alignCheck = UvAlignCheck(Color.WHITE, Color.RED, Color(1, 1, 0), Color.GREEN, Color(0, 1, 1))
+        assertEquals<ColorProvider>(TextureMap(alignCheck, CylindricalMapping, Transformations.rotationY(1.0)), provider)
+    }
+
+    /** A sphere whose material has a texture map with [body] as its keys after `type: map`. */
+    private fun mapError(body: String, shape: String = "sphere") =
+        error("- add: $shape\n  material:\n    pattern:\n      type: map\n" + body.trimIndent().prependIndent("      "))
+
+    @Test
+    fun `invalid texture maps are rejected`() {
+        assertContains(mapError("mapping: cubic\n$checkers"), "cubic")
+        assertContains(mapError("mapping: planar\nuv_pattern: { type: noise }"), "noise")
+        assertContains(mapError("mapping: planar\n" + checkers.replace("width", "widht")), "widht")
+        assertContains(mapError("mapping: planar\ncolors: [[0, 0, 0], [1, 1, 1]]\n$checkers"), "colors")
+        assertContains(mapError("mapping: planar"), "scene:8:3: a texture map needs a `uv_pattern`")
+        assertContains(
+            mapError("mapping: planar\nuv_pattern: { type: checkers, width: 0, height: 2, colors: [[0, 0, 0], [1, 1, 1]] }"),
+            "positive `width` and `height`",
+        )
+    }
+
+    private fun face(name: String, main: String) =
+        "$name: { type: align_check, colors: { main: $main, ul: [1, 0, 0], ur: [1, 1, 0], bl: [0, 1, 0], br: [0, 1, 1] } }"
+
+    private val faceNames = listOf("left", "front", "right", "back", "up", "down")
+
+    @Test
+    fun `cube maps load one pattern per face`() {
+        val faces = faceNames.mapIndexed { index, name -> face(name, "[0.$index, 0, 0]") }
+        val provider = onlyColorProvider(
+            "- add: cube\n  material:\n    pattern:\n      type: map\n      mapping: cube\n" +
+                faces.joinToString("\n").prependIndent("      "),
+        )
+        fun face(index: Int) = UvAlignCheck(Color(index / 10.0, 0.0, 0.0), Color.RED, Color(1, 1, 0), Color.GREEN, Color(0, 1, 1))
+        assertEquals<ColorProvider>(CubeMap(face(0), face(1), face(2), face(3), face(4), face(5)), provider)
+    }
+
+    @Test
+    fun `invalid cube maps are rejected`() {
+        val fiveFaces = faceNames.dropLast(1).joinToString("\n") { face(it, "[1, 1, 1]") }
+        assertContains(mapError("mapping: cube\n$fiveFaces", "cube"), "cube map: missing the `down` face")
+        assertContains(
+            mapError("mapping: cube\n" + face("uv_pattern", "[1, 1, 1]"), "cube"),
+            "instead of `uv_pattern`",
+        )
+        assertContains(mapError("mapping: spherical\n" + face("front", "[1, 1, 1]")), "only apply to `mapping: cube`")
+    }
+
+    @Test
+    fun `texture images are resolved relative to the scene file`(@TempDir directory: Path) {
+        val image = BufferedImage(2, 1, BufferedImage.TYPE_INT_RGB).apply {
+            setRGB(0, 0, 0xFF0000)
+            setRGB(1, 0, 0x0000FF)
+        }
+        directory.resolve("textures").createDirectories()
+        ImmutableImage.wrapAwt(image).output(PngWriter.NoCompression, directory.resolve("textures/stripe.png"))
+        val scene = directory.resolve("scene.yaml")
+        val sphere = "- add: sphere\n  material:\n    pattern:\n      type: map\n      mapping: spherical\n" +
+            "      uv_pattern: { type: image, file: %s }"
+        scene.writeText(camera + "\n" + sphere.format("textures/stripe.png"))
+        val provider = SceneLoader.load(scene).world.shapes.single().material.colorProvider
+        assertEquals<ColorProvider?>(TextureMap(UvImage(2, 1, intArrayOf(0xFF0000, 0x0000FF)), SphericalMapping), provider)
+
+        scene.writeText(camera + "\n" + sphere.format("missing.png"))
+        val message = assertFailsWith<SceneException> { SceneLoader.load(scene) }.message!!
+        assertContains(message, "$scene:13:40: cannot load texture ${directory.resolve("missing.png")}: no such file")
     }
 }

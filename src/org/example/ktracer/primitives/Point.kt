@@ -2,7 +2,7 @@ package org.example.ktracer.primitives
 
 import kotlin.math.absoluteValue
 
-class Point(override val x: Double = 0.0, override val y: Double = 0.0, override val z: Double = 0.0) : Tuple() {
+value class Point(override val x: Double = 0.0, override val y: Double = 0.0, override val z: Double = 0.0) : Tuple() {
     override val w get() = 1.0
 
     constructor(fn: (Int) -> Double) : this(fn(0), fn(1), fn(2))

@@ -5,11 +5,12 @@ import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
 
-class GradientPattern(
+/** Blends from [colorA] to [colorB] along x, then back again, so it stays continuous (the book jumps back). */
+value class GradientPattern(
     val colorA: Color,
     val colorB: Color,
-    transformation: Transformation = Transformation.identity()
-) : Pattern(transformation) {
+    override val transformation: Transformation = Transformation.identity(),
+) : Pattern() {
     override fun colorAt(point: Point): Color {
         val distance = colorB - colorA
         var fraction = (point.x % 1.0).absoluteValue
@@ -18,6 +19,4 @@ class GradientPattern(
         }
         return colorA + (distance * fraction)
     }
-
-    override fun toString(): String = "GradientPattern(colorA=$colorA, colorB=$colorB)"
 }

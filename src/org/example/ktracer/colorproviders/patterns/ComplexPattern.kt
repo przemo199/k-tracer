@@ -5,15 +5,17 @@ import org.example.ktracer.primitives.Color
 import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
 
-class ComplexPattern(
+/**
+ * The book's nested patterns: alternates between [patternA] and [patternB] along x. Each is evaluated in its own
+ * pattern space, so the two can be transformed independently.
+ */
+value class ComplexPattern(
     val patternA: Pattern,
     val patternB: Pattern,
-    transformation: Transformation = Transformation.identity()
-) : Pattern(transformation) {
+    override val transformation: Transformation = Transformation.identity(),
+) : Pattern() {
     override fun colorAt(point: Point): Color {
-        val distance = floor(point.x)
-        return if (distance % 2.0 == 0.0) patternA.colorAt(point) else patternB.colorAt(point)
+        val pattern = if (floor(point.x) % 2.0 == 0.0) patternA else patternB
+        return pattern.colorAt(pattern.transformation.inverse() * point)
     }
-
-    override fun toString(): String = "ComplexPattern(patternA=$patternA, patternB=$patternB)"
 }

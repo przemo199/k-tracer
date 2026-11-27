@@ -5,7 +5,7 @@ import kotlin.math.max
 import kotlin.math.min
 import org.example.ktracer.coarseEquals
 
-abstract class Tuple constructor() : Iterable<Double> {
+abstract value class Tuple() : Iterable<Double> {
     abstract val w: Double
     abstract val x: Double
     abstract val y: Double

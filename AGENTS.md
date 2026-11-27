@@ -58,7 +58,7 @@ This project deliberately runs on bleeding-edge tooling. Some of the syntax post
   - `-Xcompanion-blocks-and-extensions`: companions are written as `companion { ... }`, **not** `companion object { ... }`. Every file in the project uses this form. Follow it.
   - `-Xfull-value-classes`: multi-field `value class` declarations, such as `Color` and `Coordinates`, are valid here.
 - Do not bump Kotlin, the toolchain (the version pinned in the `kotlin` and `kotlin.bat` wrappers), the JDK or dependency versions, or add or remove compiler flags, unless the task asks for it.
-- CI (`.github/workflows/ci.yaml`) runs `./kotlin test` (`kotlin.bat` on Windows) on Windows, Linux and macOS, plus a benchmark smoke run on Linux (`-f 0 -wi 0 -i 1 -r 1ms`: it checks the JMH harness and each benchmark's setup, not timings). Changes that only touch `*.md`, `rendered_images/` or `.claude/` don't trigger CI. When a run fails, the JUnit reports are uploaded as the `test-reports-<OS>` artifact. Validate workflow edits with [actionlint](https://github.com/rhysd/actionlint).
+- CI (`.github/workflows/ci.yaml`) runs `./kotlin test` (`kotlin.bat` on Windows) on Windows, Linux and macOS, plus a benchmark smoke run on Linux (`-f 0 -wi 0 -i 1 -r 1ms`: it checks the JMH harness and each benchmark's setup, not timings). Changes that only touch `*.md`, `rendered_images/` or `.claude/` don't trigger CI. When a run fails, the JUnit reports (and the renders of failing golden-image tests) are uploaded as the `test-reports-<OS>` artifact. Validate workflow edits with [actionlint](https://github.com/rhysd/actionlint).
 
 ## Architecture
 
@@ -71,7 +71,7 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 | `primitives/` | `Tuple` → `Point` (w=1) and `Vector` (w=0). Also `Color`, `Matrix` (4×4; `Transformation` is a typealias), `Transformations` (factory for `translation`, `scaling`, `rotationX/Y/Z`, `shearing`, `viewTransform`, …), `Light`, `Coordinates` (u,v). |
 | `composites/` | `Ray`, `Intersection`, `Intersections` (a reusable buffer), `ComputedHit` (precomputed shading data), `Material` (Phong), `World` (shading, shadows, reflection, refraction), `Camera` (rays and serial/parallel render), `Canvas` (pixels and PNG output through scrimage). |
 | `shapes/` | `Shape` base class plus `Sphere`, `Plane`, `Cube`, `Cylinder`, `Cone`, `Triangle`, `Group`, `ConstructiveSolidGeometry`, `BoundingBox`. |
-| `colorproviders/` | `ColorProvider` interface. `patterns/` (solid 3D patterns: stripe, gradient, ring, checker), `textures/` (UV textures), `mappings/` (point → UV: planar, spherical, cylindrical, cube). |
+| `colorproviders/` | `ColorProvider` interface (`colorAtShape`; `toPatternSpace` goes through the shape's and its groups' transformations, then the provider's). `patterns/`: solid 3D patterns (stripe, gradient, ring, checker, and `ComplexPattern` for nested ones). `mappings/`: point → `(u, v)` (`PlanarMapping`, `SphericalMapping`, `CylindricalMapping`), and `CubeFace`. `textures/`: 2D `UvPattern`s (`UvCheckers`, `UvAlignCheck`, `UvImage`), painted on by a `TextureMap` (one UV pattern plus a mapping) or a `CubeMap` (one UV pattern per face). All are immutable data classes, so they compare by value. |
 | `scene/` | YAML scene files, in two stages. `SceneFormat.kt` is the typed model of the file (kotlinx.serialization with [kotaml](https://github.com/Heapy/kotaml)); `SceneResolver` resolves named definitions and builds the `World` and `Camera`; `SceneLoader` ties them together and reports problems as `SceneException`. |
 
 ### Render pipeline
@@ -86,7 +86,7 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 - **Transform order.** `A * B` applies `B` first. For example, `translation(...) * scaling(...)` scales, then translates.
 - **`Intersections` is a reused scratch buffer.** It is passed down the call stack and is per-thread in parallel rendering (`ThreadLocal`). `World.collectIntersections` clears it. Do not keep references to it across calls, and do not share one between threads.
 - **Hot path.** Intersection and shading code runs billions of times per render. Avoid allocations, lambdas that capture state, `Sequence`s and boxing in `localIntersect`, `localNormalAt` and `World` shading unless you have measured the cost (see [Performance](#performance)).
-- **Scene format coverage.** Scenes can contain `camera`, `light`, `plane`, `sphere`, `cube`, `cone`, `cylinder` and the patterns `stripes`, `gradient`, `rings`, `checkers`. Groups, triangles, CSG and textures exist in code but are **not** yet in the YAML format.
+- **Scene format coverage.** Scenes can contain `camera`, `light`, `plane`, `sphere`, `cube`, `cone`, `cylinder`, the patterns `stripes`, `gradient`, `rings`, `checkers`, and texture maps (`type: map` with `mapping: planar|spherical|cylindrical|cube` and `uv_pattern` of `type: checkers|align_check|image`; see `scenes/textures.yaml`). Image paths are relative to the scene file. Groups, triangles and CSG exist in code but are **not** yet in the YAML format. The format matches ray-tracer-challenge's, so scenes work in both projects.
 - **Scene format rules.** A `define` is a material (a mapping), a transform (a list of steps) or a color (three numbers), told apart by its value, not its name. Only materials can `extend`. Transform steps apply in list order, whether inline or named. Unknown keys, undefined names, non-invertible transforms and a missing camera are errors that report `file:line:column`. Keep it that way: never ignore input silently.
 
 ## Conventions
@@ -102,6 +102,7 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 - Use `kotlin.test` (`@Test`, `assertEquals`, …) on JUnit Platform. Use `junit-jupiter-params` for parameterised tests.
 - Name test methods as backtick sentences, usually echoing the book's scenarios: ``fun `ray intersects sphere at two points`()``.
 - Every new shape, pattern or math routine needs unit tests. Every bug fix needs a regression test.
+- **Golden images.** `GoldenImageTest` renders every scene in `scenes/` 240 px wide and compares it with `testResources/golden/<scene>.png`. It tolerates a per-channel difference of 2/255 on all but 0.1% of pixels, for floating-point differences between platforms. A failing scene's render is saved to `build/reports/golden/<scene>-actual.png`. A new scene needs a reference, and so does any change meant to alter rendered output: run `UPDATE_GOLDEN=1 ./kotlin test -m k-tracer --include-classes 'org.example.ktracer.GoldenImageTest'`, look at the new images, and say in your summary that references changed and why. Never update references to make an unexplained failure pass.
 
 ### Recipes
 
@@ -111,7 +112,7 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 2. Add `XxxTest` covering hits, misses, tangents, normals and the bounding box.
 3. Optionally add it to the scene format: a `ShapeKind` entry in `SceneFormat.kt` and a branch in `SceneResolver.shape`.
 
-**Add a pattern:** subclass `Pattern`, implement `colorAt(point)` in pattern space, add a test, then add a `PatternType` entry in `SceneFormat.kt` and a branch in `SceneResolver.pattern`.
+**Add a pattern:** write a `data class` that extends `Pattern` (a 3D pattern; `override val transformation` in its constructor) or implements `UvPattern` (2D, for texture maps), add a test, then add a `@SerialName`d subclass of `PatternDef` or `UvPatternDef` in `SceneFormat.kt` and a branch in `SceneResolver.pattern` or `SceneResolver.uvPattern`.
 
 **Add a scene key:** add a property to the matching `@Serializable` class in `SceneFormat.kt` (`@SerialName` for kebab-case keys; make it nullable or give it a default if it is optional), use it in `SceneResolver`, and add a case to `SceneLoaderTest`.
 
@@ -125,6 +126,7 @@ All code is under `src/org/example/ktracer/` (Kotlin Toolchain default layout: `
 | `IntersectBenchmark.intersect` | `Ray.intersect` per shape, param `case=<shape>/<hit\|miss>` |
 | `NormalAtBenchmark.normalAt` | `Shape.normalAt`, param `shape=sphere\|cube` |
 | `IntersectionsBenchmark.hit` | `Intersections.hit()` on lists of 8 intersections (score is per list) |
+| `ColorProviderBenchmark.colorAtShape` | `ColorProvider.colorAtShape` on a transformed sphere, param `provider=stripes\|checkers\|gradient\|rings\|nested\|map-planar\|map-spherical\|map-cylindrical\|map-image\|cube-map` |
 
 Inputs come from a fixed-seed generator (`Rng` in `Common.kt`) in batches of 1024. Scores are average **ns per input**. A full run takes about 2.5 minutes. Always use the script: it pins the run to two physical cores at high priority. Comparing two runs of unchanged code, the median change was 3.6% pinned and 5.5% unpinned, and only the unpinned run produced false "regressed" or "improved" verdicts (4 of 29).
 
@@ -152,7 +154,7 @@ How it works, and the rules for adding a benchmark:
   - Write parameters as `@Param(...) lateinit var x: String`. A `lateinit` property's backing field is public, which JMH's generated code needs.
   - Add `@OperationsPerInvocation(BATCH)` and loop over batched inputs.
 - **Defeat dead-code elimination.** Write results into a preallocated output array and return it, or pass them to a `Blackhole`. Never discard a result.
-- **Shape benchmarks call `polluteShapeCallSites()` in `@Setup`.** It sends every shape type through `Ray.intersect` and `Shape.normalAt`. Otherwise each JMH fork would only ever see one shape type, and the JIT would inline calls that stay virtual in a real scene.
+- **Shape and color provider benchmarks pollute their call sites in `@Setup`.** Shape benchmarks call `polluteShapeCallSites()`, which sends every shape type through `Ray.intersect` and `Shape.normalAt`; `ColorProviderBenchmark` sends every provider through `colorAtShape`. Otherwise each JMH fork would only ever see one type, and the JIT would inline calls that stay virtual in a real scene.
 - **Watch for caches.** `Matrix.inverse()` caches its result, so `MatrixBenchmark.inverse` gets fresh, uncached instances before each invocation from the `UncachedMatrices` state. Look for similar caches before benchmarking anything else.
 
 ### Whole-render comparisons

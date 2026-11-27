@@ -1,12 +1,23 @@
 package org.example.ktracer.scene
 
 import com.charleskorn.kaml.Location
+import java.nio.file.Path
+import kotlin.io.path.isRegularFile
 import kotlin.math.PI
+import org.example.ktracer.colorproviders.ColorProvider
+import org.example.ktracer.colorproviders.mappings.CylindricalMapping
+import org.example.ktracer.colorproviders.mappings.PlanarMapping
+import org.example.ktracer.colorproviders.mappings.SphericalMapping
 import org.example.ktracer.colorproviders.patterns.CheckerPattern
 import org.example.ktracer.colorproviders.patterns.GradientPattern
-import org.example.ktracer.colorproviders.patterns.Pattern
 import org.example.ktracer.colorproviders.patterns.RingPattern
 import org.example.ktracer.colorproviders.patterns.StripePattern
+import org.example.ktracer.colorproviders.textures.CubeMap
+import org.example.ktracer.colorproviders.textures.TextureMap
+import org.example.ktracer.colorproviders.textures.UvAlignCheck
+import org.example.ktracer.colorproviders.textures.UvCheckers
+import org.example.ktracer.colorproviders.textures.UvImage
+import org.example.ktracer.colorproviders.textures.UvPattern
 import org.example.ktracer.composites.Camera
 import org.example.ktracer.composites.Material
 import org.example.ktracer.composites.World
@@ -26,13 +37,19 @@ import org.example.ktracer.shapes.Sphere
 /** A scene entry and where it starts in the file. */
 data class Located<out T>(val value: T, val location: Location)
 
-/** Turns parsed scene entries into a [World] and a [Camera]. [source] names the file in error messages. */
-class SceneResolver(private val source: String) {
+/**
+ * Turns parsed scene entries into a [World] and a [Camera]. [source] names the file in error messages, and relative
+ * paths in it (texture images) are resolved from [baseDirectory].
+ */
+class SceneResolver(private val source: String, private val baseDirectory: Path) {
     private val colors = HashMap<String, Color>()
 
     /** Stored with `extend` already applied. */
     private val materials = HashMap<String, MaterialDef>()
     private val transforms = HashMap<String, Transformation>()
+
+    /** Each image is loaded once, however many shapes use it. */
+    private val images = HashMap<Path, UvImage>()
 
     fun build(entries: List<Located<Entry>>): Scene {
         // definitions first, so that `add` entries may use names defined further down the file
@@ -67,8 +84,8 @@ class SceneResolver(private val source: String) {
         }
         when (value) {
             is DefineValue.Material -> {
-                val base = entry.extend?.let { materials[it] ?: fail(location, "undefined material `$it`") }
-                materials[name] = base?.let(value.material::over) ?: value.material
+                val material = value.material
+                materials[name] = flatten(material.copy(extend = material.extend ?: entry.extend), location)
             }
             is DefineValue.Transform -> transforms[name] = transformation(value.steps)
             is DefineValue.Color -> colors[name] = value.color.toColor()
@@ -90,7 +107,7 @@ class SceneResolver(private val source: String) {
     }
 
     private fun shape(entry: ShapeEntry, location: Location): Shape {
-        var material = entry.material?.let(::material) ?: Material()
+        var material = entry.material?.let { material(it, location) } ?: Material()
         entry.shadow?.let { material = material.copy(castsShadow = it) }
         val transformation = transformation(entry.transform)
         val isCapped = entry.add == ShapeKind.CYLINDER || entry.add == ShapeKind.CONE
@@ -114,9 +131,16 @@ class SceneResolver(private val source: String) {
         }
     }
 
-    private fun material(reference: Ref<MaterialDef>): Material {
-        val definition = resolve(reference, materials, "material") { it }
-        val default = Material()
+    /** Layers a material over the definition it extends, if any. */
+    private fun flatten(definition: MaterialDef, location: Location): MaterialDef {
+        val baseName = definition.extend ?: return definition
+        return definition.over(materials[baseName] ?: fail(location, "undefined material `$baseName`"))
+    }
+
+    /** [location] is the entry's, for errors that have no better place. */
+    private fun material(reference: Ref<MaterialDef>, location: Location): Material {
+        val definition = resolve(reference, materials, "material") { flatten(it, location) }
+        val default = Material.DEFAULT
         return Material(
             color = definition.color?.let(::color) ?: default.color,
             ambient = definition.ambient ?: default.ambient,
@@ -127,19 +151,85 @@ class SceneResolver(private val source: String) {
             refractiveIndex = definition.refractiveIndex ?: default.refractiveIndex,
             transparency = definition.transparency ?: default.transparency,
             castsShadow = definition.castsShadow ?: default.castsShadow,
-            colorProvider = definition.pattern?.let(::pattern),
+            colorProvider = definition.pattern?.let { pattern(it, location) },
         )
     }
 
-    private fun pattern(definition: PatternDef): Pattern {
-        val first = color(definition.colors.first)
-        val second = color(definition.colors.second)
+    private fun pattern(definition: PatternDef, location: Location): ColorProvider {
         val transformation = transformation(definition.transform)
-        return when (definition.type) {
-            PatternType.STRIPES -> StripePattern(first, second, transformation)
-            PatternType.GRADIENT -> GradientPattern(first, second, transformation)
-            PatternType.RINGS -> RingPattern(first, second, transformation)
-            PatternType.CHECKERS -> CheckerPattern(first, second, transformation)
+        return when (definition) {
+            is ColorPatternDef -> {
+                val first = color(definition.colors.first)
+                val second = color(definition.colors.second)
+                when (definition) {
+                    is StripesDef -> StripePattern(first, second, transformation)
+                    is GradientDef -> GradientPattern(first, second, transformation)
+                    is RingsDef -> RingPattern(first, second, transformation)
+                    is CheckersDef -> CheckerPattern(first, second, transformation)
+                }
+            }
+            is TextureMapDef -> textureMap(definition, transformation, location)
+        }
+    }
+
+    private fun textureMap(definition: TextureMapDef, transformation: Transformation, location: Location): ColorProvider {
+        val mapping = when (definition.mapping) {
+            MappingKind.PLANAR -> PlanarMapping
+            MappingKind.SPHERICAL -> SphericalMapping
+            MappingKind.CYLINDRICAL -> CylindricalMapping
+            MappingKind.CUBE -> return cubeMap(definition, transformation, location)
+        }
+        if (definition.faces.any { it != null }) {
+            fail(location, "`left`, `front`, `right`, `back`, `up` and `down` only apply to `mapping: cube`")
+        }
+        val uvPattern = definition.uvPattern ?: fail(location, "a texture map needs a `uv_pattern`")
+        return TextureMap(uvPattern(uvPattern, location), mapping, transformation)
+    }
+
+    private fun cubeMap(definition: TextureMapDef, transformation: Transformation, location: Location): CubeMap {
+        if (definition.uvPattern != null) {
+            fail(
+                location,
+                "a cube map takes one pattern per face (`left`, `front`, `right`, `back`, `up`, `down`) " +
+                    "instead of `uv_pattern`",
+            )
+        }
+        fun face(name: String, face: UvPatternDef?) =
+            uvPattern(face ?: fail(location, "cube map: missing the `$name` face"), location)
+        return CubeMap(
+            left = face("left", definition.left),
+            front = face("front", definition.front),
+            right = face("right", definition.right),
+            back = face("back", definition.back),
+            up = face("up", definition.up),
+            down = face("down", definition.down),
+            transformation = transformation,
+        )
+    }
+
+    private fun uvPattern(definition: UvPatternDef, location: Location): UvPattern = when (definition) {
+        is UvCheckersDef -> {
+            if (definition.width <= 0 || definition.height <= 0) {
+                fail(location, "checkers need a positive `width` and `height`")
+            }
+            UvCheckers(definition.width, definition.height, color(definition.colors.first), color(definition.colors.second))
+        }
+        is UvAlignCheckDef -> definition.colors.let {
+            UvAlignCheck(color(it.main), color(it.ul), color(it.ur), color(it.bl), color(it.br))
+        }
+        is UvImageDef -> image(definition.file)
+    }
+
+    private fun image(file: FileRef): UvImage {
+        val path = baseDirectory.resolve(file.path).normalize()
+        return images.getOrPut(path) {
+            // scrimage reports a missing file with just its path
+            if (!path.isRegularFile()) fail(file.location, "cannot load texture $path: no such file")
+            try {
+                UvImage.load(path)
+            } catch (e: Exception) {
+                fail(file.location, "cannot load texture $path: ${e.message}")
+            }
         }
     }
 

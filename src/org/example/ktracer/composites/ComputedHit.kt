@@ -8,7 +8,7 @@ import org.example.ktracer.primitives.Vector
 import org.example.ktracer.shapes.Shape
 import org.example.ktracer.squared
 
-data class ComputedHit(
+value class ComputedHit(
     val distance: Double,
     val shape: Shape,
     val point: Point,
@@ -19,8 +19,8 @@ data class ComputedHit(
     val refractiveIndex2: Double,
     val isInside: Boolean,
 ) {
-    val overPoint = point + (normal * EPSILON)
-    val underPoint = point - (normal * EPSILON)
+    val overPoint get() = point + (normal * EPSILON)
+    val underPoint get() = point - (normal * EPSILON)
 
     fun schlick(): Double {
         var cos = cameraDirection dot normal

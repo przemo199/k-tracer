@@ -77,8 +77,7 @@ class StripePatternTest {
     @Test
     fun `stripe pattern with pattern transformation`() {
         val sphere = Sphere()
-        val pattern = StripePattern(Color.WHITE, Color.BLACK)
-        pattern.transformation = Transformations.scaling(2, 2, 2)
+        val pattern = StripePattern(Color.WHITE, Color.BLACK, Transformations.scaling(2, 2, 2))
         val color = pattern.colorAtShape(sphere, Point(1.5, 0, 0))
         assertEquals(Color.WHITE, color)
     }
@@ -87,8 +86,7 @@ class StripePatternTest {
     fun `stripe pattern with pattern and object transformation`() {
         val sphere = Sphere()
         sphere.transformation = Transformations.scaling(2, 2, 2)
-        val pattern = StripePattern(Color.WHITE, Color.BLACK)
-        pattern.transformation = Transformations.translation(0.5, 0, 0)
+        val pattern = StripePattern(Color.WHITE, Color.BLACK, Transformations.translation(0.5, 0, 0))
         val color = pattern.colorAtShape(sphere, Point(2.5, 0, 0))
         assertEquals(Color.WHITE, color)
     }

@@ -10,7 +10,7 @@ import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Vector
 import org.example.ktracer.shapes.Shape
 
-data class Material(
+value class Material(
     val color: Color = Color.WHITE,
     val ambient: Double = 0.1,
     val diffuse: Double = 0.9,
@@ -26,6 +26,30 @@ data class Material(
     val isUnreflective get() = reflectiveness == 0.0
     val isTransparent get() = transparency > 0.0
     val isOpaque get() = transparency == 0.0
+
+    fun copy(
+        color: Color = this.color,
+        ambient: Double = this.ambient,
+        diffuse: Double = this.diffuse,
+        specular: Double = this.specular,
+        shininess: Double = this.shininess,
+        reflectiveness: Double = this.reflectiveness,
+        refractiveIndex: Double = this.refractiveIndex,
+        transparency: Double = this.transparency,
+        castsShadow: Boolean = this.castsShadow,
+        colorProvider: ColorProvider? = this.colorProvider,
+    ): Material = Material(
+        color,
+        ambient,
+        diffuse,
+        specular,
+        shininess,
+        reflectiveness,
+        refractiveIndex,
+        transparency,
+        castsShadow,
+        colorProvider,
+    )
 
     fun lighting(
         shape: Shape,
@@ -70,8 +94,7 @@ data class Material(
     }
 
     override fun equals(other: Any?): Boolean {
-        return this === other ||
-                other is Material &&
+        return other is Material &&
                 color == other.color &&
                 ambient coarseEquals other.ambient &&
                 diffuse coarseEquals other.diffuse &&
@@ -113,7 +136,8 @@ data class Material(
          */
         const val DEFAULT_REFRACTIVE_INDEX = 1.0
 
-        val GLASS
-            get() = Material(transparency = 1.0, refractiveIndex = 1.5)
+        val GLASS = Material(transparency = 1.0, refractiveIndex = 1.5)
+
+        val DEFAULT = Material()
     }
 }

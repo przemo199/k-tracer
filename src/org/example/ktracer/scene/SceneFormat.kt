@@ -86,6 +86,8 @@ data class ShapeEntry(
 /** Every field is optional, so that `extend` can layer a definition over its base. */
 @Serializable
 data class MaterialDef(
+    /** The defined material this one is layered over; also allowed inline, in a shape's `material:`. */
+    val extend: String? = null,
     val color: Ref<Triplet>? = null,
     val pattern: PatternDef? = null,
     val ambient: Double? = null,
@@ -97,7 +99,7 @@ data class MaterialDef(
     @SerialName("refractive-index") val refractiveIndex: Double? = null,
     @SerialName("casts-shadow") val castsShadow: Boolean? = null,
 ) {
-    /** This definition, with the fields it leaves out taken from [base]. */
+    /** This definition, with the fields it leaves out taken from [base]; the result extends nothing. */
     fun over(base: MaterialDef) = MaterialDef(
         color = color ?: base.color,
         pattern = pattern ?: base.pattern,
@@ -112,20 +114,96 @@ data class MaterialDef(
     )
 }
 
+/** A material's pattern, chosen by its `type:` key. */
 @Serializable
-enum class PatternType {
-    @SerialName("stripes") STRIPES,
-    @SerialName("gradient") GRADIENT,
-    @SerialName("rings") RINGS,
-    @SerialName("checkers") CHECKERS,
+sealed interface PatternDef {
+    val transform: List<Step>
+}
+
+/** The 3D patterns, which alternate between or blend two colors. */
+@Serializable
+sealed interface ColorPatternDef : PatternDef {
+    val colors: ColorPair
 }
 
 @Serializable
-data class PatternDef(
-    val type: PatternType,
-    val colors: ColorPair,
-    val transform: List<Step> = emptyList(),
+@SerialName("stripes")
+data class StripesDef(override val colors: ColorPair, override val transform: List<Step> = emptyList()) :
+    ColorPatternDef
+
+@Serializable
+@SerialName("gradient")
+data class GradientDef(override val colors: ColorPair, override val transform: List<Step> = emptyList()) :
+    ColorPatternDef
+
+@Serializable
+@SerialName("rings")
+data class RingsDef(override val colors: ColorPair, override val transform: List<Step> = emptyList()) :
+    ColorPatternDef
+
+@Serializable
+@SerialName("checkers")
+data class CheckersDef(override val colors: ColorPair, override val transform: List<Step> = emptyList()) :
+    ColorPatternDef
+
+@Serializable
+enum class MappingKind {
+    @SerialName("planar") PLANAR,
+    @SerialName("spherical") SPHERICAL,
+    @SerialName("cylindrical") CYLINDRICAL,
+    @SerialName("cube") CUBE,
+}
+
+/**
+ * A texture map: a UV pattern painted on through a mapping. `mapping: cube` takes one pattern per face (`left`,
+ * `front`, `right`, `back`, `up`, `down`); every other mapping takes a single `uv_pattern`. The resolver checks which.
+ */
+@Serializable
+@SerialName("map")
+data class TextureMapDef(
+    val mapping: MappingKind,
+    @SerialName("uv_pattern") val uvPattern: UvPatternDef? = null,
+    val left: UvPatternDef? = null,
+    val front: UvPatternDef? = null,
+    val right: UvPatternDef? = null,
+    val back: UvPatternDef? = null,
+    val up: UvPatternDef? = null,
+    val down: UvPatternDef? = null,
+    override val transform: List<Step> = emptyList(),
+) : PatternDef {
+    val faces get() = listOf(left, front, right, back, up, down)
+}
+
+/** A 2D pattern for a texture map, chosen by its `type:` key. */
+@Serializable
+sealed interface UvPatternDef
+
+@Serializable
+@SerialName("checkers")
+data class UvCheckersDef(val width: Int, val height: Int, val colors: ColorPair) : UvPatternDef
+
+@Serializable
+@SerialName("align_check")
+data class UvAlignCheckDef(val colors: AlignCheckColors) : UvPatternDef
+
+/** An image file; a relative path is relative to the scene file. */
+@Serializable
+@SerialName("image")
+data class UvImageDef(val file: FileRef) : UvPatternDef
+
+/** The main color and the four corner colors (upper and bottom, left and right) of an align check. */
+@Serializable
+data class AlignCheckColors(
+    val main: Ref<Triplet>,
+    val ul: Ref<Triplet>,
+    val ur: Ref<Triplet>,
+    val bl: Ref<Triplet>,
+    val br: Ref<Triplet>,
 )
+
+/** A file path as written in the scene, with its location for error messages. */
+@Serializable(with = FileRefSerializer::class)
+data class FileRef(val path: String, val location: Location)
 
 /** A value written inline, or the name of a `define`d one. */
 @Serializable(with = RefSerializer::class)
@@ -210,6 +288,13 @@ object TripletSerializer : NodeSerializer<Triplet>("Triplet") {
     override fun decode(node: YamlNode, yaml: Yaml): Triplet {
         val (x, y, z) = numbers(node, 3, "[x, y, z]")
         return Triplet(x, y, z)
+    }
+}
+
+object FileRefSerializer : NodeSerializer<FileRef>("FileRef") {
+    override fun decode(node: YamlNode, yaml: Yaml): FileRef {
+        val path = (node as? YamlScalar)?.content ?: throw YamlException("Expected a file path.", node.path)
+        return FileRef(path, node.location)
     }
 }
 

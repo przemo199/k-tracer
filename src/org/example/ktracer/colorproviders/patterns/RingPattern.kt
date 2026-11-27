@@ -7,15 +7,13 @@ import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
 import org.example.ktracer.squared
 
-class RingPattern(
+value class RingPattern(
     val colorA: Color,
     val colorB: Color,
-    transformation: Transformation = Transformation.identity()
-) : Pattern(transformation) {
+    override val transformation: Transformation = Transformation.identity(),
+) : Pattern() {
     override fun colorAt(point: Point): Color {
         val distance = (point.x.squared() + point.z.squared()).run(::sqrt).run(::floor)
         return if (distance % 2.0 == 0.0) colorA else colorB
     }
-
-    override fun toString(): String = "RingPattern(colorA=$colorA, colorB=$colorB)"
 }

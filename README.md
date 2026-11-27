@@ -8,6 +8,8 @@ Implementation of ray tracer from Ray Tracer Challenge book by [Jamis Buck](mail
 
 - Handling for multiple light sources
 - Groups, Constructive Solid Geometry and Bounding Boxes implemented
+- Patterns (stripes, gradients, rings, checkers, nested) and texture mapping (planar, spherical, cylindrical and cube
+  mappings with UV checkers, align checks and image textures)
 
 ## Building
 
@@ -44,6 +46,8 @@ Options:
 ![](./rendered_images/cover.png)
 
 ![](./rendered_images/reflect_refract.png)
+
+![](./rendered_images/textures.png)
 
 ![](./rendered_images/refraction.png)
 

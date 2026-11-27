@@ -1,11 +1,14 @@
 package org.example.ktracer.scene
 
+import com.charleskorn.kaml.PolymorphismStyle
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import com.charleskorn.kaml.YamlException
 import com.charleskorn.kaml.YamlList
 import java.io.IOException
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
+import kotlin.io.path.Path
 import kotlin.io.path.readText
 import kotlinx.serialization.SerializationException
 import org.example.ktracer.composites.Camera
@@ -18,7 +21,8 @@ class SceneException(message: String, cause: Throwable? = null) : Exception(mess
 
 /** Loads YAML scene files: `SceneFormat.kt` describes the file, [SceneResolver] builds the world from it. */
 object SceneLoader {
-    private val yaml = Yaml.default
+    // patterns pick their class with a `type:` key
+    private val yaml = Yaml(configuration = YamlConfiguration(polymorphismStyle = PolymorphismStyle.Property))
 
     fun load(path: Path): Scene {
         val text = try {
@@ -26,11 +30,14 @@ object SceneLoader {
         } catch (e: IOException) {
             throw SceneException("cannot read $path: ${if (e is NoSuchFileException) "no such file" else e.message}", e)
         }
-        return parse(text, path.toString())
+        return parse(text, path.toString(), path.parent ?: Path(""))
     }
 
-    /** Parses a scene; [source] names it in error messages. */
-    fun parse(text: String, source: String = "scene"): Scene {
+    /**
+     * Parses a scene. [source] names it in error messages, and relative paths in it (texture images) are resolved
+     * from [baseDirectory].
+     */
+    fun parse(text: String, source: String = "scene", baseDirectory: Path = Path("")): Scene {
         val entries = try {
             val root = yaml.parseToYamlNode(text)
             if (root !is YamlList) {
@@ -42,6 +49,6 @@ object SceneLoader {
         } catch (e: SerializationException) {
             throw SceneException("$source: ${e.message}", e)
         }
-        return SceneResolver(source).build(entries)
+        return SceneResolver(source, baseDirectory).build(entries)
     }
 }

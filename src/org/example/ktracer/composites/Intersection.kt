@@ -3,7 +3,7 @@ package org.example.ktracer.composites
 import org.example.ktracer.coarseEquals
 import org.example.ktracer.shapes.Shape
 
-data class Intersection(val distance: Double, val shape: Shape) : Comparable<Intersection> {
+value class Intersection(val distance: Double, val shape: Shape) : Comparable<Intersection> {
     fun prepareComputations(ray: Ray, intersections: Intersections): ComputedHit {
         val point = ray.position(distance)
         var normal = shape.normalAt(point)
@@ -20,7 +20,7 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
         var refractiveIndex1 = Material.DEFAULT_REFRACTIVE_INDEX
         var refractiveIndex2 = Material.DEFAULT_REFRACTIVE_INDEX
         for (intersection in intersections) {
-            val isThis = intersection === this
+            val isThis = intersection == this
             if (isThis) {
                 refractiveIndex1 = getRefrctiveIndexFromContainers(containers)
             }
@@ -57,8 +57,7 @@ data class Intersection(val distance: Double, val shape: Shape) : Comparable<Int
     override fun compareTo(other: Intersection): Int = distance.compareTo(other.distance)
 
     override fun equals(other: Any?): Boolean {
-        return this === other ||
-                other is Intersection &&
+        return other is Intersection &&
                 distance coarseEquals other.distance &&
                 shape == other.shape
     }

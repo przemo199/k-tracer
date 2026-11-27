@@ -7,7 +7,7 @@ import org.example.ktracer.primitives.Point
 import org.example.ktracer.shapes.Shape
 import org.example.ktracer.squared
 
-class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
+data class World(var lights: MutableList<Light>, var shapes: MutableList<Shape>) {
     fun collectIntersections(ray: Ray, intersections: Intersections) {
         intersections.clear()
         shapes.forEach { ray.intersect(it, intersections) }

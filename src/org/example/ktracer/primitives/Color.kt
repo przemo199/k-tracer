@@ -3,9 +3,6 @@ package org.example.ktracer.primitives
 import org.example.ktracer.coarseEquals
 
 value class Color(val red: Double = 0.0, val green: Double = 0.0, val blue: Double = 0.0) {
-//    val red by this::x
-//    val green by this::y
-//    val blue by this::z
 
     constructor(fn: (Int) -> Double) : this(fn(0), fn(1), fn(2))
 
@@ -45,19 +42,14 @@ value class Color(val red: Double = 0.0, val green: Double = 0.0, val blue: Doub
 
         const val MAX_VALUE = 1.0
 
-        @JvmField
         val BLACK = Color(MIN_VALUE, MIN_VALUE, MIN_VALUE)
 
-        @JvmField
         val WHITE = Color(MAX_VALUE, MAX_VALUE, MAX_VALUE)
 
-        @JvmField
         val RED = Color(MAX_VALUE, MIN_VALUE, MIN_VALUE)
 
-        @JvmField
         val GREEN = Color(MIN_VALUE, MAX_VALUE, MIN_VALUE)
 
-        @JvmField
         val BLUE = Color(MIN_VALUE, MIN_VALUE, MAX_VALUE)
 
         fun clamp(value: Double) = value.coerceIn(MIN_VALUE, MAX_VALUE)

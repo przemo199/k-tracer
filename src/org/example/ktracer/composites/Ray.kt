@@ -6,7 +6,7 @@ import org.example.ktracer.primitives.Vector
 import org.example.ktracer.shapes.Intersectable
 import org.example.ktracer.shapes.Transformable
 
-data class Ray(val origin: Point, val direction: Vector) {
+value class Ray(val origin: Point, val direction: Vector) {
     fun position(distance: Number): Point = origin + (direction * distance.toDouble())
 
     fun <T> intersect(shape: T, intersections: Intersections) where T : Transformable, T : Intersectable {

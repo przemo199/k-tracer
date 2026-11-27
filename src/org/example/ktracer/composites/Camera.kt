@@ -83,7 +83,7 @@ class Camera : Transformable {
                     indexStream
                         .parallel()
                         .forEach { index: Int ->
-                            val (x, y) = canvas.indexToCoordinates(index)
+                            val [x, y] = canvas.indexToCoordinates(index)
                             val ray = rayForPixel(x, y)
                             canvas[index] = world.colorAt(ray, intersections.get())
                         }
@@ -92,7 +92,7 @@ class Camera : Transformable {
         } else {
             val intersections = Intersections()
             indexStream.forEach { index: Int ->
-                val (x, y) = canvas.indexToCoordinates(index)
+                val [x, y] = canvas.indexToCoordinates(index)
                 val ray = rayForPixel(x, y)
                 canvas[index] = world.colorAt(ray, intersections)
             }

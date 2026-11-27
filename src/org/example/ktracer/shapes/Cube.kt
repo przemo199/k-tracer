@@ -14,7 +14,7 @@ import org.example.ktracer.primitives.Point
 import org.example.ktracer.primitives.Transformation
 import org.example.ktracer.primitives.Vector
 
-open class Cube(
+class Cube(
     material: Material = Material(),
     transformation: Transformation = Transformation.identity()
 ) : Shape(material, transformation) {
